@@ -1,0 +1,58 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.buildlog/
+.history
+.idea
+.metadata
+.recommenders/
+.settings/
+.vscode/
+
+# Flutter/Dart
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+/build/
+/ios/Pods/
+/ios/Flutter/App.framework
+/ios/Flutter/Flutter.framework
+/ios/Flutter/engine
+/ios/Flutter/flutter_assets/
+/ios/Flutter/flutter_export_environment.sh
+/ios/Runner/GeneratedPluginRegistrant.h
+/ios/Runner/GeneratedPluginRegistrant.m
+/ios/Runner/GeneratedPluginRegistrant-Swift.h
+/ios/Runner/GeneratedPluginRegistrant-Swift.m
+/ios/Runner/GeneratedPluginRegistrant.swift
+/ios/Runner/Runner.app/
+/ios/Runner/Runner.app.dSYM/
+/ios/Runner/Runner.ipa
+/ios/Runner/Runner.xcarchive/
+/ios/Runner/Runner.xcworkspace/xcshareddata/
+/ios/Runner/Runner.xcworkspace/xcuserdata/
+/ios/Runner.xcworkspace/xcshareddata/
+/ios/Runner.xcworkspace/xcuserdata/
+/ios/Flutter/ephemeral/
+/ios/Flutter/Generated.xcconfig
+
+# Android
+/android/app/src/main/assets/flutter_assets/
+/android/app/build/
+/android/build/
+/android/.gradle/
+/android/key.properties
+/android/local.properties
+
+# Web
+/web/build/
+
+# Outros
+*.local

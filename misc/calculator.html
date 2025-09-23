@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora Moderna</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+
+        .calculator {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            padding: 30px;
+            box-shadow: 0 8px 32px rgba(31, 38, 135, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            max-width: 350px;
+            width: 100%;
+        }
+
+        .display {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            margin-bottom: 20px;
+            text-align: right;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .display-text {
+            font-size: 2.5rem;
+            color: white;
+            font-weight: 300;
+            word-wrap: break-word;
+            min-height: 60px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+        }
+
+        .buttons {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 15px;
+        }
+
+        button {
+            border: none;
+            border-radius: 15px;
+            font-size: 1.4rem;
+            font-weight: 500;
+            height: 70px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            color: white;
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            background: rgba(255, 255, 255, 0.2);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .operator {
+            background: linear-gradient(135deg, #ff6b6b, #ee5a24);
+        }
+
+        .operator:hover {
+            background: linear-gradient(135deg, #ff5252, #d63031);
+        }
+
+        .clear {
+            background: linear-gradient(135deg, #ff9ff3, #f368e0);
+        }
+
+        .clear:hover {
+            background: linear-gradient(135deg, #ff86f7, #e056fd);
+        }
+
+        .equals {
+            background: linear-gradient(135deg, #2ed573, #00b894);
+            grid-column: span 2;
+        }
+
+        .equals:hover {
+            background: linear-gradient(135deg, #2cb67d, #00a085);
+        }
+
+        .zero {
+            grid-column: span 2;
+        }
+
+        .error {
+            color: #ff6b6b;
+            font-size: 1.8rem;
+        }
+    </style>
+</head>
+<body>
+    <div class="calculator">
+        <div class="display">
+            <div class="display-text" id="display">0</div>
+        </div>
+
+        <div class="buttons">
+            <button class="clear" onclick="clearDisplay()">C</button>
+            <button class="clear" onclick="deleteLast()">⌫</button>
+            <button class="operator" onclick="inputOperator('/')" title="Divisão">÷</button>
+            <button class="operator" onclick="inputOperator('*')" title="Multiplicação">×</button>
+
+            <button onclick="inputNumber('7')">7</button>
+            <button onclick="inputNumber('8')">8</button>
+            <button onclick="inputNumber('9')">9</button>
+            <button class="operator" onclick="inputOperator('-')" title="Subtração">-</button>
+
+            <button onclick="inputNumber('4')">4</button>
+            <button onclick="inputNumber('5')">5</button>
+            <button onclick="inputNumber('6')">6</button>
+            <button class="operator" onclick="inputOperator('+')" title="Adição">+</button>
+
+            <button onclick="inputNumber('1')">1</button>
+            <button onclick="inputNumber('2')">2</button>
+            <button onclick="inputNumber('3')">3</button>
+            <button class="equals" onclick="calculate()" rowspan="2" title="Calcular">=</button>
+
+            <button class="zero" onclick="inputNumber('0')">0</button>
+            <button onclick="inputDecimal()" title="Ponto decimal">.</button>
+        </div>
+    </div>
+
+    <script>
+        let display = document.getElementById('display');
+        let currentInput = '0';
+        let previousInput = '';
+        let operator = '';
+        let waitingForNewInput = false;
+
+        function updateDisplay() {
+            if (currentInput.length > 10) {
+                display.textContent = parseFloat(currentInput).toExponential(5);
+            } else {
+                display.textContent = currentInput;
+            }
+            display.className = 'display-text';
+        }
+
+        function inputNumber(number) {
+            if (waitingForNewInput) {
+                currentInput = number;
+                waitingForNewInput = false;
+            } else {
+                currentInput = currentInput === '0' ? number : currentInput + number;
+            }
+            updateDisplay();
+        }
+
+        function inputDecimal() {
+            if (waitingForNewInput) {
+                currentInput = '0.';
+                waitingForNewInput = false;
+            } else if (!currentInput.includes('.')) {
+                currentInput += '.';
+            }
+            updateDisplay();
+        }
+
+        function inputOperator(nextOperator) {
+            const inputValue = parseFloat(currentInput);
+
+            if (previousInput === '') {
+                previousInput = inputValue;
+            } else if (operator) {
+                const result = performCalculation();
+                currentInput = String(result);
+                previousInput = result;
+                updateDisplay();
+            }
+
+            waitingForNewInput = true;
+            operator = nextOperator;
+        }
+
+        function performCalculation() {
+            const prev = parseFloat(previousInput);
+            const current = parseFloat(currentInput);
+
+            if (isNaN(prev) || isNaN(current)) return 0;
+
+            switch (operator) {
+                case '+':
+                    return prev + current;
+                case '-':
+                    return prev - current;
+                case '*':
+                    return prev * current;
+                case '/':
+                    if (current === 0) {
+                        showError('Erro: Divisão por zero');
+                        return 0;
+                    }
+                    return prev / current;
+                default:
+                    return current;
+            }
+        }
+
+        function calculate() {
+            if (operator && previousInput !== '' && !waitingForNewInput) {
+                const result = performCalculation();
+                currentInput = String(result);
+                previousInput = '';
+                operator = '';
+                waitingForNewInput = true;
+                updateDisplay();
+            }
+        }
+
+        function clearDisplay() {
+            currentInput = '0';
+            previousInput = '';
+            operator = '';
+            waitingForNewInput = false;
+            updateDisplay();
+        }
+
+        function deleteLast() {
+            if (currentInput.length > 1) {
+                currentInput = currentInput.slice(0, -1);
+            } else {
+                currentInput = '0';
+            }
+            updateDisplay();
+        }
+
+        function showError(message) {
+            display.textContent = message;
+            display.className = 'display-text error';
+            setTimeout(() => {
+                clearDisplay();
+            }, 2000);
+        }
+
+        // Suporte para teclado
+        document.addEventListener('keydown', function(event) {
+            const key = event.key;
+
+            if (key >= '0' && key <= '9') {
+                inputNumber(key);
+            } else if (key === '.') {
+                inputDecimal();
+            } else if (key === '+' || key === '-') {
+                inputOperator(key);
+            } else if (key === '*') {
+                inputOperator('*');
+            } else if (key === '/') {
+                event.preventDefault();
+                inputOperator('/');
+            } else if (key === 'Enter' || key === '=') {
+                event.preventDefault();
+                calculate();
+            } else if (key === 'Escape' || key === 'c' || key === 'C') {
+                clearDisplay();
+            } else if (key === 'Backspace') {
+                deleteLast();
+            }
+        });
+
+        // Inicializar display
+        updateDisplay();
+    </script>
+</body>
+</html>

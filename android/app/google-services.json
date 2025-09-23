@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "528920830753",
+    "project_id": "opt2-n5y3g4",
+    "storage_bucket": "opt2-n5y3g4.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:528920830753:android:7129910aac8e5d05e55460",
+        "android_client_info": {
+          "package_name": "com.evo.opt2"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyASi3sK1NNx_pO9Z0OjD_S1MK7SLbJV7ow"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

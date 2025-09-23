@@ -1,0 +1,186 @@
+# Special Naming Cases: Dart Field Names vs Database Column Names
+
+This document lists all the special cases where the Dart field name differs from the database column name. These mappings need to be implemented in the Python generator to ensure correct code generation.
+
+## Firebase Schema Special Cases
+
+### Users Record
+1. `displayName` (Dart) → `display_name` (Database)
+2. `photoUrl` (Dart) → `photo_url` (Database)
+3. `createdTime` (Dart) → `created_time` (Database)
+4. `phoneNumber` (Dart) → `phone_number` (Database)
+5. `cpfCnpj` (Dart) → `cpf_Cnpj` (Database)
+6. `chavePix` (Dart) → `chave_pix` (Database)
+7. `meusIndicados` (Dart) → `meusIndicados` (Database)
+8. `tipoChave` (Dart) → `tipoChave` (Database)
+9. `papeisUsuario` (Dart) → `papeisUsuario` (Database)
+10. `idViagem` (Dart) → `idViagem` (Database)
+11. `notificacaoPendente` (Dart) → `notificacaoPendente` (Database)
+12. `notificaoViagem` (Dart) → `notificaoViagem` (Database)
+
+### Relatorio Record
+1. `agenciaId` (Dart) → `agenciaId` (Database)
+2. `promotorId` (Dart) → `promotorId` (Database)
+3. `temProdutoVencido` (Dart) → `temProdutoVencido` (Database)
+4. `dataEntrega` (Dart) → `dataEntrega` (Database)
+5. `itensRelatorio` (Dart) → `itensRelatorio` (Database)
+6. `itensProdutosVencidos` (Dart) → `itensProdutosVencidos` (Database)
+7. `relatorioId` (Dart) → `relatorioId` (Database)
+8. `fotoAntes` (Dart) → `fotoAntes` (Database)
+9. `fotoDepois` (Dart) → `fotoDepois` (Database)
+10. `ordemId` (Dart) → `ordemId` (Database)
+11. `idEnderecamento` (Dart) → `idEnderecamento` (Database)
+12. `checkIn` (Dart) → `checkIn` (Database)
+13. `checkOut` (Dart) → `checkOut` (Database)
+
+## Supabase Special Cases
+
+### AppUsers Table
+1. `fullName` (Dart) → `full_name` (Database)
+2. `photoUrl` (Dart) → `photo_url` (Database)
+3. `userType` (Dart) → `user_type` (Database)
+4. `createdAt` (Dart) → `created_at` (Database)
+5. `updatedAt` (Dart) → `updated_at` (Database)
+6. `fcmToken` (Dart) → `fcm_token` (Database)
+7. `deviceId` (Dart) → `device_id` (Database)
+8. `devicePlatform` (Dart) → `device_platform` (Database)
+9. `lastActiveAt` (Dart) → `last_active_at` (Database)
+10. `profileComplete` (Dart) → `profile_complete` (Database)
+11. `onesignalPlayerId` (Dart) → `onesignal_player_id` (Database)
+12. `idText` (Dart) → `id_text` (Database)
+13. `currentUserUidFirebase` (Dart) → `currentUser_UID_Firebase` (Database)
+
+### Drivers Table
+1. `userId` (Dart) → `user_id` (Database)
+2. `vehicleBrand` (Dart) → `vehicle_brand` (Database)
+3. `vehicleModel` (Dart) → `vehicle_model` (Database)
+4. `vehicleYear` (Dart) → `vehicle_year` (Database)
+5. `vehicleColor` (Dart) → `vehicle_color` (Database)
+6. `vehiclePlate` (Dart) → `vehicle_plate` (Database)
+7. `vehicleCategory` (Dart) → `vehicle_category` (Database)
+8. `approvedBy` (Dart) → `approved_by` (Database)
+9. `approvedAt` (Dart) → `approved_at` (Database)
+10. `isOnline` (Dart) → `is_online` (Database)
+11. `acceptsPet` (Dart) → `accepts_pet` (Database)
+12. `petFee` (Dart) → `pet_fee` (Database)
+13. `acceptsGrocery` (Dart) → `accepts_grocery` (Database)
+14. `groceryFee` (Dart) → `grocery_fee` (Database)
+15. `acceptsCondo` (Dart) → `accepts_condo` (Database)
+16. `condoFee` (Dart) → `condo_fee` (Database)
+17. `stopFee` (Dart) → `stop_fee` (Database)
+18. `acPolicy` (Dart) → `ac_policy` (Database)
+19. `customPricePerKm` (Dart) → `custom_price_per_km` (Database)
+20. `customPricePerMinute` (Dart) → `custom_price_per_minute` (Database)
+21. `bankAccountType` (Dart) → `bank_account_type` (Database)
+22. `bankCode` (Dart) → `bank_code` (Database)
+23. `bankAgency` (Dart) → `bank_agency` (Database)
+24. `bankAccount` (Dart) → `bank_account` (Database)
+25. `pixKey` (Dart) → `pix_key` (Database)
+26. `pixKeyType` (Dart) → `pix_key_type` (Database)
+27. `consecutiveCancellations` (Dart) → `consecutive_cancellations` (Database)
+28. `totalTrips` (Dart) → `total_trips` (Database)
+29. `averageRating` (Dart) → `average_rating` (Database)
+30. `currentLatitude` (Dart) → `current_latitude` (Database)
+31. `currentLongitude` (Dart) → `current_longitude` (Database)
+32. `lastLocationUpdate` (Dart) → `last_location_update` (Database)
+33. `createdAt` (Dart) → `created_at` (Database)
+34. `updatedAt` (Dart) → `updated_at` (Database)
+35. `fcmToken` (Dart) → `fcm_token` (Database)
+36. `devicePlatform` (Dart) → `device_platform` (Database)
+37. `lastNotificationAt` (Dart) → `last_notification_at` (Database)
+38. `approvalStatus` (Dart) → `approval_status` (Database)
+39. `onesignalPlayerId` (Dart) → `onesignal_player_id` (Database)
+
+### Trips Table
+1. `tripCode` (Dart) → `trip_code` (Database)
+2. `requestId` (Dart) → `request_id` (Database)
+3. `passengerId` (Dart) → `passenger_id` (Database)
+4. `driverId` (Dart) → `driver_id` (Database)
+5. `originAddress` (Dart) → `origin_address` (Database)
+6. `originLatitude` (Dart) → `origin_latitude` (Database)
+7. `originLongitude` (Dart) → `origin_longitude` (Database)
+8. `originNeighborhood` (Dart) → `origin_neighborhood` (Database)
+9. `destinationAddress` (Dart) → `destination_address` (Database)
+10. `destinationLatitude` (Dart) → `destination_latitude` (Database)
+11. `destinationLongitude` (Dart) → `destination_longitude` (Database)
+12. `destinationNeighborhood` (Dart) → `destination_neighborhood` (Database)
+13. `vehicleCategory` (Dart) → `vehicle_category` (Database)
+14. `needsPet` (Dart) → `needs_pet` (Database)
+15. `needsGrocerySpace` (Dart) → `needs_grocery_space` (Database)
+16. `isCondoDestination` (Dart) → `is_condo_destination` (Database)
+17. `isCondoOrigin` (Dart) → `is_condo_origin` (Database)
+18. `needsAc` (Dart) → `needs_ac` (Database)
+19. `numberOfStops` (Dart) → `number_of_stops` (Database)
+20. `routePolyline` (Dart) → `route_polyline` (Database)
+21. `estimatedDistanceKm` (Dart) → `estimated_distance_km` (Database)
+22. `estimatedDurationMinutes` (Dart) → `estimated_duration_minutes` (Database)
+
+## Pattern Analysis
+
+### Snake Case to Camel Case Conversions
+Most database columns use snake_case while Dart fields use camelCase:
+
+Examples:
+- `full_name` → `fullName`
+- `phone_number` → `phoneNumber`
+- `created_time` → `createdTime`
+- `display_name` → `displayName`
+- `photo_url` → `photoUrl`
+- `user_id` → `userId`
+- `vehicle_brand` → `vehicleBrand`
+- `created_at` → `createdAt`
+- `updated_at` → `updatedAt`
+
+### Special Characters and Capitalization
+Some database columns have special characters or capitalization that need special handling:
+
+Examples:
+- `cpf_Cnpj` → `cpfCnpj`
+- `chave_pix` → `chavePix`
+- `currentUser_UID_Firebase` → `currentUserUidFirebase`
+
+## Implementation Notes for Python Generator
+
+The Python generator needs to handle these special cases by:
+
+1. Maintaining a mapping dictionary for special cases
+2. Applying snake_case to camelCase conversion as the default
+3. Handling special characters and capitalization appropriately
+4. Preserving exact database column names in the getter/setter methods
+
+Example implementation pattern:
+```python
+SPECIAL_NAMING_CASES = {
+    'currentUser_UID_Firebase': 'currentUserUidFirebase',
+    # Add more special cases here
+}
+
+def to_camel_case(snake_str: str) -> str:
+    """Convert snake_case to camelCase with special case handling."""
+    # Check for special cases first
+    if snake_str in SPECIAL_NAMING_CASES:
+        return SPECIAL_NAMING_CASES[snake_str]
+    
+    # Handle standard snake_case conversion
+    if not snake_str:
+        return snake_str
+    components = snake_str.split('_')
+    return components[0] + ''.join(x.capitalize() for x in components[1:])
+```
+
+## Complete Special Cases Dictionary for Implementation
+
+```python
+SPECIAL_NAMING_CASES = {
+    # Firebase schema special cases
+    'display_name': 'displayName',
+    'photo_url': 'photoUrl',
+    'created_time': 'createdTime',
+    'phone_number': 'phoneNumber',
+    'cpf_Cnpj': 'cpfCnpj',
+    'chave_pix': 'chavePix',
+    'currentUser_UID_Firebase': 'currentUserUidFirebase',
+    
+    # Add any other special cases here as they are discovered
+}
+```

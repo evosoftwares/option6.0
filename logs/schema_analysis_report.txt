@@ -1,0 +1,977 @@
+================================================================================
+📊 RELATÓRIO DE ANÁLISE DO SCHEMA SUPABASE
+================================================================================
+Gerado em: 2025-09-22 22:22:50
+
+🎯 RESUMO EXECUTIVO
+----------------------------------------
+• Total de Tabelas: 45
+• Total de Colunas: 553
+• Média de Colunas por Tabela: 12.3
+
+📋 DISTRIBUIÇÃO DE TIPOS DE DADOS
+----------------------------------------
+• text                       148 ( 26.8%)
+• timestamp with time zone   108 ( 19.5%)
+• uuid                       104 ( 18.8%)
+• numeric(10,2)               50 (  9.0%)
+• boolean                     37 (  6.7%)
+• integer                     33 (  6.0%)
+• jsonb                       17 (  3.1%)
+• numeric(10,8)                9 (  1.6%)
+• numeric(11,8)                9 (  1.6%)
+• numeric(3,2)                 6 (  1.1%)
+• character varying(50)        6 (  1.1%)
+• numeric(5,2)                 4 (  0.7%)
+• date                         3 (  0.5%)
+• uuid[]                       3 (  0.5%)
+• character varying(255)       3 (  0.5%)
+• text[]                       3 (  0.5%)
+• approval_status_enum         2 (  0.4%)
+• double precision             2 (  0.4%)
+• numeric                      2 (  0.4%)
+• inet                         1 (  0.2%)
+• numeric(4,2)                 1 (  0.2%)
+• numeric(6,2)                 1 (  0.2%)
+• bigint                       1 (  0.2%)
+
+🔒 ESTATÍSTICAS DE NULABILIDADE
+----------------------------------------
+• Colunas Nullable: 507 (91.7%)
+• Colunas NOT NULL: 46 (8.3%)
+
+🏢 ENTIDADES DE NEGÓCIO
+----------------------------------------
+• AUDIT: 3 tabelas
+  - activity_logs (11 colunas)
+  - security_logs (14 colunas)
+  - zona_exclusao_code_logs (5 colunas)
+• USERS: 21 tabelas
+  - app_users (16 colunas)
+  - backup_app_users_migration (10 colunas)
+  - backup_drivers_migration (40 colunas)
+  - backup_passengers_before_fk_change (8 colunas)
+  - backup_passengers_migration (8 colunas)
+  - corrupted_users_backup (9 colunas)
+  - driver_approval_audit (7 colunas)
+  - driver_documents (14 colunas)
+  - driver_excluded_zones (5 colunas)
+  - driver_operation_zones (8 colunas)
+  - driver_operational_cities (5 colunas)
+  - driver_schedule_overrides (9 colunas)
+  - driver_status (3 colunas)
+  - driver_wallets (9 colunas)
+  - drivers (41 colunas)
+  - passenger_promo_code_usage (8 colunas)
+  - passenger_promo_codes (13 colunas)
+  - passenger_wallet_transactions (13 colunas)
+  - passenger_wallets (10 colunas)
+  - passengers (9 colunas)
+  - user_devices (11 colunas)
+• OTHER: 9 tabelas
+  - asaas_webhook_events (7 colunas)
+  - backup_conflict_409_removal (11 colunas)
+  - operational_cities (9 colunas)
+  - platform_settings (13 colunas)
+  - promo_code_usage (6 colunas)
+  - promo_codes (18 colunas)
+  - ratings (12 colunas)
+  - saved_places (9 colunas)
+  - withdrawals (12 colunas)
+• LOCATION: 2 tabelas
+  - location_sharing (7 colunas)
+  - location_updates (5 colunas)
+• NOTIFICATIONS: 2 tabelas
+  - notifications (10 colunas)
+  - security_alerts (9 colunas)
+• FINANCIAL: 2 tabelas
+  - payment_methods (10 colunas)
+  - wallet_transactions (10 colunas)
+• TRIPS: 6 tabelas
+  - trip_chats (7 colunas)
+  - trip_location_history (8 colunas)
+  - trip_requests (30 colunas)
+  - trip_status_history (8 colunas)
+  - trip_stops (9 colunas)
+  - trips (57 colunas)
+
+📊 TABELAS COM MAIS COLUNAS
+----------------------------------------
+• trips                           57 colunas
+• drivers                         41 colunas
+• backup_drivers_migration        40 colunas
+• trip_requests                   30 colunas
+• promo_codes                     18 colunas
+• app_users                       16 colunas
+• driver_documents                14 colunas
+• security_logs                   14 colunas
+• passenger_promo_codes           13 colunas
+• passenger_wallet_transactions   13 colunas
+
+🔗 COLUNAS MAIS COMUNS
+----------------------------------------
+• id                         44 tabelas
+• created_at                 36 tabelas
+• updated_at                 20 tabelas
+• user_id                    15 tabelas
+• driver_id                  11 tabelas
+• status                      9 tabelas
+• is_active                   8 tabelas
+• trip_id                     8 tabelas
+• email                       7 tabelas
+• type                        6 tabelas
+• metadata                    5 tabelas
+• consecutive_cancellations   5 tabelas
+• total_trips                 5 tabelas
+• average_rating              5 tabelas
+• passenger_id                5 tabelas
+
+🔑 CANDIDATOS A CHAVE ESTRANGEIRA
+----------------------------------------
+• activity_logs:
+  - entity_id
+  - user_id
+• app_users:
+  - device_id
+  - onesignal_player_id
+• asaas_webhook_events:
+  - asaas_event_id
+  - payment_id
+• backup_app_users_migration:
+  - user_id
+• backup_drivers_migration:
+  - user_id
+• backup_passengers_before_fk_change:
+  - payment_method_id
+  - user_id
+• backup_passengers_migration:
+  - payment_method_id
+  - user_id
+• corrupted_users_backup:
+  - original_user_id
+• driver_approval_audit:
+  - driver_id
+• driver_documents:
+  - driver_id
+• driver_excluded_zones:
+  - driver_id
+• driver_operation_zones:
+  - driver_id
+• driver_operational_cities:
+  - city_id
+  - driver_id
+• driver_schedule_overrides:
+  - driver_id
+• driver_status:
+  - driver_id
+• driver_wallets:
+  - driver_id
+• drivers:
+  - onesignal_player_id
+  - user_id
+• location_sharing:
+  - user_id
+• location_updates:
+  - sharing_id
+• notifications:
+  - user_id
+• passenger_promo_code_usage:
+  - promo_code_id
+  - trip_id
+  - user_id
+• passenger_wallet_transactions:
+  - asaas_payment_id
+  - passenger_id
+  - payment_method_id
+  - trip_id
+  - wallet_id
+• passenger_wallets:
+  - passenger_id
+  - user_id
+• passengers:
+  - payment_method_id
+  - user_id
+• payment_methods:
+  - asaas_customer_id
+  - user_id
+• promo_code_usage:
+  - passenger_id
+  - promo_code_id
+  - trip_id
+• ratings:
+  - trip_id
+• saved_places:
+  - user_id
+• security_logs:
+  - session_id
+  - user_id
+• trip_chats:
+  - sender_id
+  - trip_id
+• trip_location_history:
+  - trip_id
+• trip_requests:
+  - accepted_by_driver_id
+  - passenger_id
+  - selected_offer_id
+  - target_driver_id
+• trip_status_history:
+  - trip_id
+• trip_stops:
+  - trip_id
+• trips:
+  - driver_id
+  - passenger_id
+  - payment_id
+  - promo_code_id
+  - request_id
+• user_devices:
+  - user_id
+• wallet_transactions:
+  - reference_id
+  - wallet_id
+• withdrawals:
+  - asaas_transfer_id
+  - driver_id
+  - wallet_id
+• zona_exclusao_code_logs:
+  - driver_id
+
+⏰ TABELAS COM CONTROLE TEMPORAL
+----------------------------------------
+• activity_logs
+• app_users
+• asaas_webhook_events
+• backup_app_users_migration
+• backup_conflict_409_removal
+• backup_drivers_migration
+• backup_passengers_before_fk_change
+• backup_passengers_migration
+• corrupted_users_backup
+• driver_approval_audit
+• driver_documents
+• driver_excluded_zones
+• driver_operation_zones
+• driver_operational_cities
+• driver_schedule_overrides
+• driver_status
+• driver_wallets
+• drivers
+• location_sharing
+• location_updates
+• notifications
+• operational_cities
+• passenger_promo_code_usage
+• passenger_promo_codes
+• passenger_wallet_transactions
+• passenger_wallets
+• passengers
+• payment_methods
+• platform_settings
+• promo_code_usage
+• promo_codes
+• ratings
+• saved_places
+• security_alerts
+• security_logs
+• trip_chats
+• trip_location_history
+• trip_requests
+• trip_status_history
+• trip_stops
+• trips
+• user_devices
+• wallet_transactions
+• withdrawals
+• zona_exclusao_code_logs
+
+📋 DETALHAMENTO POR TABELA
+----------------------------------------
+
+🔸 ACTIVITY_LOGS (11 colunas)
+  --------------------------------------------------
+  • id                        uuid                 NOT NULL
+  • user_id                   uuid                 NULL
+  • action                    text                 NULL
+  • entity_type               text                 NULL
+  • entity_id                 uuid                 NULL
+  • old_values                jsonb                NULL
+  • new_values                jsonb                NULL
+  • metadata                  jsonb                NULL
+  • ip_address                inet                 NULL
+  • user_agent                text                 NULL
+  • created_at                timestamp with time zone NULL
+
+🔸 APP_USERS (16 colunas)
+  --------------------------------------------------
+  • id                        uuid                 NOT NULL
+  • email                     text                 NULL
+  • full_name                 text                 NULL
+  • phone                     text                 NULL
+  • photo_url                 text                 NULL
+  • user_type                 text                 NULL
+  • status                    text                 NULL
+  • created_at                timestamp with time zone NULL
+  • updated_at                timestamp with time zone NULL
+  • fcm_token                 text                 NULL
+  • device_id                 text                 NULL
+  • device_platform           text                 NULL
+  • last_active_at            timestamp with time zone NULL
+  • profile_complete          boolean              NULL
+  • onesignal_player_id       text                 NULL
+  • currentUser_UID_Firebase  text                 NULL
+
+🔸 ASAAS_WEBHOOK_EVENTS (7 colunas)
+  --------------------------------------------------
+  • id                        uuid                 NOT NULL
+  • asaas_event_id            text                 NULL
+  • event_type                text                 NULL
+  • payment_id                text                 NULL
+  • payload                   jsonb                NULL
+  • processed_at              timestamp with time zone NULL
+  • created_at                timestamp with time zone NULL
+
+🔸 BACKUP_APP_USERS_MIGRATION (10 colunas)
+  --------------------------------------------------
+  • id                        uuid                 NULL
+  • email                     text                 NULL
+  • full_name                 text                 NULL
+  • phone                     text                 NULL
+  • photo_url                 text                 NULL
+  • user_type                 text                 NULL
+  • status                    text                 NULL
+  • created_at                timestamp with time zone NULL
+  • updated_at                timestamp with time zone NULL
+  • user_id                   uuid                 NULL
+
+🔸 BACKUP_CONFLICT_409_REMOVAL (11 colunas)
+  --------------------------------------------------
+  • source_table              text                 NULL
+  • backup_timestamp          timestamp with time zone NULL
+  • id                        uuid                 NULL
+  • email                     text                 NULL
+  • full_name                 text                 NULL
+  • phone                     text                 NULL
+  • photo_url                 text                 NULL
+  • user_type                 text                 NULL
+  • status                    text                 NULL
+  • created_at                timestamp with time zone NULL
+  • updated_at                timestamp with time zone NULL
+
+🔸 BACKUP_DRIVERS_MIGRATION (40 colunas)
+  --------------------------------------------------
+  • id                        uuid                 NULL
+  • user_id                   uuid                 NULL
+  • cnh_number                text                 NULL
+  • cnh_expiry_date           date                 NULL
+  • cnh_photo_url             text                 NULL
+  • vehicle_brand             text                 NULL
+  • vehicle_model             text                 NULL
+  • vehicle_year              integer              NULL
+  • vehicle_color             text                 NULL
+  • vehicle_plate             text                 NULL
+  • vehicle_category          text                 NULL
+  • crlv_photo_url            text                 NULL
+  • approval_status           text                 NULL
+  • approved_by               uuid                 NULL
+  • approved_at               timestamp with time zone NULL
+  • is_online                 boolean              NULL
+  • accepts_pet               boolean              NULL
+  • pet_fee                   numeric(10,2)        NULL
+  • accepts_grocery           boolean              NULL
+  • grocery_fee               numeric(10,2)        NULL
+  • accepts_condo             boolean              NULL
+  • condo_fee                 numeric(10,2)        NULL
+  • stop_fee                  numeric(10,2)        NULL
+  • ac_policy                 text                 NULL
+  • custom_price_per_km       numeric(10,2)        NULL
+  • custom_price_per_minute   numeric(10,2)        NULL
+  • bank_account_type         text                 NULL
+  • bank_code                 text                 NULL
+  • bank_agency               text                 NULL
+  • bank_account              text                 NULL
+  • pix_key                   text                 NULL
+  • pix_key_type              text                 NULL
+  • consecutive_cancellations integer              NULL
+  • total_trips               integer              NULL
+  • average_rating            numeric(3,2)         NULL
+  • current_latitude          numeric(10,8)        NULL
+  • current_longitude         numeric(11,8)        NULL
+  • last_location_update      timestamp with time zone NULL
+  • created_at                timestamp with time zone NULL
+  • updated_at                timestamp with time zone NULL
+
+🔸 BACKUP_PASSENGERS_BEFORE_FK_CHANGE (8 colunas)
+  --------------------------------------------------
+  • id                        uuid                 NULL
+  • consecutive_cancellations integer              NULL
+  • total_trips               integer              NULL
+  • average_rating            numeric(3,2)         NULL
+  • payment_method_id         text                 NULL
+  • created_at                timestamp with time zone NULL
+  • updated_at                timestamp with time zone NULL
+  • user_id                   text                 NULL
+
+🔸 BACKUP_PASSENGERS_MIGRATION (8 colunas)
+  --------------------------------------------------
+  • id                        uuid                 NULL
+  • user_id                   uuid                 NULL
+  • consecutive_cancellations integer              NULL
+  • total_trips               integer              NULL
+  • average_rating            numeric(3,2)         NULL
+  • payment_method_id         text                 NULL
+  • created_at                timestamp with time zone NULL
+  • updated_at                timestamp with time zone NULL
+
+🔸 CORRUPTED_USERS_BACKUP (9 colunas)
+  --------------------------------------------------
+  • id                        uuid                 NOT NULL
+  • original_user_id          uuid                 NULL
+  • original_full_name        text                 NULL
+  • original_phone            text                 NULL
+  • original_email            text                 NULL
+  • correction_timestamp      timestamp with time zone NULL
+  • correction_reason         text                 NULL
+  • restored                  boolean              NULL
+  • restored_at               timestamp with time zone NULL
+
+🔸 DRIVER_APPROVAL_AUDIT (7 colunas)
+  --------------------------------------------------
+  • id                        uuid                 NOT NULL
+  • driver_id                 uuid                 NULL
+  • old_status                text                 NULL
+  • new_status                text                 NULL
+  • reason                    text                 NULL
+  • approved_documents        jsonb                NULL
+  • created_at                timestamp with time zone NULL
+
+🔸 DRIVER_DOCUMENTS (14 colunas)
+  --------------------------------------------------
+  • id                        uuid                 NOT NULL
+  • driver_id                 uuid                 NULL
+  • document_type             text                 NULL
+  • file_url                  text                 NULL
+  • file_size                 integer              NULL
+  • mime_type                 text                 NULL
+  • expiry_date               date                 NULL
+  • rejection_reason          text                 NULL
+  • reviewed_by               uuid                 NULL
+  • reviewed_at               timestamp with time zone NULL
+  • is_current                boolean              NULL
+  • created_at                timestamp with time zone NULL
+  • updated_at                timestamp with time zone NULL
+  • status                    approval_status_enum NULL
+
+🔸 DRIVER_EXCLUDED_ZONES (5 colunas)
+  --------------------------------------------------
+  • id                        uuid                 NOT NULL
+  • driver_id                 uuid                 NULL
+  • type                      text                 NULL
+  • local_name                text                 NULL
+  • created_at                timestamp with time zone NULL
+
+🔸 DRIVER_OPERATION_ZONES (8 colunas)
+  --------------------------------------------------
+  • id                        uuid                 NOT NULL
+  • driver_id                 uuid                 NULL
+  • zone_name                 text                 NULL
+  • polygon_coordinates       jsonb                NULL
+  • price_multiplier          numeric(4,2)         NULL
+  • is_active                 boolean              NULL
+  • created_at                timestamp with time zone NULL
+  • updated_at                timestamp with time zone NULL
+
+🔸 DRIVER_OPERATIONAL_CITIES (5 colunas)
+  --------------------------------------------------
+  • id                        uuid                 NOT NULL
+  • driver_id                 uuid                 NULL
+  • city_id                   uuid                 NULL
+  • is_primary                boolean              NULL
+  • created_at                timestamp with time zone NULL
+
+🔸 DRIVER_SCHEDULE_OVERRIDES (9 colunas)
+  --------------------------------------------------
+  • id                        uuid                 NOT NULL
+  • driver_id                 uuid                 NULL
+  • override_start            timestamp with time zone NULL
+  • override_end              timestamp with time zone NULL
+  • is_active                 boolean              NULL
+  • reason                    text                 NULL
+  • created_by                uuid                 NULL
+  • created_at                timestamp with time zone NULL
+  • updated_at                timestamp with time zone NULL
+
+🔸 DRIVER_STATUS (3 colunas)
+  --------------------------------------------------
+  • driver_id                 uuid                 NOT NULL
+  • online_intent             boolean              NULL
+  • updated_at                timestamp with time zone NULL
+
+🔸 DRIVER_WALLETS (9 colunas)
+  --------------------------------------------------
+  • id                        uuid                 NOT NULL
+  • driver_id                 uuid                 NULL
+  • available_balance         numeric(10,2)        NULL
+  • pending_balance           numeric(10,2)        NULL
+  • total_earned              numeric(10,2)        NULL
+  • total_withdrawn           numeric(10,2)        NULL
+  • created_at                timestamp with time zone NULL
+  • updated_at                timestamp with time zone NULL
+  • email                     text                 NULL
+
+🔸 DRIVERS (41 colunas)
+  --------------------------------------------------
+  • id                        uuid                 NOT NULL
+  • user_id                   uuid                 NOT NULL
+  • vehicle_brand             text                 NULL
+  • vehicle_model             text                 NULL
+  • vehicle_year              integer              NULL
+  • vehicle_color             text                 NULL
+  • vehicle_plate             text                 NULL
+  • vehicle_category          text                 NULL
+  • approved_by               uuid                 NULL
+  • approved_at               timestamp with time zone NULL
+  • is_online                 boolean              NULL
+  • accepts_pet               boolean              NULL
+  • pet_fee                   numeric(10,2)        NULL
+  • accepts_grocery           boolean              NULL
+  • grocery_fee               numeric(10,2)        NULL
+  • accepts_condo             boolean              NULL
+  • condo_fee                 numeric(10,2)        NULL
+  • stop_fee                  numeric(10,2)        NULL
+  • ac_policy                 text                 NULL
+  • custom_price_per_km       numeric(10,2)        NULL
+  • custom_price_per_minute   numeric(10,2)        NULL
+  • bank_account_type         text                 NULL
+  • bank_code                 text                 NULL
+  • bank_agency               text                 NULL
+  • bank_account              text                 NULL
+  • pix_key                   text                 NULL
+  • pix_key_type              text                 NULL
+  • consecutive_cancellations integer              NULL
+  • total_trips               integer              NULL
+  • average_rating            numeric(3,2)         NULL
+  • current_latitude          numeric(10,8)        NULL
+  • current_longitude         numeric(11,8)        NULL
+  • last_location_update      timestamp with time zone NULL
+  • created_at                timestamp with time zone NULL
+  • updated_at                timestamp with time zone NULL
+  • fcm_token                 text                 NULL
+  • device_platform           text                 NULL
+  • last_notification_at      timestamp with time zone NULL
+  • approval_status           approval_status_enum NULL
+  • onesignal_player_id       text                 NULL
+  • email                     text                 NOT NULL
+
+🔸 LOCATION_SHARING (7 colunas)
+  --------------------------------------------------
+  • id                        uuid                 NOT NULL
+  • user_id                   uuid                 NULL
+  • expires_at                timestamp with time zone NULL
+  • shared_with_users         uuid[]               NULL
+  • is_active                 boolean              NULL
+  • created_at                timestamp with time zone NULL
+  • ended_at                  timestamp with time zone NULL
+
+🔸 LOCATION_UPDATES (5 colunas)
+  --------------------------------------------------
+  • id                        uuid                 NOT NULL
+  • sharing_id                uuid                 NULL
+  • latitude                  double precision     NULL
+  • longitude                 double precision     NULL
+  • timestamp                 timestamp with time zone NULL
+
+🔸 NOTIFICATIONS (10 colunas)
+  --------------------------------------------------
+  • id                        uuid                 NOT NULL
+  • user_id                   uuid                 NULL
+  • title                     text                 NULL
+  • body                      text                 NULL
+  • type                      text                 NULL
+  • data                      jsonb                NULL
+  • priority                  text                 NULL
+  • is_read                   boolean              NULL
+  • sent_at                   timestamp with time zone NULL
+  • read_at                   timestamp with time zone NULL
+
+🔸 OPERATIONAL_CITIES (9 colunas)
+  --------------------------------------------------
+  • id                        uuid                 NOT NULL
+  • name                      text                 NULL
+  • state                     text                 NULL
+  • country                   text                 NULL
+  • is_active                 boolean              NULL
+  • min_fare                  numeric(10,2)        NULL
+  • launch_date               date                 NULL
+  • polygon_coordinates       jsonb                NULL
+  • created_at                timestamp with time zone NULL
+
+🔸 PASSENGER_PROMO_CODE_USAGE (8 colunas)
+  --------------------------------------------------
+  • id                        uuid                 NOT NULL
+  • user_id                   uuid                 NULL
+  • promo_code_id             uuid                 NULL
+  • trip_id                   uuid                 NULL
+  • original_amount           numeric(10,2)        NULL
+  • discount_amount           numeric(10,2)        NULL
+  • final_amount              numeric(10,2)        NULL
+  • used_at                   timestamp with time zone NULL
+
+🔸 PASSENGER_PROMO_CODES (13 colunas)
+  --------------------------------------------------
+  • id                        uuid                 NOT NULL
+  • code                      character varying(50) NULL
+  • type                      character varying(50) NULL
+  • value                     numeric(10,2)        NULL
+  • min_amount                numeric(10,2)        NULL
+  • max_discount              numeric(10,2)        NULL
+  • is_active                 boolean              NULL
+  • is_first_ride_only        boolean              NULL
+  • usage_limit               integer              NULL
+  • usage_count               integer              NULL
+  • valid_from                timestamp with time zone NULL
+  • valid_until               timestamp with time zone NULL
+  • created_at                timestamp with time zone NULL
+
+🔸 PASSENGER_WALLET_TRANSACTIONS (13 colunas)
+  --------------------------------------------------
+  • id                        uuid                 NOT NULL
+  • wallet_id                 uuid                 NULL
+  • passenger_id              uuid                 NULL
+  • type                      character varying(50) NULL
+  • amount                    numeric(10,2)        NULL
+  • description               text                 NULL
+  • trip_id                   uuid                 NULL
+  • payment_method_id         uuid                 NULL
+  • asaas_payment_id          character varying(255) NULL
+  • status                    character varying(50) NULL
+  • metadata                  jsonb                NULL
+  • created_at                timestamp with time zone NULL
+  • processed_at              timestamp with time zone NULL
+
+🔸 PASSENGER_WALLETS (10 colunas)
+  --------------------------------------------------
+  • id                        uuid                 NOT NULL
+  • passenger_id              uuid                 NULL
+  • email                     text                 NULL
+  • available_balance         numeric(10,2)        NULL
+  • pending_balance           numeric(10,2)        NULL
+  • total_spent               numeric(10,2)        NULL
+  • total_cashback            numeric(10,2)        NULL
+  • created_at                timestamp with time zone NULL
+  • updated_at                timestamp with time zone NULL
+  • user_id                   uuid                 NOT NULL
+
+🔸 PASSENGERS (9 colunas)
+  --------------------------------------------------
+  • id                        uuid                 NOT NULL
+  • consecutive_cancellations integer              NULL
+  • total_trips               integer              NULL
+  • average_rating            numeric(3,2)         NULL
+  • payment_method_id         text                 NULL
+  • created_at                timestamp with time zone NULL
+  • updated_at                timestamp with time zone NULL
+  • user_id                   uuid                 NOT NULL
+  • email                     text                 NULL
+
+🔸 PAYMENT_METHODS (10 colunas)
+  --------------------------------------------------
+  • id                        uuid                 NOT NULL
+  • user_id                   uuid                 NULL
+  • type                      character varying(50) NULL
+  • is_default                boolean              NULL
+  • is_active                 boolean              NULL
+  • card_data                 jsonb                NULL
+  • pix_data                  jsonb                NULL
+  • asaas_customer_id         character varying(255) NULL
+  • created_at                timestamp with time zone NULL
+  • updated_at                timestamp with time zone NULL
+
+🔸 PLATFORM_SETTINGS (13 colunas)
+  --------------------------------------------------
+  • id                        uuid                 NOT NULL
+  • category                  text                 NULL
+  • base_price_per_km         numeric(10,2)        NULL
+  • base_price_per_minute     numeric(10,2)        NULL
+  • platform_commission_percent numeric(5,2)         NULL
+  • min_fare                  numeric(10,2)        NULL
+  • min_cancellation_fee      numeric(10,2)        NULL
+  • cancellation_fee_percent  numeric(5,2)         NULL
+  • no_show_wait_minutes      integer              NULL
+  • driver_acceptance_timeout_seconds integer              NULL
+  • created_at                timestamp with time zone NULL
+  • updated_at                timestamp with time zone NULL
+  • search_radius_km          integer              NULL
+
+🔸 PROMO_CODE_USAGE (6 colunas)
+  --------------------------------------------------
+  • id                        uuid                 NOT NULL
+  • promo_code_id             uuid                 NULL
+  • passenger_id              uuid                 NULL
+  • trip_id                   uuid                 NULL
+  • discount_applied          numeric(10,2)        NULL
+  • used_at                   timestamp with time zone NULL
+
+🔸 PROMO_CODES (18 colunas)
+  --------------------------------------------------
+  • id                        uuid                 NOT NULL
+  • code                      text                 NULL
+  • description               text                 NULL
+  • discount_type             text                 NULL
+  • discount_value            numeric(10,2)        NULL
+  • max_discount              numeric(10,2)        NULL
+  • min_trip_value            numeric(10,2)        NULL
+  • max_uses_per_user         integer              NULL
+  • valid_from                timestamp with time zone NULL
+  • valid_until               timestamp with time zone NULL
+  • usage_limit               integer              NULL
+  • used_count                integer              NULL
+  • target_cities             uuid[]               NULL
+  • target_categories         text[]               NULL
+  • is_first_trip_only        boolean              NULL
+  • is_active                 boolean              NULL
+  • created_by                uuid                 NULL
+  • created_at                timestamp with time zone NULL
+
+🔸 RATINGS (12 colunas)
+  --------------------------------------------------
+  • id                        uuid                 NOT NULL
+  • trip_id                   uuid                 NULL
+  • passenger_rating          integer              NULL
+  • passenger_rating_tags     text[]               NULL
+  • passenger_rating_comment  text                 NULL
+  • passenger_rated_at        timestamp with time zone NULL
+  • driver_rating             integer              NULL
+  • driver_rating_tags        text[]               NULL
+  • driver_rating_comment     text                 NULL
+  • driver_rated_at           timestamp with time zone NULL
+  • created_at                timestamp with time zone NULL
+  • updated_at                timestamp with time zone NULL
+
+🔸 SAVED_PLACES (9 colunas)
+  --------------------------------------------------
+  • id                        uuid                 NOT NULL
+  • user_id                   uuid                 NULL
+  • label                     character varying(255) NULL
+  • address                   text                 NULL
+  • latitude                  numeric(10,8)        NULL
+  • longitude                 numeric(11,8)        NULL
+  • category                  character varying(50) NULL
+  • created_at                timestamp with time zone NULL
+  • updated_at                timestamp with time zone NULL
+
+🔸 SECURITY_ALERTS (9 colunas)
+  --------------------------------------------------
+  • id                        uuid                 NOT NULL
+  • alert_type                text                 NULL
+  • severity                  text                 NULL
+  • description               text                 NULL
+  • metadata                  jsonb                NULL
+  • resolved                  boolean              NULL
+  • resolved_at               timestamp with time zone NULL
+  • resolved_by               uuid                 NULL
+  • created_at                timestamp with time zone NULL
+
+🔸 SECURITY_LOGS (14 colunas)
+  --------------------------------------------------
+  • id                        uuid                 NOT NULL
+  • event_type                text                 NULL
+  • severity                  text                 NULL
+  • description               text                 NULL
+  • user_id                   uuid                 NULL
+  • ip_address                text                 NULL
+  • user_agent                text                 NULL
+  • device_info               jsonb                NULL
+  • platform                  text                 NULL
+  • app_version               text                 NULL
+  • session_id                text                 NULL
+  • metadata                  jsonb                NULL
+  • timestamp                 timestamp with time zone NULL
+  • created_at                timestamp with time zone NULL
+
+🔸 TRIP_CHATS (7 colunas)
+  --------------------------------------------------
+  • id                        uuid                 NOT NULL
+  • trip_id                   uuid                 NULL
+  • sender_id                 uuid                 NULL
+  • message                   text                 NULL
+  • is_read                   boolean              NULL
+  • read_at                   timestamp with time zone NULL
+  • created_at                timestamp with time zone NULL
+
+🔸 TRIP_LOCATION_HISTORY (8 colunas)
+  --------------------------------------------------
+  • id                        uuid                 NOT NULL
+  • trip_id                   uuid                 NULL
+  • latitude                  numeric(10,8)        NULL
+  • longitude                 numeric(11,8)        NULL
+  • speed_kmh                 numeric(5,2)         NULL
+  • heading                   numeric(5,2)         NULL
+  • accuracy_meters           numeric(6,2)         NULL
+  • recorded_at               timestamp with time zone NULL
+
+🔸 TRIP_REQUESTS (30 colunas)
+  --------------------------------------------------
+  • id                        uuid                 NOT NULL
+  • passenger_id              uuid                 NULL
+  • origin_address            text                 NULL
+  • origin_latitude           numeric(10,8)        NULL
+  • origin_longitude          numeric(11,8)        NULL
+  • origin_neighborhood       text                 NULL
+  • destination_address       text                 NULL
+  • destination_latitude      numeric(10,8)        NULL
+  • destination_longitude     numeric(11,8)        NULL
+  • destination_neighborhood  text                 NULL
+  • vehicle_category          text                 NULL
+  • needs_pet                 boolean              NULL
+  • needs_grocery_space       boolean              NULL
+  • needs_ac                  boolean              NULL
+  • is_condo_origin           boolean              NULL
+  • is_condo_destination      boolean              NULL
+  • number_of_stops           integer              NULL
+  • status                    text                 NULL
+  • selected_offer_id         uuid                 NULL
+  • created_at                timestamp with time zone NULL
+  • expires_at                timestamp with time zone NULL
+  • target_driver_id          uuid                 NULL
+  • fallback_drivers          uuid[]               NULL
+  • accepted_by_driver_id     uuid                 NULL
+  • accepted_at               timestamp with time zone NULL
+  • current_fallback_index    integer              NULL
+  • timeout_count             integer              NULL
+  • estimated_distance_km     numeric              NULL
+  • estimated_duration_minutes integer              NULL
+  • estimated_fare            numeric              NULL
+
+🔸 TRIP_STATUS_HISTORY (8 colunas)
+  --------------------------------------------------
+  • id                        uuid                 NOT NULL
+  • trip_id                   uuid                 NULL
+  • old_status                text                 NULL
+  • new_status                text                 NULL
+  • changed_by                uuid                 NULL
+  • reason                    text                 NULL
+  • metadata                  jsonb                NULL
+  • created_at                timestamp with time zone NULL
+
+🔸 TRIP_STOPS (9 colunas)
+  --------------------------------------------------
+  • id                        uuid                 NOT NULL
+  • trip_id                   uuid                 NULL
+  • stop_order                integer              NULL
+  • address                   text                 NULL
+  • latitude                  numeric(10,8)        NULL
+  • longitude                 numeric(11,8)        NULL
+  • arrived_at                timestamp with time zone NULL
+  • departed_at               timestamp with time zone NULL
+  • created_at                timestamp with time zone NULL
+
+🔸 TRIPS (57 colunas)
+  --------------------------------------------------
+  • id                        uuid                 NOT NULL
+  • trip_code                 text                 NULL
+  • request_id                uuid                 NULL
+  • passenger_id              uuid                 NULL
+  • driver_id                 uuid                 NULL
+  • status                    text                 NULL
+  • origin_address            text                 NULL
+  • origin_latitude           numeric(10,8)        NULL
+  • origin_longitude          numeric(11,8)        NULL
+  • origin_neighborhood       text                 NULL
+  • destination_address       text                 NULL
+  • destination_latitude      numeric(10,8)        NULL
+  • destination_longitude     numeric(11,8)        NULL
+  • destination_neighborhood  text                 NULL
+  • vehicle_category          text                 NULL
+  • needs_pet                 boolean              NULL
+  • needs_grocery_space       boolean              NULL
+  • is_condo_destination      boolean              NULL
+  • is_condo_origin           boolean              NULL
+  • needs_ac                  boolean              NULL
+  • number_of_stops           integer              NULL
+  • route_polyline            text                 NULL
+  • estimated_distance_km     numeric(10,2)        NULL
+  • estimated_duration_minutes integer              NULL
+  • driver_to_pickup_distance_km numeric(10,2)        NULL
+  • driver_to_pickup_duration_minutes integer              NULL
+  • actual_distance_km        numeric(10,2)        NULL
+  • actual_duration_minutes   integer              NULL
+  • waiting_time_minutes      integer              NULL
+  • driver_distance_traveled_km numeric(10,2)        NULL
+  • base_fare                 numeric(10,2)        NULL
+  • additional_fees           numeric(10,2)        NULL
+  • surge_multiplier          numeric(3,2)         NULL
+  • total_fare                numeric(10,2)        NULL
+  • platform_commission       numeric(10,2)        NULL
+  • driver_earnings           numeric(10,2)        NULL
+  • cancellation_reason       text                 NULL
+  • cancellation_fee          numeric(10,2)        NULL
+  • cancelled_by              text                 NULL
+  • created_at                timestamp with time zone NULL
+  • driver_assigned_at        timestamp with time zone NULL
+  • driver_arrived_at         timestamp with time zone NULL
+  • trip_started_at           timestamp with time zone NULL
+  • trip_completed_at         timestamp with time zone NULL
+  • cancelled_at              timestamp with time zone NULL
+  • payment_status            text                 NULL
+  • payment_id                text                 NULL
+  • payment_completed_at      timestamp with time zone NULL
+  • promo_code_id             uuid                 NULL
+  • discount_applied          numeric(10,2)        NULL
+  • updated_at                timestamp with time zone NULL
+  • start_time                timestamp with time zone NULL
+  • end_time                  timestamp with time zone NULL
+  • requested_at              timestamp with time zone NULL
+  • completed_at              timestamp with time zone NULL
+  • assigned_at               timestamp with time zone NULL
+  • arrived_at                timestamp with time zone NULL
+
+🔸 USER_DEVICES (11 colunas)
+  --------------------------------------------------
+  • id                        uuid                 NOT NULL
+  • user_id                   uuid                 NULL
+  • device_token              text                 NULL
+  • platform                  text                 NULL
+  • device_model              text                 NULL
+  • app_version               text                 NULL
+  • os_version                text                 NULL
+  • is_active                 boolean              NULL
+  • last_used_at              timestamp with time zone NULL
+  • created_at                timestamp with time zone NULL
+  • updated_at                timestamp with time zone NULL
+
+🔸 WALLET_TRANSACTIONS (10 colunas)
+  --------------------------------------------------
+  • id                        uuid                 NOT NULL
+  • wallet_id                 uuid                 NULL
+  • type                      text                 NULL
+  • amount                    numeric(10,2)        NULL
+  • description               text                 NULL
+  • reference_type            text                 NULL
+  • reference_id              uuid                 NULL
+  • balance_after             numeric(10,2)        NULL
+  • status                    text                 NULL
+  • created_at                timestamp with time zone NULL
+
+🔸 WITHDRAWALS (12 colunas)
+  --------------------------------------------------
+  • id                        uuid                 NOT NULL
+  • driver_id                 uuid                 NULL
+  • wallet_id                 uuid                 NULL
+  • amount                    numeric(10,2)        NULL
+  • withdrawal_method         text                 NULL
+  • bank_account_info         jsonb                NULL
+  • asaas_transfer_id         text                 NULL
+  • status                    text                 NULL
+  • failure_reason            text                 NULL
+  • requested_at              timestamp with time zone NULL
+  • processed_at              timestamp with time zone NULL
+  • completed_at              timestamp with time zone NULL
+
+🔸 ZONA_EXCLUSAO_CODE_LOGS (5 colunas)
+  --------------------------------------------------
+  • id                        bigint               NOT NULL
+  • driver_id                 text                 NOT NULL
+  • action                    text                 NOT NULL
+  • data                      jsonb                NULL
+  • timestamp                 timestamp with time zone NULL
