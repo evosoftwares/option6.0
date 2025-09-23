@@ -151,7 +151,33 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
         FFRoute(
           name: EscolhaMotoristaWidget.routeName,
           path: EscolhaMotoristaWidget.routePath,
-          builder: (context, params) => EscolhaMotoristaWidget(),
+          builder: (context, params) => EscolhaMotoristaWidget(
+            origem: params.getParam(
+              'origem',
+              ParamType.FFPlace,
+            ),
+            destino: params.getParam(
+              'destino',
+              ParamType.FFPlace,
+            ),
+            paradas: params.getParam(
+              'paradas',
+              ParamType.FFPlace,
+              isList: true,
+            ),
+            distancia: params.getParam(
+              'distancia',
+              ParamType.double,
+            ),
+            duracao: params.getParam(
+              'duracao',
+              ParamType.int,
+            ),
+            preco: params.getParam(
+              'preco',
+              ParamType.double,
+            ),
+          ),
         ),
         FFRoute(
           name: SearchScreenWidget.routeName,
