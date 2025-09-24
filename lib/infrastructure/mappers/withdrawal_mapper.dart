@@ -1,24 +1,22 @@
 // lib/infrastructure/mappers/withdrawal_mapper.dart
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../domain/entities/withdrawal.dart';
 import '../../backend/supabase/database/tables/withdrawals.dart';
-
 
 class WithdrawalMapper {
   Withdrawal toDomain(WithdrawalsRow row) {
     return Withdrawal(
       id: row.id,
-      driverId: row.driverId,
-      walletId: row.walletId,
-      amount: row.amount,
-      withdrawalMethod: row.withdrawalMethod,
+      driverId: row.driverId ?? '',
+      walletId: row.walletId ?? '',
+      amount: row.amount is num ? (row.amount as num).toDouble() : 0.0,
+      withdrawalMethod: row.withdrawalMethod ?? '',
       bankAccountInfo: row.bankAccountInfo,
-      asaasTransferId: row.asaasTransferId,
-      status: row.status,
-      failureReason: row.failureReason,
-      requestedAt: row.requestedAt,
-      processedAt: row.processedAt,
-      completedAt: row.completedAt,
+      asaasTransferId: row.asaasTransferId ?? '',
+      status: row.status ?? '',
+      failureReason: row.failureReason ?? '',
+      requestedAt: row.requestedAt ?? DateTime.fromMillisecondsSinceEpoch(0),
+      processedAt: row.processedAt ?? DateTime.fromMillisecondsSinceEpoch(0),
+      completedAt: row.completedAt ?? DateTime.fromMillisecondsSinceEpoch(0),
     );
   }
   

@@ -53,7 +53,7 @@ class DriverDocumentsRow extends SupabaseDataRow {
   DateTime? get updatedAt => getField<DateTime>('updated_at');
   set updatedAt(DateTime? value) => setField<DateTime>('updated_at', value);
 
-  dynamic? get status => getField<dynamic>('status');
-  set status(dynamic? value) => setField<dynamic>('status', value);
+  dynamic get status => getField<dynamic>('status');
+  set status(dynamic value) => setField<dynamic>('status', value);
 
 }

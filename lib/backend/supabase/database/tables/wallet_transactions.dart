@@ -23,8 +23,8 @@ class WalletTransactionsRow extends SupabaseDataRow {
   String? get type => getField<String>('type');
   set type(String? value) => setField<String>('type', value);
 
-  dynamic? get amount => getField<dynamic>('amount');
-  set amount(dynamic? value) => setField<dynamic>('amount', value);
+  dynamic get amount => getField<dynamic>('amount');
+  set amount(dynamic value) => setField<dynamic>('amount', value);
 
   String? get description => getField<String>('description');
   set description(String? value) => setField<String>('description', value);
@@ -35,8 +35,8 @@ class WalletTransactionsRow extends SupabaseDataRow {
   String? get referenceId => getField<String>('reference_id');
   set referenceId(String? value) => setField<String>('reference_id', value);
 
-  dynamic? get balanceAfter => getField<dynamic>('balance_after');
-  set balanceAfter(dynamic? value) => setField<dynamic>('balance_after', value);
+  dynamic get balanceAfter => getField<dynamic>('balance_after');
+  set balanceAfter(dynamic value) => setField<dynamic>('balance_after', value);
 
   String? get status => getField<String>('status');
   set status(String? value) => setField<String>('status', value);

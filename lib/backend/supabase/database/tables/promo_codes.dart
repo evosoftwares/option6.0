@@ -26,14 +26,14 @@ class PromoCodesRow extends SupabaseDataRow {
   String? get discountType => getField<String>('discount_type');
   set discountType(String? value) => setField<String>('discount_type', value);
 
-  dynamic? get discountValue => getField<dynamic>('discount_value');
-  set discountValue(dynamic? value) => setField<dynamic>('discount_value', value);
+  dynamic get discountValue => getField<dynamic>('discount_value');
+  set discountValue(dynamic value) => setField<dynamic>('discount_value', value);
 
-  dynamic? get maxDiscount => getField<dynamic>('max_discount');
-  set maxDiscount(dynamic? value) => setField<dynamic>('max_discount', value);
+  dynamic get maxDiscount => getField<dynamic>('max_discount');
+  set maxDiscount(dynamic value) => setField<dynamic>('max_discount', value);
 
-  dynamic? get minTripValue => getField<dynamic>('min_trip_value');
-  set minTripValue(dynamic? value) => setField<dynamic>('min_trip_value', value);
+  dynamic get minTripValue => getField<dynamic>('min_trip_value');
+  set minTripValue(dynamic value) => setField<dynamic>('min_trip_value', value);
 
   int? get maxUsesPerUser => getField<int>('max_uses_per_user');
   set maxUsesPerUser(int? value) => setField<int>('max_uses_per_user', value);

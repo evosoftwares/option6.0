@@ -1,5 +1,4 @@
 // lib/infrastructure/mappers/userdevice_mapper.dart
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../domain/entities/userdevice.dart';
 import '../../backend/supabase/database/tables/user_devices.dart';
 
@@ -8,16 +7,16 @@ class UserDeviceMapper {
   UserDevice toDomain(UserDevicesRow row) {
     return UserDevice(
       id: row.id,
-      userId: row.userId,
-      deviceToken: row.deviceToken,
-      platform: row.platform,
-      deviceModel: row.deviceModel,
-      appVersion: row.appVersion,
-      osVersion: row.osVersion,
-      isActive: row.isActive,
-      lastUsedAt: row.lastUsedAt,
-      createdAt: row.createdAt,
-      updatedAt: row.updatedAt,
+      userId: row.userId ?? '',
+      deviceToken: row.deviceToken ?? '',
+      platform: row.platform ?? '',
+      deviceModel: row.deviceModel ?? '',
+      appVersion: row.appVersion ?? '',
+      osVersion: row.osVersion ?? '',
+      isActive: row.isActive ?? false,
+      lastUsedAt: row.lastUsedAt ?? DateTime.fromMillisecondsSinceEpoch(0),
+      createdAt: row.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0),
+      updatedAt: row.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0),
     );
   }
   

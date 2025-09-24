@@ -1,5 +1,4 @@
 // lib/infrastructure/mappers/passengerpromocode_mapper.dart
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../domain/entities/passengerpromocode.dart';
 import '../../backend/supabase/database/tables/passenger_promo_codes.dart';
 
@@ -8,18 +7,18 @@ class PassengerPromoCodeMapper {
   PassengerPromoCode toDomain(PassengerPromoCodesRow row) {
     return PassengerPromoCode(
       id: row.id,
-      code: row.code,
-      type: row.type,
-      value: row.value,
-      minAmount: row.minAmount,
-      maxDiscount: row.maxDiscount,
-      isActive: row.isActive,
-      isFirstRideOnly: row.isFirstRideOnly,
-      usageLimit: row.usageLimit,
-      usageCount: row.usageCount,
-      validFrom: row.validFrom,
-      validUntil: row.validUntil,
-      createdAt: row.createdAt,
+      code: row.code ?? '',
+      type: row.type ?? '',
+      value: row.value ?? 0.0,
+      minAmount: row.minAmount ?? 0.0,
+      maxDiscount: row.maxDiscount ?? 0.0,
+      isActive: row.isActive ?? false,
+      isFirstRideOnly: row.isFirstRideOnly ?? false,
+      usageLimit: row.usageLimit ?? 0,
+      usageCount: row.usageCount ?? 0,
+      validFrom: row.validFrom ?? DateTime.now(),
+      validUntil: row.validUntil ?? DateTime.now(),
+      createdAt: row.createdAt ?? DateTime.now(),
     );
   }
   

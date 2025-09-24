@@ -1,5 +1,4 @@
 // lib/infrastructure/mappers/paymentmethod_mapper.dart
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../domain/entities/paymentmethod.dart';
 import '../../backend/supabase/database/tables/payment_methods.dart';
 
@@ -8,15 +7,15 @@ class PaymentMethodMapper {
   PaymentMethod toDomain(PaymentMethodsRow row) {
     return PaymentMethod(
       id: row.id,
-      userId: row.userId,
-      type: row.type,
-      isDefault: row.isDefault,
-      isActive: row.isActive,
+      userId: row.userId ?? '',
+      type: row.type ?? '',
+      isDefault: row.isDefault ?? false,
+      isActive: row.isActive ?? false,
       cardData: row.cardData,
       pixData: row.pixData,
       asaasCustomerId: row.asaasCustomerId,
-      createdAt: row.createdAt,
-      updatedAt: row.updatedAt,
+      createdAt: row.createdAt ?? DateTime.now(),
+      updatedAt: row.updatedAt ?? DateTime.now(),
     );
   }
   

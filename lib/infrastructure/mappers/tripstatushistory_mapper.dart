@@ -1,5 +1,4 @@
 // lib/infrastructure/mappers/tripstatushistory_mapper.dart
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../domain/entities/tripstatushistory.dart';
 import '../../backend/supabase/database/tables/trip_status_history.dart';
 
@@ -8,13 +7,13 @@ class TripStatusHistoryMapper {
   TripStatusHistory toDomain(TripStatusHistoryRow row) {
     return TripStatusHistory(
       id: row.id,
-      tripId: row.tripId,
-      oldStatus: row.oldStatus,
-      newStatus: row.newStatus,
-      changedBy: row.changedBy,
-      reason: row.reason,
+      tripId: row.tripId ?? '',
+      oldStatus: row.oldStatus ?? '',
+      newStatus: row.newStatus ?? '',
+      changedBy: row.changedBy ?? '',
+      reason: row.reason ?? '',
       metadata: row.metadata,
-      createdAt: row.createdAt,
+      createdAt: row.createdAt ?? DateTime.now(),
     );
   }
   

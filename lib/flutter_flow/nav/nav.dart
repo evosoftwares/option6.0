@@ -272,6 +272,37 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           ),
         ),
         FFRoute(
+          name: PreferenciasPassageiroWidget.routeName,
+          path: PreferenciasPassageiroWidget.routePath,
+          builder: (context, params) => PreferenciasPassageiroWidget(
+            origem: params.getParam(
+              'origem',
+              ParamType.FFPlace,
+            ),
+            destino: params.getParam(
+              'destino',
+              ParamType.FFPlace,
+            ),
+            paradas: params.getParam(
+              'paradas',
+              ParamType.FFPlace,
+              isList: true,
+            ),
+            distancia: params.getParam(
+              'distancia',
+              ParamType.double,
+            ),
+            duracao: params.getParam(
+              'duracao',
+              ParamType.int,
+            ),
+            preco: params.getParam(
+              'preco',
+              ParamType.double,
+            ),
+          ),
+        ),
+        FFRoute(
           name: PreferenciasMotoristaWidget.routeName,
           path: PreferenciasMotoristaWidget.routePath,
           builder: (context, params) => PreferenciasMotoristaWidget(),
@@ -454,22 +485,42 @@ class FFRoute {
             return '/login';
           }
 
-          // Verificar user_type para rotas protegidas
-          if (appStateNotifier.loggedIn && _requiresAppUserValidation(state.uri.toString())) {
-            print('🔍 [ROUTE_REDIRECT] Rota protegida detectada - validando user_type');
-            bool hasValidUserType = await _validateAppUser();
+          // Prevenção de loops: não validar user_type se já estamos em rotas de configuração
+          final currentRoute = state.uri.toString();
+          if (_isConfigurationRoute(currentRoute)) {
+            print('⚙️ [ROUTE_REDIRECT] Rota de configuração detectada - pulando validações');
+            return null;
+          }
 
-            if (!hasValidUserType) {
-              print('🚫 [ROUTE_REDIRECT] user_type inválido/vazio - redirecionando para escolha de perfil');
-              appStateNotifier.setRedirectLocationIfUnset(state.uri.toString());
-              return '/escolhaSeuPerfil';
-            } else {
-              print('✅ [ROUTE_REDIRECT] user_type válido - permitindo acesso à rota');
+          // Verificar user_type para rotas protegidas com debounce
+          if (appStateNotifier.loggedIn && _requiresAppUserValidation(currentRoute)) {
+            print('🔍 [ROUTE_REDIRECT] Rota protegida detectada - validando user_type');
+            
+            // Implementar debounce para evitar múltiplas validações
+            if (_isValidationInProgress) {
+              print('⏳ [ROUTE_REDIRECT] Validação já em progresso - aguardando');
+              return null;
+            }
+            
+            _isValidationInProgress = true;
+            
+            try {
+              bool hasValidUserType = await _validateAppUser();
+
+              if (!hasValidUserType) {
+                print('🚫 [ROUTE_REDIRECT] user_type inválido/vazio - redirecionando para escolha de perfil');
+                appStateNotifier.setRedirectLocationIfUnset(currentRoute);
+                return '/escolhaSeuPerfil';
+              } else {
+                print('✅ [ROUTE_REDIRECT] user_type válido - permitindo acesso à rota');
+              }
+            } finally {
+              _isValidationInProgress = false;
             }
           }
 
           // Verificar documentos obrigatórios para motoristas
-          if (appStateNotifier.loggedIn && _requiresDriverDocumentValidation(state.uri.toString())) {
+          if (appStateNotifier.loggedIn && _requiresDriverDocumentValidation(currentRoute)) {
             print('🔍 [ROUTE_REDIRECT] Rota de motorista detectada - validando documentos');
 
             bool isDriver = await isCurrentUserDriver();
@@ -478,7 +529,7 @@ class FFRoute {
 
               if (!hasAllDocuments) {
                 print('🚫 [ROUTE_REDIRECT] Documentos obrigatórios faltando - redirecionando para tela de documentos');
-                appStateNotifier.setRedirectLocationIfUnset(state.uri.toString());
+                appStateNotifier.setRedirectLocationIfUnset(currentRoute);
                 return '/documentos_motorista';
               } else {
                 print('✅ [ROUTE_REDIRECT] Todos os documentos aprovados - permitindo acesso à rota');
@@ -551,7 +602,11 @@ class TransitionInfo {
   final Duration duration;
   final Alignment? alignment;
 
-  static TransitionInfo appDefault() => TransitionInfo(hasTransition: false);
+  static TransitionInfo appDefault() => TransitionInfo(
+    hasTransition: true,
+    transitionType: PageTransitionType.rightToLeft,
+    duration: const Duration(milliseconds: 300),
+  );
 }
 
 class RootPageContext {
@@ -636,6 +691,25 @@ Future<bool> _validateAppUser() async {
     print('💥 [NAV_GUARD] Erro ao validar user_type: $e');
     return false;
   }
+}
+
+/// Variável global para controle de debounce de validação
+bool _isValidationInProgress = false;
+
+/// Verifica se a rota é de configuração e não deve ser validada
+bool _isConfigurationRoute(String route) {
+  final configurationRoutes = {
+    '/login',
+    '/cadastrar', 
+    '/esqueceuSenha',
+    '/suporteRecuperacao',
+    '/selfie',
+    '/cadastroSucesso',
+    '/escolhaSeuPerfil',
+    '/documentos_motorista',
+    '/',
+  };
+  return configurationRoutes.contains(route);
 }
 
 /// Rotas que não precisam de validação de user_type

@@ -1,6 +1,5 @@
 import '/backend/supabase/supabase.dart';
 // lib/infrastructure/mappers/passenger_mapper.dart
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../domain/entities/passenger.dart';
 import '../../backend/supabase/database/tables/passengers.dart';
 import '../../domain/value_objects/email.dart';
@@ -9,13 +8,14 @@ class PassengerMapper {
   Passenger toDomain(PassengersRow row) {
     return Passenger(
       id: row.id,
-      userId: row.userId,
-      totalTrips: row.totalTrips,
-      averageRating: row.averageRating,
-      paymentMethodId: row.paymentMethodId,
-      createdAt: row.createdAt,
-      updatedAt: row.updatedAt,
-      email: Email(row.email!),
+      userId: row.userId ?? '',
+      totalTrips: row.totalTrips ?? 0,
+      consecutiveCancellations: row.consecutiveCancellations ?? 0,
+      averageRating: row.averageRating ?? 0.0,
+      paymentMethodId: row.paymentMethodId ?? '',
+      createdAt: row.createdAt ?? DateTime.now(),
+      updatedAt: row.updatedAt ?? DateTime.now(),
+      email: Email(row.email ?? ''),
     );
   }
   

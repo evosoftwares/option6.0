@@ -1,5 +1,4 @@
 // lib/infrastructure/mappers/backuppassengersmigration_mapper.dart
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../domain/entities/backuppassengersmigration.dart';
 import '../../backend/supabase/database/tables/backup_passengers_migration.dart';
 
@@ -8,12 +7,12 @@ class BackupPassengersMigrationMapper {
   BackupPassengersMigration toDomain(BackupPassengersMigrationRow row) {
     return BackupPassengersMigration(
       id: row.id,
-      userId: row.userId,
-      totalTrips: row.totalTrips,
-      averageRating: row.averageRating,
-      paymentMethodId: row.paymentMethodId,
-      createdAt: row.createdAt,
-      updatedAt: row.updatedAt,
+      userId: row.userId ?? '',
+      totalTrips: row.totalTrips ?? 0,
+      averageRating: row.averageRating ?? 0.0,
+      paymentMethodId: row.paymentMethodId ?? '',
+      createdAt: row.createdAt ?? DateTime.now(),
+      updatedAt: row.updatedAt ?? DateTime.now(),
     );
   }
   

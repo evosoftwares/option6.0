@@ -6,24 +6,33 @@ import '../backend/supabase/database/tables/app_users.dart';
 class UserIdConverter {
   /// Converte Firebase UID para app_users.id (UUID)
   /// 
-  /// Busca o usuário na tabela app_users usando o fcm_token (que armazena o Firebase UID)
-  /// e retorna o UUID correspondente.
-  /// 
-  /// Returns null se o usuário não for encontrado.
+  /// Busca o usuário na tabela app_users usando primeiramente o fcm_token (que
+  /// armazena o Firebase UID) e, em fallback, o campo currentUser_UID_Firebase.
+  /// Retorna o UUID correspondente ou null se não encontrado.
   static Future<String?> getAppUserIdFromFirebaseUid(String firebaseUid) async {
     try {
-      final query = await AppUsersTable().queryRows(
+      // 1) Tenta via fcm_token
+      final byFcm = await AppUsersTable().queryRows(
         queryFn: (q) => q.eq('fcm_token', firebaseUid).limit(1),
       );
-      
-      if (query.isNotEmpty) {
-        final appUserId = query.first.id;
-        print('🔄 [UserIdConverter] Firebase UID "$firebaseUid" -> App User ID "$appUserId"');
+      if (byFcm.isNotEmpty) {
+        final appUserId = byFcm.first.id;
+        print('🔄 [UserIdConverter] Firebase UID "$firebaseUid" -> App User ID "$appUserId" (via fcm_token)');
         return appUserId;
-      } else {
-        print('⚠️ [UserIdConverter] Usuário não encontrado para Firebase UID: $firebaseUid');
-        return null;
       }
+
+      // 2) Fallback via currentUser_UID_Firebase
+      final byCurrentUid = await AppUsersTable().queryRows(
+        queryFn: (q) => q.eq('currentUser_UID_Firebase', firebaseUid).limit(1),
+      );
+      if (byCurrentUid.isNotEmpty) {
+        final appUserId = byCurrentUid.first.id;
+        print('🔄 [UserIdConverter] Firebase UID "$firebaseUid" -> App User ID "$appUserId" (via currentUser_UID_Firebase)');
+        return appUserId;
+      }
+
+      print('⚠️ [UserIdConverter] Usuário não encontrado para Firebase UID: $firebaseUid');
+      return null;
     } catch (e) {
       print('❌ [UserIdConverter] Erro na conversão: $e');
       return null;
@@ -42,7 +51,7 @@ class UserIdConverter {
       );
       
       if (query.isNotEmpty) {
-        final firebaseUid = query.first.fcmToken;
+        final firebaseUid = query.first.fcmToken ?? query.first.currentUserUidFirebase;
         print('🔄 [UserIdConverter] App User ID "$appUserId" -> Firebase UID "$firebaseUid"');
         return firebaseUid;
       } else {
@@ -60,7 +69,7 @@ class UserIdConverter {
   /// Firebase UIDs geralmente têm 28 caracteres e contêm letras e números
   /// UUIDs têm 36 caracteres com hífens no formato: xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx
   static bool isFirebaseUid(String id) {
-    // UUID pattern: 8-4-4-4-12 characters separated by hyphens
+    // UUID pattern: 8-4-4-4-12 caracteres separados por hífens
     final uuidPattern = RegExp(r'^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$', caseSensitive: false);
     
     if (uuidPattern.hasMatch(id)) {

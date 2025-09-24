@@ -1,4 +1,4 @@
-import '/auth/firebase_auth/auth_util.dart';
+// import '/auth/firebase_auth/auth_util.dart';
 import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
@@ -238,58 +238,19 @@ class _MenuPassageiroWidgetState extends State<MenuPassageiroWidget> {
                 ),
               ),
 
-              // Botão Sair (fixo na parte inferior)
+              // Botão Sair Seguro (fixo na parte inferior)
               Container(
                 width: double.infinity,
                 padding: EdgeInsetsDirectional.fromSTEB(16.0, 16.0, 16.0, 16.0),
-                child: InkWell(
-                  splashColor: Colors.transparent,
-                  focusColor: Colors.transparent,
-                  hoverColor: Colors.transparent,
-                  highlightColor: Colors.transparent,
-                  onTap: () async {
-                    print('🔍 [MENU_PASSAGEIRO] Realizando logout');
-                    GoRouter.of(context).prepareAuthEvent();
-                    await authManager.signOut();
-                    GoRouter.of(context).clearRedirectLocation();
-                    context.goNamedAuth(LoginWidget.routeName, context.mounted);
+                child: LogoutButtonWidget(
+                  buttonText: 'Sair da Conta',
+                  showConfirmDialog: true,
+                  buttonColor: FlutterFlowTheme.of(context).error,
+                  textColor: Colors.white,
+                  iconData: Icons.logout,
+                  onLogoutComplete: () {
+                    print('🔍 [MENU_PASSAGEIRO] Logout seguro concluído');
                   },
-                  child: Container(
-                    width: double.infinity,
-                    height: 60.0,
-                    decoration: BoxDecoration(
-                      color: FlutterFlowTheme.of(context).error.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(8.0),
-                      border: Border.all(
-                        color: FlutterFlowTheme.of(context).error.withValues(alpha: 0.3),
-                        width: 1.0,
-                      ),
-                    ),
-                    child: Padding(
-                      padding: EdgeInsetsDirectional.fromSTEB(16.0, 16.0, 16.0, 16.0),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.max,
-                        children: [
-                          Icon(
-                            Icons.logout,
-                            color: FlutterFlowTheme.of(context).error,
-                            size: 24.0,
-                          ),
-                          Text(
-                            'Sair',
-                            style: FlutterFlowTheme.of(context)
-                                .bodyMedium
-                                .override(
-                                  font: GoogleFonts.inter(),
-                                  letterSpacing: 0.0,
-                                  fontWeight: FontWeight.w500,
-                                  color: FlutterFlowTheme.of(context).error,
-                                ),
-                          ),
-                        ].divide(SizedBox(width: 12.0)),
-                      ),
-                    ),
-                  ),
                 ),
               ),
             ],

@@ -1,5 +1,4 @@
 // lib/infrastructure/mappers/drivercurrentdocument_mapper.dart
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../domain/entities/drivercurrentdocument.dart';
 import '../../backend/supabase/database/tables/driver_documents.dart';
 

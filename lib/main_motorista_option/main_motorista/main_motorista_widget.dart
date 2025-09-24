@@ -6,7 +6,6 @@ import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_timer.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
-import '/flutter_flow/user_id_converter.dart';
 import '/index.dart';
 import '/custom_code/actions/index.dart' as actions;
 import 'package:mapbox_search/mapbox_search.dart' as mapbox;
@@ -52,15 +51,16 @@ class _MainMotoristaWidgetState extends State<MainMotoristaWidget> {
 
     // On page load action.
     SchedulerBinding.instance.addPostFrameCallback((_) async {
-      _model.checkpassageiro = await AppUsersTable().queryRows(
-        queryFn: (q) => q.eqOrNull(
-          'fcm_token',
-          currentUserUid,
-        ),
-      );
-      if (_model.checkpassageiro?.firstOrNull?.userType == 'passenger') {
-        context.pushNamed(MainPassageiroWidget.routeName);
-        return;
+      final appUserId = await UserIdConverter.getAppUserIdFromFirebaseUid(currentUserUid);
+      if (appUserId != null) {
+        _model.checkpassageiro = await AppUsersTable().queryRows(
+          queryFn: (q) => q.eqOrNull('id', appUserId),
+        );
+        final ut0 = _model.checkpassageiro?.firstOrNull?.userType?.toLowerCase();
+        if (ut0 == 'passenger' || ut0 == 'passageiro') {
+          context.goNamed(MainPassageiroWidget.routeName);
+          return;
+        }
       }
 
       // Verificar se os dados do veículo estão completos
@@ -178,8 +178,9 @@ class _MainMotoristaWidgetState extends State<MainMotoristaWidget> {
                 safeSetState(() {});
                 try {
                   // Guarda: impedir ações se for passageiro
+                  final appUserId = await UserIdConverter.getAppUserIdFromFirebaseUid(currentUserUid);
                   final appUsers = await AppUsersTable().queryRows(
-                    queryFn: (q) => q.eqOrNull('fcm_token', currentUserUid),
+                    queryFn: (q) => q.eqOrNull('id', appUserId),
                   );
                   if (appUsers.firstOrNull?.userType == 'passenger') {
                     await action_blocks.alertaNegativo(
@@ -194,8 +195,8 @@ class _MainMotoristaWidgetState extends State<MainMotoristaWidget> {
                   }
 
                   // Converter Firebase UID para Supabase UUID
-                  final appUserId = await UserIdConverter.getAppUserIdFromFirebaseUid(currentUserUid);
-                  if (appUserId == null) {
+                  final appUserId2 = appUserId;
+                  if (appUserId2 == null) {
                     await action_blocks.alertaNegativo(
                       context,
                       mensagem: 'Erro: Usuário não encontrado no sistema',
@@ -207,14 +208,14 @@ class _MainMotoristaWidgetState extends State<MainMotoristaWidget> {
 
                   final updated = await DriversTable().update(
                     data: {'is_online': false},
-                    matchingRows: (rows) => rows.eq('user_id', appUserId),
+                    matchingRows: (rows) => rows.eq('user_id', appUserId2),
                     returnRows: true,
                   );
                   if (updated.isEmpty) {
                     // Apenas drivers podem criar row em drivers
                     if (appUsers.firstOrNull?.userType == 'driver') {
                       await DriversTable().insert({
-                        'user_id': appUserId,
+                        'user_id': appUserId2,
                         'email': currentUserEmail,
                         'is_online': false,
                         'created_at': DateTime.now().toUtc(),
@@ -294,8 +295,9 @@ class _MainMotoristaWidgetState extends State<MainMotoristaWidget> {
                 safeSetState(() {});
                 try {
                   // Guarda: impedir ações se for passageiro
+                  final appUserId = await UserIdConverter.getAppUserIdFromFirebaseUid(currentUserUid);
                   final appUsers = await AppUsersTable().queryRows(
-                    queryFn: (q) => q.eqOrNull('fcm_token', currentUserUid),
+                    queryFn: (q) => q.eqOrNull('id', appUserId),
                   );
                   if (appUsers.firstOrNull?.userType == 'passenger') {
                     await action_blocks.alertaNegativo(
@@ -310,8 +312,8 @@ class _MainMotoristaWidgetState extends State<MainMotoristaWidget> {
                   }
 
                   // Converter Firebase UID para Supabase UUID
-                  final appUserId = await UserIdConverter.getAppUserIdFromFirebaseUid(currentUserUid);
-                  if (appUserId == null) {
+                  final appUserId2 = appUserId;
+                  if (appUserId2 == null) {
                     await action_blocks.alertaNegativo(
                       context,
                       mensagem: 'Erro: Usuário não encontrado no sistema',
@@ -323,14 +325,14 @@ class _MainMotoristaWidgetState extends State<MainMotoristaWidget> {
 
                   final updated = await DriversTable().update(
                     data: {'is_online': true},
-                    matchingRows: (rows) => rows.eq('user_id', appUserId),
+                    matchingRows: (rows) => rows.eq('user_id', appUserId2),
                     returnRows: true,
                   );
                   if (updated.isEmpty) {
                     // Apenas drivers podem criar row em drivers
                     if (appUsers.firstOrNull?.userType == 'driver') {
                       await DriversTable().insert({
-                        'user_id': appUserId,
+                        'user_id': appUserId2,
                         'email': currentUserEmail,
                         'is_online': true,
                         'created_at': DateTime.now().toUtc(),
@@ -343,7 +345,7 @@ class _MainMotoristaWidgetState extends State<MainMotoristaWidget> {
                     // Forçar driver offline se não conseguir rastreamento em segundo plano
                     await DriversTable().update(
                       data: {'is_online': false},
-                      matchingRows: (rows) => rows.eq('user_id', appUserId),
+                      matchingRows: (rows) => rows.eq('user_id', appUserId2),
                     );
 
                     // Mostrar diálogo explicativo com orientações claras

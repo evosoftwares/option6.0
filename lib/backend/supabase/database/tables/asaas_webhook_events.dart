@@ -26,8 +26,8 @@ class AsaasWebhookEventsRow extends SupabaseDataRow {
   String? get paymentId => getField<String>('payment_id');
   set paymentId(String? value) => setField<String>('payment_id', value);
 
-  dynamic? get payload => getField<dynamic>('payload');
-  set payload(dynamic? value) => setField<dynamic>('payload', value);
+  dynamic get payload => getField<dynamic>('payload');
+  set payload(dynamic value) => setField<dynamic>('payload', value);
 
   DateTime? get processedAt => getField<DateTime>('processed_at');
   set processedAt(DateTime? value) => setField<DateTime>('processed_at', value);

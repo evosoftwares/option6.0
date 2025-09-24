@@ -1,25 +1,28 @@
 // lib/infrastructure/mappers/passengerwallettransaction_mapper.dart
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../domain/entities/passengerwallettransaction.dart';
 import '../../backend/supabase/database/tables/passenger_wallet_transactions.dart';
-
 
 class PassengerWalletTransactionMapper {
   PassengerWalletTransaction toDomain(PassengerWalletTransactionsRow row) {
     return PassengerWalletTransaction(
       id: row.id,
-      walletId: row.walletId,
-      passengerId: row.passengerId,
-      type: row.type,
-      amount: row.amount,
-      description: row.description,
-      tripId: row.tripId,
-      paymentMethodId: row.paymentMethodId,
-      asaasPaymentId: row.asaasPaymentId,
-      status: row.status,
+      walletId: row.walletId ?? '',
+      passengerId: row.passengerId ?? '',
+      type: (row.type ?? '').toString(),
+      amount: (() {
+        final v = row.amount;
+        if (v is num) return v.toDouble();
+        if (v is String) return double.tryParse(v) ?? 0.0;
+        return 0.0;
+      })(),
+      description: row.description ?? '',
+      tripId: row.tripId ?? '',
+      paymentMethodId: row.paymentMethodId ?? '',
+      asaasPaymentId: (row.asaasPaymentId ?? '').toString(),
+      status: (row.status ?? '').toString(),
       metadata: row.metadata,
-      createdAt: row.createdAt,
-      processedAt: row.processedAt,
+      createdAt: row.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0),
+      processedAt: row.processedAt ?? DateTime.fromMillisecondsSinceEpoch(0),
     );
   }
   
@@ -40,5 +43,4 @@ class PassengerWalletTransactionMapper {
       'processed_at': entity.processedAt,
     };
   }
-
 }

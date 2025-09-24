@@ -437,9 +437,9 @@ class _MainPassageiroWidgetState extends State<MainPassageiroWidget> {
                                       }
                                     }
 
-                                    // Navegar para próxima tela (escolha de motorista)
+                                    // Navegar para tela de preferências
                                     context.pushNamed(
-                                      EscolhaMotoristaWidget.routeName,
+                                      'preferenciasPassageiro',
                                       queryParameters: {
                                         'origem': serializeParam(_model.origemPlace, ParamType.FFPlace),
                                         'destino': serializeParam(_model.destinoPlace, ParamType.FFPlace),

@@ -1,5 +1,4 @@
 // lib/infrastructure/mappers/tripchat_mapper.dart
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../domain/entities/tripchat.dart';
 import '../../backend/supabase/database/tables/trip_chats.dart';
 
@@ -8,12 +7,12 @@ class TripChatMapper {
   TripChat toDomain(TripChatsRow row) {
     return TripChat(
       id: row.id,
-      tripId: row.tripId,
-      senderId: row.senderId,
-      message: row.message,
-      isRead: row.isRead,
-      readAt: row.readAt,
-      createdAt: row.createdAt,
+      tripId: row.tripId ?? '',
+      senderId: row.senderId ?? '',
+      message: row.message ?? '',
+      isRead: row.isRead ?? false,
+      readAt: row.readAt ?? DateTime.now(),
+      createdAt: row.createdAt ?? DateTime.now(),
     );
   }
   

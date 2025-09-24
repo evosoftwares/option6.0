@@ -1,5 +1,4 @@
 // lib/infrastructure/mappers/driverscheduleoverride_mapper.dart
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../domain/entities/driverscheduleoverride.dart';
 import '../../backend/supabase/database/tables/driver_schedule_overrides.dart';
 
@@ -8,14 +7,14 @@ class DriverScheduleOverrideMapper {
   DriverScheduleOverride toDomain(DriverScheduleOverridesRow row) {
     return DriverScheduleOverride(
       id: row.id,
-      driverId: row.driverId,
-      overrideStart: row.overrideStart,
-      overrideEnd: row.overrideEnd,
-      isActive: row.isActive,
-      reason: row.reason,
-      createdBy: row.createdBy,
-      createdAt: row.createdAt,
-      updatedAt: row.updatedAt,
+      driverId: row.driverId ?? '',
+      overrideStart: row.overrideStart ?? DateTime.now(),
+      overrideEnd: row.overrideEnd ?? DateTime.now(),
+      isActive: row.isActive ?? false,
+      reason: row.reason ?? '',
+      createdBy: row.createdBy ?? '',
+      createdAt: row.createdAt ?? DateTime.now(),
+      updatedAt: row.updatedAt ?? DateTime.now(),
     );
   }
   

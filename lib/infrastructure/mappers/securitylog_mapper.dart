@@ -1,5 +1,4 @@
 // lib/infrastructure/mappers/securitylog_mapper.dart
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../domain/entities/securitylog.dart';
 import '../../backend/supabase/database/tables/security_logs.dart';
 
@@ -8,19 +7,19 @@ class SecurityLogMapper {
   SecurityLog toDomain(SecurityLogsRow row) {
     return SecurityLog(
       id: row.id,
-      eventType: row.eventType,
-      severity: row.severity,
-      description: row.description,
-      userId: row.userId,
-      ipAddress: row.ipAddress,
-      userAgent: row.userAgent,
-      deviceInfo: row.deviceInfo,
-      platform: row.platform,
-      appVersion: row.appVersion,
-      sessionId: row.sessionId,
+      eventType: row.eventType ?? '',
+      severity: row.severity ?? '',
+      description: row.description ?? '',
+      userId: row.userId ?? '',
+      ipAddress: row.ipAddress ?? '',
+      userAgent: row.userAgent ?? '',
+      deviceInfo: row.deviceInfo ?? '',
+      platform: row.platform ?? '',
+      appVersion: row.appVersion ?? '',
+      sessionId: row.sessionId ?? '',
       metadata: row.metadata,
-      timestamp: row.timestamp,
-      createdAt: row.createdAt,
+      timestamp: row.timestamp ?? DateTime.now(),
+      createdAt: row.createdAt ?? DateTime.now(),
     );
   }
   

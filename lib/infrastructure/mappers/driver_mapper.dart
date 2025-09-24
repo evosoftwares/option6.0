@@ -1,6 +1,4 @@
-import '/backend/supabase/supabase.dart';
 // lib/infrastructure/mappers/driver_mapper.dart
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../domain/entities/driver.dart';
 import '../../backend/supabase/database/tables/drivers.dart';
 import '../../domain/value_objects/email.dart';
@@ -8,45 +6,55 @@ import '../../domain/value_objects/location.dart';
 import '../../domain/value_objects/money.dart';
 
 class DriverMapper {
+  static double _toDouble(dynamic v) {
+    if (v == null) return 0.0;
+    if (v is num) return v.toDouble();
+    if (v is String) return double.tryParse(v) ?? 0.0;
+    return 0.0;
+  }
+
   Driver toDomain(DriversRow row) {
     return Driver(
       id: row.id,
       userId: row.userId,
-      vehicleBrand: row.vehicleBrand,
-      vehicleModel: row.vehicleModel,
-      vehicleYear: row.vehicleYear,
-      vehicleColor: row.vehicleColor,
-      vehiclePlate: row.vehiclePlate,
-      vehicleCategory: row.vehicleCategory,
-      approvedBy: row.approvedBy,
-      approvedAt: row.approvedAt,
-      isOnline: row.isOnline,
-      acceptsPet: row.acceptsPet,
-      petFee: Money.fromReais(row.petFee ?? 0.0),
-      acceptsGrocery: row.acceptsGrocery,
-      groceryFee: Money.fromReais(row.groceryFee ?? 0.0),
-      acceptsCondo: row.acceptsCondo,
-      condoFee: Money.fromReais(row.condoFee ?? 0.0),
-      stopFee: Money.fromReais(row.stopFee ?? 0.0),
-      acPolicy: row.acPolicy,
-      customPricePerKm: Money.fromReais(row.customPricePerKm ?? 0.0),
-      bankAccountType: row.bankAccountType,
-      bankCode: row.bankCode,
-      bankAgency: row.bankAgency,
-      bankAccount: row.bankAccount,
-      pixKey: row.pixKey,
-      pixKeyType: row.pixKeyType,
-      totalTrips: row.totalTrips,
-      averageRating: row.averageRating,
-      createdAt: row.createdAt,
-      updatedAt: row.updatedAt,
-      fcmToken: row.fcmToken,
-      devicePlatform: row.devicePlatform,
-      approvalStatus: row.approvalStatus,
+      vehicleBrand: row.vehicleBrand ?? '',
+      vehicleModel: row.vehicleModel ?? '',
+      vehicleYear: row.vehicleYear ?? 0,
+      vehicleColor: row.vehicleColor ?? '',
+      vehiclePlate: row.vehiclePlate ?? '',
+      vehicleCategory: row.vehicleCategory ?? '',
+      approvedBy: row.approvedBy ?? '',
+      approvedAt: row.approvedAt ?? DateTime.fromMillisecondsSinceEpoch(0),
+      isOnline: row.isOnline ?? false,
+      acceptsPet: row.acceptsPet ?? false,
+      petFee: Money.fromReais(_toDouble(row.petFee)),
+      acceptsGrocery: row.acceptsGrocery ?? false,
+      groceryFee: Money.fromReais(_toDouble(row.groceryFee)),
+      acceptsCondo: row.acceptsCondo ?? false,
+      condoFee: Money.fromReais(_toDouble(row.condoFee)),
+      stopFee: Money.fromReais(_toDouble(row.stopFee)),
+      acPolicy: row.acPolicy ?? '',
+      customPricePerKm: Money.fromReais(_toDouble(row.customPricePerKm)),
+      bankAccountType: row.bankAccountType ?? '',
+      bankCode: row.bankCode ?? '',
+      bankAgency: row.bankAgency ?? '',
+      bankAccount: row.bankAccount ?? '',
+      pixKey: row.pixKey ?? '',
+      pixKeyType: row.pixKeyType ?? '',
+      totalTrips: row.totalTrips ?? 0,
+      averageRating: _toDouble(row.averageRating),
+      createdAt: row.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0),
+      updatedAt: row.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0),
+      fcmToken: row.fcmToken ?? '',
+      devicePlatform: row.devicePlatform ?? '',
+      approvalStatus: row.approvalStatus?.toString() ?? '',
       onesignalPlayerId: row.onesignalPlayerId,
-      email: Email(row.email!),
+      email: Email(row.email ?? 'placeholder@example.com'),
       currentLocation: row.currentLatitude != null && row.currentLongitude != null
-          ? Location.fromCoordinates(row.currentLatitude!, row.currentLongitude!)
+          ? Location.fromCoordinates(
+              _toDouble(row.currentLatitude),
+              _toDouble(row.currentLongitude),
+            )
           : null,
     );
   }

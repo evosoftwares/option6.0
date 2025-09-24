@@ -32,8 +32,8 @@ class TripStatusHistoryRow extends SupabaseDataRow {
   String? get reason => getField<String>('reason');
   set reason(String? value) => setField<String>('reason', value);
 
-  dynamic? get metadata => getField<dynamic>('metadata');
-  set metadata(dynamic? value) => setField<dynamic>('metadata', value);
+  dynamic get metadata => getField<dynamic>('metadata');
+  set metadata(dynamic value) => setField<dynamic>('metadata', value);
 
   DateTime? get createdAt => getField<DateTime>('created_at');
   set createdAt(DateTime? value) => setField<DateTime>('created_at', value);

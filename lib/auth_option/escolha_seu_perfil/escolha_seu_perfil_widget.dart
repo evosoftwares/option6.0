@@ -184,7 +184,7 @@ class _EscolhaSeuPerfilWidgetState extends State<EscolhaSeuPerfilWidget> {
   }
 
   /// Busca ou cria um app_user de forma robusta
-  Future<AppUsersRow?> _getOrCreateAppUser(String userType) async {
+  Future<AppUsersRow> _getOrCreateAppUser(String userType) async {
     final transactionId = DateTime.now().millisecondsSinceEpoch.toString();
     final startTimestamp = DateTime.now();
 
@@ -384,8 +384,20 @@ class _EscolhaSeuPerfilWidgetState extends State<EscolhaSeuPerfilWidget> {
       print('❌ [GET_OR_CREATE_USER][TXN:$transactionId] ERROR_MESSAGE: $e');
       print('🔌 [GET_OR_CREATE_USER][TXN:$transactionId] Connection Hash at Error: ${SupaFlow.client.hashCode}');
       print('📍 [GET_OR_CREATE_USER][TXN:$transactionId] STACK_TRACE: $stackTrace');
-      print('🏁 [GET_OR_CREATE_USER][TXN:$transactionId] ====== TRANSAÇÃO TERMINADA COM ERRO ======');
-      return null;
+      print('🔑 [GET_OR_CREATE_USER][TXN:$transactionId] currentUserUid no momento do erro: $currentUserUid');
+      print('📧 [GET_OR_CREATE_USER][TXN:$transactionId] currentUserEmail no momento do erro: $currentUserEmail');
+      print('⏰ [GET_OR_CREATE_USER][TXN:$transactionId] Timestamp do erro: ${DateTime.now()}');
+      print('💥 [GET_OR_CREATE_USER][TXN:$transactionId] ===== FIM DA EXCEÇÃO =====');
+
+      _showErrorSnackBar('Erro inesperado: $e');
+      throw Exception('Falha ao buscar/criar app_user: $e');
+    } finally {
+      // ===== LIMPEZA DO ESTADO (SEMPRE EXECUTADO) =====
+      print('🧹 [MOTORISTA] LIMPANDO ESTADO - Liberando lock do processo...');
+      safeSetState(() {
+        _model.isDriverCreationInProgress = false;
+      });
+      print('✅ [MOTORISTA] Estado limpo: isDriverCreationInProgress=${_model.isDriverCreationInProgress}');
     }
   }
 
@@ -665,15 +677,7 @@ class _EscolhaSeuPerfilWidgetState extends State<EscolhaSeuPerfilWidget> {
                             print('👤 [MOTORISTA] ===== STEP 2: BUSCAR/CRIAR APP_USER =====');
                             print('🔍 [MOTORISTA] Chamando _getOrCreateAppUser com userType "driver"...');
                             final appUser = await _getOrCreateAppUser('driver');
-
-                            if (appUser == null) {
-                              print('❌ [MOTORISTA] ERRO CRÍTICO: app_user retornou null');
-                              print('🔍 [MOTORISTA] currentUserUid usado na busca: $currentUserUid');
-                              print('📧 [MOTORISTA] currentUserEmail usado na busca: $currentUserEmail');
-                              print('💥 [MOTORISTA] ABORTANDO PROCESSO - Exibindo erro para usuário');
-                              _showErrorSnackBar('Erro ao localizar seu perfil. Tente novamente.');
-                              return;
-                            }
+                            // _getOrCreateAppUser lança exceção em caso de falha
 
                             print('✅ [MOTORISTA] app_user encontrado/criado com sucesso!');
                             print('🆔 [MOTORISTA] app_user.id: ${appUser.id}');
@@ -978,15 +982,7 @@ class _EscolhaSeuPerfilWidgetState extends State<EscolhaSeuPerfilWidget> {
                             print('👤 [PASSAGEIRO] ===== STEP 2: BUSCAR/CRIAR APP_USER =====');
                             print('🔍 [PASSAGEIRO] Chamando _getOrCreateAppUser com userType "passenger"...');
                             final appUser = await _getOrCreateAppUser('passenger');
-
-                            if (appUser == null) {
-                              print('❌ [PASSAGEIRO] ERRO CRÍTICO: app_user retornou null');
-                              print('🔍 [PASSAGEIRO] currentUserUid usado na busca: $currentUserUid');
-                              print('📧 [PASSAGEIRO] currentUserEmail usado na busca: $currentUserEmail');
-                              print('💥 [PASSAGEIRO] ABORTANDO PROCESSO - Exibindo erro para usuário');
-                              _showErrorSnackBar('Erro ao localizar seu perfil. Tente novamente.');
-                              return;
-                            }
+                            // _getOrCreateAppUser lança exceção em caso de falha
 
                             print('✅ [PASSAGEIRO] app_user encontrado/criado com sucesso!');
                             print('🆔 [PASSAGEIRO] app_user.id: ${appUser.id}');
@@ -1234,7 +1230,8 @@ class _EscolhaSeuPerfilWidgetState extends State<EscolhaSeuPerfilWidget> {
                                     .bodySmall
                                     .fontStyle,
                               ),
-                              color: FlutterFlowTheme.of(context).secondaryText,
+                              color: FlutterFlowTheme.of(context)
+                                  .secondaryText,
                               letterSpacing: 0.0,
                               fontWeight: FlutterFlowTheme.of(context)
                                   .bodySmall
@@ -1253,6 +1250,6 @@ class _EscolhaSeuPerfilWidgetState extends State<EscolhaSeuPerfilWidget> {
         ),
       ),
     ),
-    );
+  );
   }
 }

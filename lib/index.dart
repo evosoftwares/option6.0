@@ -46,5 +46,10 @@ export '/mai_passageiro_option/menu_passageiro/menu_passageiro_widget.dart'
     show MenuPassageiroWidget;
 export '/mai_passageiro_option/minhas_viagens_pax/minhas_viagens_pax_widget.dart' show MinhasViagensPaxWidget;
 export '/mai_passageiro_option/carteira_passageiro/carteira_passageiro_widget.dart' show CarteiraPassageiroWidget;
+export '/mai_passageiro_option/preferencias_passageiro/preferencias_passageiro_widget.dart' show PreferenciasPassageiroWidget;
+
+// Export logout components
+export '/components/logout_button_widget.dart' show LogoutButtonWidget, SimpleLogoutWidget, AppBarLogoutWidget;
+export '/components/logout_button_model.dart' show LogoutButtonModel;
 
 export 'flutter_flow/user_id_converter.dart';

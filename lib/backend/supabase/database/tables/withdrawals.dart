@@ -23,8 +23,8 @@ class WithdrawalsRow extends SupabaseDataRow {
   String? get walletId => getField<String>('wallet_id');
   set walletId(String? value) => setField<String>('wallet_id', value);
 
-  dynamic? get amount => getField<dynamic>('amount');
-  set amount(dynamic? value) => setField<dynamic>('amount', value);
+  dynamic get amount => getField<dynamic>('amount');
+  set amount(dynamic value) => setField<dynamic>('amount', value);
 
   String? get withdrawalMethod => getField<String>('withdrawal_method');
   set withdrawalMethod(String? value) => setField<String>('withdrawal_method', value);

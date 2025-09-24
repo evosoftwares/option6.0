@@ -36,11 +36,11 @@ class TripsRow extends SupabaseDataRow {
   String? get originAddress => getField<String>('origin_address');
   set originAddress(String? value) => setField<String>('origin_address', value);
 
-  dynamic? get originLatitude => getField<dynamic>('origin_latitude');
-  set originLatitude(dynamic? value) => setField<dynamic>('origin_latitude', value);
+  dynamic get originLatitude => getField<dynamic>('origin_latitude');
+  set originLatitude(dynamic value) => setField<dynamic>('origin_latitude', value);
 
-  dynamic? get originLongitude => getField<dynamic>('origin_longitude');
-  set originLongitude(dynamic? value) => setField<dynamic>('origin_longitude', value);
+  dynamic get originLongitude => getField<dynamic>('origin_longitude');
+  set originLongitude(dynamic value) => setField<dynamic>('origin_longitude', value);
 
   String? get originNeighborhood => getField<String>('origin_neighborhood');
   set originNeighborhood(String? value) => setField<String>('origin_neighborhood', value);
@@ -48,11 +48,11 @@ class TripsRow extends SupabaseDataRow {
   String? get destinationAddress => getField<String>('destination_address');
   set destinationAddress(String? value) => setField<String>('destination_address', value);
 
-  dynamic? get destinationLatitude => getField<dynamic>('destination_latitude');
-  set destinationLatitude(dynamic? value) => setField<dynamic>('destination_latitude', value);
+  dynamic get destinationLatitude => getField<dynamic>('destination_latitude');
+  set destinationLatitude(dynamic value) => setField<dynamic>('destination_latitude', value);
 
-  dynamic? get destinationLongitude => getField<dynamic>('destination_longitude');
-  set destinationLongitude(dynamic? value) => setField<dynamic>('destination_longitude', value);
+  dynamic get destinationLongitude => getField<dynamic>('destination_longitude');
+  set destinationLongitude(dynamic value) => setField<dynamic>('destination_longitude', value);
 
   String? get destinationNeighborhood => getField<String>('destination_neighborhood');
   set destinationNeighborhood(String? value) => setField<String>('destination_neighborhood', value);
@@ -81,20 +81,20 @@ class TripsRow extends SupabaseDataRow {
   String? get routePolyline => getField<String>('route_polyline');
   set routePolyline(String? value) => setField<String>('route_polyline', value);
 
-  dynamic? get estimatedDistanceKm => getField<dynamic>('estimated_distance_km');
-  set estimatedDistanceKm(dynamic? value) => setField<dynamic>('estimated_distance_km', value);
+  dynamic get estimatedDistanceKm => getField<dynamic>('estimated_distance_km');
+  set estimatedDistanceKm(dynamic value) => setField<dynamic>('estimated_distance_km', value);
 
   int? get estimatedDurationMinutes => getField<int>('estimated_duration_minutes');
   set estimatedDurationMinutes(int? value) => setField<int>('estimated_duration_minutes', value);
 
-  dynamic? get driverToPickupDistanceKm => getField<dynamic>('driver_to_pickup_distance_km');
-  set driverToPickupDistanceKm(dynamic? value) => setField<dynamic>('driver_to_pickup_distance_km', value);
+  dynamic get driverToPickupDistanceKm => getField<dynamic>('driver_to_pickup_distance_km');
+  set driverToPickupDistanceKm(dynamic value) => setField<dynamic>('driver_to_pickup_distance_km', value);
 
   int? get driverToPickupDurationMinutes => getField<int>('driver_to_pickup_duration_minutes');
   set driverToPickupDurationMinutes(int? value) => setField<int>('driver_to_pickup_duration_minutes', value);
 
-  dynamic? get actualDistanceKm => getField<dynamic>('actual_distance_km');
-  set actualDistanceKm(dynamic? value) => setField<dynamic>('actual_distance_km', value);
+  dynamic get actualDistanceKm => getField<dynamic>('actual_distance_km');
+  set actualDistanceKm(dynamic value) => setField<dynamic>('actual_distance_km', value);
 
   int? get actualDurationMinutes => getField<int>('actual_duration_minutes');
   set actualDurationMinutes(int? value) => setField<int>('actual_duration_minutes', value);
@@ -102,32 +102,32 @@ class TripsRow extends SupabaseDataRow {
   int? get waitingTimeMinutes => getField<int>('waiting_time_minutes');
   set waitingTimeMinutes(int? value) => setField<int>('waiting_time_minutes', value);
 
-  dynamic? get driverDistanceTraveledKm => getField<dynamic>('driver_distance_traveled_km');
-  set driverDistanceTraveledKm(dynamic? value) => setField<dynamic>('driver_distance_traveled_km', value);
+  dynamic get driverDistanceTraveledKm => getField<dynamic>('driver_distance_traveled_km');
+  set driverDistanceTraveledKm(dynamic value) => setField<dynamic>('driver_distance_traveled_km', value);
 
-  dynamic? get baseFare => getField<dynamic>('base_fare');
-  set baseFare(dynamic? value) => setField<dynamic>('base_fare', value);
+  dynamic get baseFare => getField<dynamic>('base_fare');
+  set baseFare(dynamic value) => setField<dynamic>('base_fare', value);
 
-  dynamic? get additionalFees => getField<dynamic>('additional_fees');
-  set additionalFees(dynamic? value) => setField<dynamic>('additional_fees', value);
+  dynamic get additionalFees => getField<dynamic>('additional_fees');
+  set additionalFees(dynamic value) => setField<dynamic>('additional_fees', value);
 
-  dynamic? get surgeMultiplier => getField<dynamic>('surge_multiplier');
-  set surgeMultiplier(dynamic? value) => setField<dynamic>('surge_multiplier', value);
+  dynamic get surgeMultiplier => getField<dynamic>('surge_multiplier');
+  set surgeMultiplier(dynamic value) => setField<dynamic>('surge_multiplier', value);
 
-  dynamic? get totalFare => getField<dynamic>('total_fare');
-  set totalFare(dynamic? value) => setField<dynamic>('total_fare', value);
+  dynamic get totalFare => getField<dynamic>('total_fare');
+  set totalFare(dynamic value) => setField<dynamic>('total_fare', value);
 
-  dynamic? get platformCommission => getField<dynamic>('platform_commission');
-  set platformCommission(dynamic? value) => setField<dynamic>('platform_commission', value);
+  dynamic get platformCommission => getField<dynamic>('platform_commission');
+  set platformCommission(dynamic value) => setField<dynamic>('platform_commission', value);
 
-  dynamic? get driverEarnings => getField<dynamic>('driver_earnings');
-  set driverEarnings(dynamic? value) => setField<dynamic>('driver_earnings', value);
+  dynamic get driverEarnings => getField<dynamic>('driver_earnings');
+  set driverEarnings(dynamic value) => setField<dynamic>('driver_earnings', value);
 
   String? get cancellationReason => getField<String>('cancellation_reason');
   set cancellationReason(String? value) => setField<String>('cancellation_reason', value);
 
-  dynamic? get cancellationFee => getField<dynamic>('cancellation_fee');
-  set cancellationFee(dynamic? value) => setField<dynamic>('cancellation_fee', value);
+  dynamic get cancellationFee => getField<dynamic>('cancellation_fee');
+  set cancellationFee(dynamic value) => setField<dynamic>('cancellation_fee', value);
 
   String? get cancelledBy => getField<String>('cancelled_by');
   set cancelledBy(String? value) => setField<String>('cancelled_by', value);
@@ -162,8 +162,8 @@ class TripsRow extends SupabaseDataRow {
   String? get promoCodeId => getField<String>('promo_code_id');
   set promoCodeId(String? value) => setField<String>('promo_code_id', value);
 
-  dynamic? get discountApplied => getField<dynamic>('discount_applied');
-  set discountApplied(dynamic? value) => setField<dynamic>('discount_applied', value);
+  dynamic get discountApplied => getField<dynamic>('discount_applied');
+  set discountApplied(dynamic value) => setField<dynamic>('discount_applied', value);
 
   DateTime? get updatedAt => getField<DateTime>('updated_at');
   set updatedAt(DateTime? value) => setField<DateTime>('updated_at', value);

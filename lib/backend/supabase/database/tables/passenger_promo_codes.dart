@@ -17,20 +17,20 @@ class PassengerPromoCodesRow extends SupabaseDataRow {
   String get id => getField<String>('id')!;
   set id(String value) => setField<String>('id', value);
 
-  dynamic? get code => getField<dynamic>('code');
-  set code(dynamic? value) => setField<dynamic>('code', value);
+  dynamic get code => getField<dynamic>('code');
+  set code(dynamic value) => setField<dynamic>('code', value);
 
-  dynamic? get type => getField<dynamic>('type');
-  set type(dynamic? value) => setField<dynamic>('type', value);
+  dynamic get type => getField<dynamic>('type');
+  set type(dynamic value) => setField<dynamic>('type', value);
 
-  dynamic? get value => getField<dynamic>('value');
-  set value(dynamic? value) => setField<dynamic>('value', value);
+  dynamic get value => getField<dynamic>('value');
+  set value(dynamic value) => setField<dynamic>('value', value);
 
-  dynamic? get minAmount => getField<dynamic>('min_amount');
-  set minAmount(dynamic? value) => setField<dynamic>('min_amount', value);
+  dynamic get minAmount => getField<dynamic>('min_amount');
+  set minAmount(dynamic value) => setField<dynamic>('min_amount', value);
 
-  dynamic? get maxDiscount => getField<dynamic>('max_discount');
-  set maxDiscount(dynamic? value) => setField<dynamic>('max_discount', value);
+  dynamic get maxDiscount => getField<dynamic>('max_discount');
+  set maxDiscount(dynamic value) => setField<dynamic>('max_discount', value);
 
   bool? get isActive => getField<bool>('is_active');
   set isActive(bool? value) => setField<bool>('is_active', value);

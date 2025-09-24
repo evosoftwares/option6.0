@@ -26,8 +26,8 @@ class BackupPassengersMigrationRow extends SupabaseDataRow {
   int? get totalTrips => getField<int>('total_trips');
   set totalTrips(int? value) => setField<int>('total_trips', value);
 
-  dynamic? get averageRating => getField<dynamic>('average_rating');
-  set averageRating(dynamic? value) => setField<dynamic>('average_rating', value);
+  dynamic get averageRating => getField<dynamic>('average_rating');
+  set averageRating(dynamic value) => setField<dynamic>('average_rating', value);
 
   String? get paymentMethodId => getField<String>('payment_method_id');
   set paymentMethodId(String? value) => setField<String>('payment_method_id', value);

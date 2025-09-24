@@ -5,6 +5,7 @@ import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
 import 'auth/firebase_auth/firebase_user_provider.dart';
 import 'auth/firebase_auth/auth_util.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 import 'backend/push_notifications/push_notifications_util.dart';
 import '/backend/supabase/supabase.dart';
@@ -12,6 +13,8 @@ import 'backend/firebase/firebase_config.dart';
 import 'flutter_flow/flutter_flow_util.dart';
 import 'flutter_flow/internationalization.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import '/custom_code/actions/sistema_monitoramento_performance.dart';
+import '/custom_code/actions/configurar_back_navigation.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -32,6 +35,9 @@ void main() async {
 
   final appState = FFAppState(); // Initialize FFAppState
   await appState.initializePersistedState();
+
+  // Inicializar sistema de monitoramento de performance
+  await iniciarMonitoramentoPerformance();
 
   runApp(ChangeNotifierProvider(
     create: (context) => appState,
@@ -79,15 +85,38 @@ class _MyAppState extends State<MyApp> {
 
     _appStateNotifier = AppStateNotifier.instance;
     _router = createRouter(_appStateNotifier);
+    
+    // Inicializar o usuário imediatamente para evitar travamento na splash screen
+    _initializeUser();
+    
     userStream = optionFirebaseUserStream()
       ..listen((user) {
         _appStateNotifier.update(user);
       });
     jwtTokenStream.listen((_) {});
+    
+    // Timer para remover a splash screen
     Future.delayed(
-      Duration(milliseconds: 1000),
+      Duration(milliseconds: 3000),
       () => _appStateNotifier.stopShowingSplashImage(),
     );
+  }
+
+  void _initializeUser() async {
+    try {
+      // Verificar se já existe um usuário logado
+      final currentUser = FirebaseAuth.instance.currentUser;
+      if (currentUser != null) {
+        _appStateNotifier.update(OptionFirebaseUser(currentUser));
+      } else {
+        // Se não há usuário logado, criar um usuário "vazio" para permitir navegação
+        _appStateNotifier.update(OptionFirebaseUser(null));
+      }
+    } catch (e) {
+      // Em caso de erro, criar usuário vazio para não travar na splash
+      debugPrint('Erro na inicialização do usuário: $e');
+      _appStateNotifier.update(OptionFirebaseUser(null));
+    }
   }
 
   @override
@@ -107,27 +136,29 @@ class _MyAppState extends State<MyApp> {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp.router(
-      debugShowCheckedModeBanner: false,
-      title: 'option',
-      localizationsDelegates: [
-        FFLocalizationsDelegate(),
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-        FallbackMaterialLocalizationDelegate(),
-        FallbackCupertinoLocalizationDelegate(),
-      ],
-      locale: _locale,
-      supportedLocales: const [
-        Locale('pt'),
-      ],
-      theme: ThemeData(
-        brightness: Brightness.light,
-        useMaterial3: false,
+    return BackNavigationWrapper(
+      child: MaterialApp.router(
+        debugShowCheckedModeBanner: false,
+        title: 'option',
+        localizationsDelegates: [
+          FFLocalizationsDelegate(),
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+          FallbackMaterialLocalizationDelegate(),
+          FallbackCupertinoLocalizationDelegate(),
+        ],
+        locale: _locale,
+        supportedLocales: const [
+          Locale('pt'),
+        ],
+        theme: ThemeData(
+          brightness: Brightness.light,
+          useMaterial3: false,
+        ),
+        themeMode: _themeMode,
+        routerConfig: _router,
       ),
-      themeMode: _themeMode,
-      routerConfig: _router,
     );
   }
 }

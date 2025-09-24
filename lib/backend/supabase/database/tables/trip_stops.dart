@@ -26,11 +26,11 @@ class TripStopsRow extends SupabaseDataRow {
   String? get address => getField<String>('address');
   set address(String? value) => setField<String>('address', value);
 
-  dynamic? get latitude => getField<dynamic>('latitude');
-  set latitude(dynamic? value) => setField<dynamic>('latitude', value);
+  dynamic get latitude => getField<dynamic>('latitude');
+  set latitude(dynamic value) => setField<dynamic>('latitude', value);
 
-  dynamic? get longitude => getField<dynamic>('longitude');
-  set longitude(dynamic? value) => setField<dynamic>('longitude', value);
+  dynamic get longitude => getField<dynamic>('longitude');
+  set longitude(dynamic value) => setField<dynamic>('longitude', value);
 
   DateTime? get arrivedAt => getField<DateTime>('arrived_at');
   set arrivedAt(DateTime? value) => setField<DateTime>('arrived_at', value);

@@ -35,8 +35,8 @@ class SecurityLogsRow extends SupabaseDataRow {
   String? get userAgent => getField<String>('user_agent');
   set userAgent(String? value) => setField<String>('user_agent', value);
 
-  dynamic? get deviceInfo => getField<dynamic>('device_info');
-  set deviceInfo(dynamic? value) => setField<dynamic>('device_info', value);
+  dynamic get deviceInfo => getField<dynamic>('device_info');
+  set deviceInfo(dynamic value) => setField<dynamic>('device_info', value);
 
   String? get platform => getField<String>('platform');
   set platform(String? value) => setField<String>('platform', value);
@@ -47,8 +47,8 @@ class SecurityLogsRow extends SupabaseDataRow {
   String? get sessionId => getField<String>('session_id');
   set sessionId(String? value) => setField<String>('session_id', value);
 
-  dynamic? get metadata => getField<dynamic>('metadata');
-  set metadata(dynamic? value) => setField<dynamic>('metadata', value);
+  dynamic get metadata => getField<dynamic>('metadata');
+  set metadata(dynamic value) => setField<dynamic>('metadata', value);
 
   DateTime? get timestamp => getField<DateTime>('timestamp');
   set timestamp(DateTime? value) => setField<DateTime>('timestamp', value);

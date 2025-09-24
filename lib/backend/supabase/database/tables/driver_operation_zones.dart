@@ -23,11 +23,11 @@ class DriverOperationZonesRow extends SupabaseDataRow {
   String? get zoneName => getField<String>('zone_name');
   set zoneName(String? value) => setField<String>('zone_name', value);
 
-  dynamic? get polygonCoordinates => getField<dynamic>('polygon_coordinates');
-  set polygonCoordinates(dynamic? value) => setField<dynamic>('polygon_coordinates', value);
+  dynamic get polygonCoordinates => getField<dynamic>('polygon_coordinates');
+  set polygonCoordinates(dynamic value) => setField<dynamic>('polygon_coordinates', value);
 
-  dynamic? get priceMultiplier => getField<dynamic>('price_multiplier');
-  set priceMultiplier(dynamic? value) => setField<dynamic>('price_multiplier', value);
+  dynamic get priceMultiplier => getField<dynamic>('price_multiplier');
+  set priceMultiplier(dynamic value) => setField<dynamic>('price_multiplier', value);
 
   bool? get isActive => getField<bool>('is_active');
   set isActive(bool? value) => setField<bool>('is_active', value);

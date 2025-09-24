@@ -1,5 +1,6 @@
 // lib/domain/repositories/passenger_repository.dart
 import '../entities/passenger.dart';
+import '../entities/trip.dart';
 import '../value_objects/result.dart';
 
 

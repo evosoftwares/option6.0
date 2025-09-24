@@ -23,11 +23,11 @@ class TripRequestsRow extends SupabaseDataRow {
   String? get originAddress => getField<String>('origin_address');
   set originAddress(String? value) => setField<String>('origin_address', value);
 
-  dynamic? get originLatitude => getField<dynamic>('origin_latitude');
-  set originLatitude(dynamic? value) => setField<dynamic>('origin_latitude', value);
+  dynamic get originLatitude => getField<dynamic>('origin_latitude');
+  set originLatitude(dynamic value) => setField<dynamic>('origin_latitude', value);
 
-  dynamic? get originLongitude => getField<dynamic>('origin_longitude');
-  set originLongitude(dynamic? value) => setField<dynamic>('origin_longitude', value);
+  dynamic get originLongitude => getField<dynamic>('origin_longitude');
+  set originLongitude(dynamic value) => setField<dynamic>('origin_longitude', value);
 
   String? get originNeighborhood => getField<String>('origin_neighborhood');
   set originNeighborhood(String? value) => setField<String>('origin_neighborhood', value);
@@ -35,11 +35,11 @@ class TripRequestsRow extends SupabaseDataRow {
   String? get destinationAddress => getField<String>('destination_address');
   set destinationAddress(String? value) => setField<String>('destination_address', value);
 
-  dynamic? get destinationLatitude => getField<dynamic>('destination_latitude');
-  set destinationLatitude(dynamic? value) => setField<dynamic>('destination_latitude', value);
+  dynamic get destinationLatitude => getField<dynamic>('destination_latitude');
+  set destinationLatitude(dynamic value) => setField<dynamic>('destination_latitude', value);
 
-  dynamic? get destinationLongitude => getField<dynamic>('destination_longitude');
-  set destinationLongitude(dynamic? value) => setField<dynamic>('destination_longitude', value);
+  dynamic get destinationLongitude => getField<dynamic>('destination_longitude');
+  set destinationLongitude(dynamic value) => setField<dynamic>('destination_longitude', value);
 
   String? get destinationNeighborhood => getField<String>('destination_neighborhood');
   set destinationNeighborhood(String? value) => setField<String>('destination_neighborhood', value);

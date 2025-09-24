@@ -296,16 +296,23 @@ extension _WithoutColorExtension on TextStyle {
 }
 
 // Slightly hacky method of getting the layout width of the provided text.
-double? _getTextWidth(String? text, TextStyle? style, int maxLines) =>
-    text != null
-        ? (TextPainter(
-            text: TextSpan(text: text, style: style),
-            textDirection: TextDirection.ltr,
-            maxLines: maxLines,
-          )..layout())
-            .size
-            .width
-        : null;
+// Fixed to avoid LayoutBuilder intrinsic dimension issues in AlertDialog
+double? _getTextWidth(String? text, TextStyle? style, int maxLines) {
+  if (text == null) return null;
+  
+  try {
+    final textPainter = TextPainter(
+      text: TextSpan(text: text, style: style),
+      textDirection: TextDirection.ltr,
+      maxLines: maxLines,
+    );
+    textPainter.layout();
+    return textPainter.size.width;
+  } catch (e) {
+    // Fallback to estimated width if layout fails during intrinsic calculations
+    return (text.length * (style?.fontSize ?? 14.0) * 0.6);
+  }
+}
 
 class FFFocusIndicator extends StatefulWidget {
   final Widget child;

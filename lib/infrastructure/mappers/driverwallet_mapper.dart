@@ -1,6 +1,5 @@
 import '/backend/supabase/supabase.dart';
 // lib/infrastructure/mappers/driverwallet_mapper.dart
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../domain/entities/driverwallet.dart';
 import '../../backend/supabase/database/tables/driver_wallets.dart';
 import '../../domain/value_objects/email.dart';
@@ -9,13 +8,13 @@ class DriverWalletMapper {
   DriverWallet toDomain(DriverWalletsRow row) {
     return DriverWallet(
       id: row.id,
-      email: Email(row.email!),
+      email: Email(row.email ?? 'placeholder@example.com'),
       availableBalance: row.availableBalance,
       pendingBalance: row.pendingBalance,
       totalEarned: row.totalEarned,
       totalWithdrawn: row.totalWithdrawn,
-      createdAt: row.createdAt,
-      updatedAt: row.updatedAt,
+      createdAt: row.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0),
+      updatedAt: row.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0),
     );
   }
   

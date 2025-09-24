@@ -1,5 +1,4 @@
 // lib/infrastructure/mappers/triprequest_mapper.dart
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../domain/entities/triprequest.dart';
 import '../../backend/supabase/database/tables/trip_requests.dart';
 import '../../domain/value_objects/location.dart';
@@ -9,27 +8,27 @@ class TripRequestMapper {
   TripRequest toDomain(TripRequestsRow row) {
     return TripRequest(
       id: row.id,
-      passengerId: row.passengerId,
-      originAddress: row.originAddress,
-      originNeighborhood: row.originNeighborhood,
-      destinationAddress: row.destinationAddress,
-      vehicleCategory: row.vehicleCategory,
-      needsPet: row.needsPet,
-      needsGrocerySpace: row.needsGrocerySpace,
-      needsAc: row.needsAc,
-      isCondoOrigin: row.isCondoOrigin,
-      isCondoDestination: row.isCondoDestination,
-      numberOfStops: row.numberOfStops,
-      status: row.status,
-      selectedOfferId: row.selectedOfferId,
-      createdAt: row.createdAt,
-      expiresAt: row.expiresAt,
-      targetDriverId: row.targetDriverId,
-      acceptedByDriverId: row.acceptedByDriverId,
-      acceptedAt: row.acceptedAt,
-      currentFallbackIndex: row.currentFallbackIndex,
-      timeoutCount: row.timeoutCount,
-      estimatedDistanceKm: row.estimatedDistanceKm,
+      passengerId: row.passengerId ?? '',
+      originAddress: row.originAddress ?? '',
+      originNeighborhood: row.originNeighborhood ?? '',
+      destinationAddress: row.destinationAddress ?? '',
+      vehicleCategory: row.vehicleCategory ?? '',
+      needsPet: row.needsPet ?? false,
+      needsGrocerySpace: row.needsGrocerySpace ?? false,
+      needsAc: row.needsAc ?? false,
+      isCondoOrigin: row.isCondoOrigin ?? false,
+      isCondoDestination: row.isCondoDestination ?? false,
+      numberOfStops: row.numberOfStops ?? 0,
+      status: row.status ?? '',
+      selectedOfferId: row.selectedOfferId ?? '',
+      createdAt: row.createdAt ?? DateTime.now(),
+      expiresAt: row.expiresAt ?? DateTime.now(),
+      targetDriverId: row.targetDriverId ?? '',
+      acceptedByDriverId: row.acceptedByDriverId ?? '',
+      acceptedAt: row.acceptedAt ?? DateTime.now(),
+      currentFallbackIndex: row.currentFallbackIndex ?? 0,
+      timeoutCount: row.timeoutCount ?? 0,
+      estimatedDistanceKm: row.estimatedDistanceKm ?? 0.0,
       estimatedFare: Money.fromReais(row.estimatedFare ?? 0.0),
       fallbackDrivers: row.fallbackDrivers,
       originLocation: row.originLatitude != null && row.originLongitude != null
@@ -74,8 +73,5 @@ class TripRequestMapper {
     };
   }
 
-  List<T> _convertList<T>(List<dynamic>? list, T Function(dynamic) converter) {
-    if (list == null) return [];
-    return list.map(converter).toList();
-  }
+
 }

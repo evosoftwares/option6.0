@@ -1,5 +1,4 @@
 // lib/infrastructure/mappers/driverdocument_mapper.dart
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../domain/entities/driverdocument.dart';
 import '../../backend/supabase/database/tables/driver_documents.dart';
 
@@ -8,19 +7,19 @@ class DriverDocumentMapper {
   DriverDocument toDomain(DriverDocumentsRow row) {
     return DriverDocument(
       id: row.id,
-      driverId: row.driverId,
-      documentType: row.documentType,
-      fileUrl: row.fileUrl,
-      fileSize: row.fileSize,
-      mimeType: row.mimeType,
-      expiryDate: row.expiryDate,
-      rejectionReason: row.rejectionReason,
-      reviewedBy: row.reviewedBy,
-      reviewedAt: row.reviewedAt,
-      isCurrent: row.isCurrent,
-      createdAt: row.createdAt,
-      updatedAt: row.updatedAt,
-      status: row.status,
+      driverId: row.driverId ?? '',
+      documentType: row.documentType ?? '',
+      fileUrl: row.fileUrl ?? '',
+      fileSize: row.fileSize ?? 0,
+      mimeType: row.mimeType ?? '',
+      expiryDate: row.expiryDate ?? DateTime.now(),
+      rejectionReason: row.rejectionReason ?? '',
+      reviewedBy: row.reviewedBy ?? '',
+      reviewedAt: row.reviewedAt ?? DateTime.now(),
+      isCurrent: row.isCurrent ?? false,
+      createdAt: row.createdAt ?? DateTime.now(),
+      updatedAt: row.updatedAt ?? DateTime.now(),
+      status: row.status ?? '',
     );
   }
   

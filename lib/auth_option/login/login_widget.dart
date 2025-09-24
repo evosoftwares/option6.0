@@ -44,24 +44,30 @@ class _LoginWidgetState extends State<LoginWidget> {
     super.initState();
     _model = createModel(context, () => LoginModel());
 
-    // On page load action.
-    SchedulerBinding.instance.addPostFrameCallback((_) async {
-      Function() _navigate = () {};
-      if (loggedIn == true) {
-        GoRouter.of(context).prepareAuthEvent();
-        await authManager.signOut();
-        GoRouter.of(context).clearRedirectLocation();
-
-        _navigate =
-            () => context.goNamedAuth(LoginWidget.routeName, context.mounted);
+    // Otimização: Usar Future.microtask para evitar bloqueio do main thread
+    Future.microtask(() async {
+      final loggedIn = currentUserUid.isNotEmpty;
+      
+      if (loggedIn) {
+        // Operações assíncronas otimizadas
+        try {
+          GoRouter.of(context).prepareAuthEvent();
+          await authManager.signOut();
+          GoRouter.of(context).clearRedirectLocation();
+          
+          if (context.mounted) {
+            context.goNamedAuth(LoginWidget.routeName, context.mounted);
+          }
+        } catch (e) {
+          // Log do erro sem bloquear a UI
+          debugPrint('Erro no logout automático: $e');
+        }
       }
-
-      _navigate();
     });
 
+    // Inicialização dos controllers de forma não bloqueante
     _model.textController1 ??= TextEditingController();
     _model.textFieldFocusNode1 ??= FocusNode();
-
     _model.textController2 ??= TextEditingController();
     _model.textFieldFocusNode2 ??= FocusNode();
   }
@@ -85,10 +91,19 @@ class _LoginWidgetState extends State<LoginWidget> {
         backgroundColor: FlutterFlowTheme.of(context).secondaryBackground,
         body: SafeArea(
           top: true,
-          child: Column(
-            mainAxisSize: MainAxisSize.max,
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
+          child: SingleChildScrollView(
+            physics: const BouncingScrollPhysics(),
+            child: ConstrainedBox(
+              constraints: BoxConstraints(
+                minHeight: MediaQuery.of(context).size.height - 
+                          MediaQuery.of(context).padding.top - 
+                          MediaQuery.of(context).padding.bottom,
+              ),
+              child: IntrinsicHeight(
+                child: Column(
+                  mainAxisSize: MainAxisSize.max,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
               Align(
                 alignment: AlignmentDirectional(0.0, 0.0),
                 child: Padding(
@@ -97,7 +112,8 @@ class _LoginWidgetState extends State<LoginWidget> {
                     borderRadius: BorderRadius.circular(8.0),
                     child: Image.asset(
                       'assets/images/Logotipo_Vertical_Color.png',
-                      width: 240.39,
+                      width: 150.0,
+                      height: 150.0,
                       fit: BoxFit.contain,
                     ),
                   ),
@@ -610,7 +626,10 @@ class _LoginWidgetState extends State<LoginWidget> {
                   ),
                 ),
               ),
-            ],
+                  ],
+                ),
+              ),
+            ),
           ),
         ),
       ),

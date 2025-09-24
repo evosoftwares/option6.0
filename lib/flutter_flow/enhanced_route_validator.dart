@@ -407,7 +407,7 @@ class EnhancedRouteValidator {
       warnings.add(ValidationWarning(
         type: ValidationWarningType.longTrip,
         message: 'Viagem com preço elevado',
-        details: 'R$ ${pricingData.totalPrice.toStringAsFixed(2)} - Verifique se está correto',
+        details: 'R\$ ${pricingData.totalPrice.toStringAsFixed(2)} - Verifique se está correto',
       ));
       }
 

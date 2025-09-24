@@ -88,8 +88,9 @@ class _ChecklistTilePerfeitoState extends State<ChecklistTilePerfeito> {
                   await widget.acaoAoMudar(newValue);
                 }
               },
-              activeColor: FlutterFlowTheme.of(context).primary,
-              checkColor: FlutterFlowTheme.of(context).info,
+-              activeColor: FlutterFlowTheme.of(context).primary,
++              activeColor: FlutterFlowTheme.of(context).primary,
+               checkColor: FlutterFlowTheme.of(context).info,
             ),
           ],
         ),

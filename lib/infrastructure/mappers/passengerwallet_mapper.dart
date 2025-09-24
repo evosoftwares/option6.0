@@ -1,5 +1,4 @@
 // lib/infrastructure/mappers/passengerwallet_mapper.dart
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../domain/entities/passengerwallet.dart';
 import '../../backend/supabase/database/tables/passenger_wallets.dart';
 import '../../domain/value_objects/email.dart';
@@ -8,14 +7,14 @@ class PassengerWalletMapper {
   PassengerWallet toDomain(PassengerWalletsRow row) {
     return PassengerWallet(
       id: row.id,
-      passengerId: row.passengerId,
-      email: Email(row.email!),
+      passengerId: row.passengerId ?? '',
+      email: Email(row.email ?? 'placeholder@example.com'),
       availableBalance: row.availableBalance,
       pendingBalance: row.pendingBalance,
       totalSpent: row.totalSpent,
       totalCashback: row.totalCashback,
-      createdAt: row.createdAt,
-      updatedAt: row.updatedAt,
+      createdAt: row.createdAt ?? DateTime.fromMillisecondsSinceEpoch(0),
+      updatedAt: row.updatedAt ?? DateTime.fromMillisecondsSinceEpoch(0),
     );
   }
   

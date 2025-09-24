@@ -1,5 +1,4 @@
 // lib/infrastructure/mappers/tripstop_mapper.dart
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../domain/entities/tripstop.dart';
 import '../../backend/supabase/database/tables/trip_stops.dart';
 import '../../domain/value_objects/location.dart';
@@ -8,12 +7,12 @@ class TripStopMapper {
   TripStop toDomain(TripStopsRow row) {
     return TripStop(
       id: row.id,
-      tripId: row.tripId,
-      stopOrder: row.stopOrder,
-      address: row.address,
-      arrivedAt: row.arrivedAt,
-      departedAt: row.departedAt,
-      createdAt: row.createdAt,
+      tripId: row.tripId ?? '',
+      stopOrder: row.stopOrder ?? 0,
+      address: row.address ?? '',
+      arrivedAt: row.arrivedAt ?? DateTime.now(),
+      departedAt: row.departedAt ?? DateTime.now(),
+      createdAt: row.createdAt ?? DateTime.now(),
       locationLocation: row.latitude != null && row.longitude != null
           ? Location.fromCoordinates(row.latitude!, row.longitude!)
           : null,

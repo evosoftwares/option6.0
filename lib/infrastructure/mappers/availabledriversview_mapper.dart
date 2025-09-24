@@ -1,5 +1,4 @@
 // lib/infrastructure/mappers/availabledriversview_mapper.dart
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../domain/entities/availabledriversview.dart';
 import '../../backend/supabase/database/tables/available_drivers_view.dart';
 import '../../domain/value_objects/location.dart';
@@ -8,6 +7,7 @@ import '../../domain/value_objects/money.dart';
 class AvailableDriversViewMapper {
   AvailableDriversView toDomain(AvailableDriversViewRow row) {
     return AvailableDriversView(
+      id: row.id,
       driverId: row.driverId,
       userId: row.userId,
       vehicleBrand: row.vehicleBrand,
@@ -36,6 +36,7 @@ class AvailableDriversViewMapper {
   
   Map<String, dynamic> toSupabase(AvailableDriversView entity) {
     return {
+      'id': entity.id,
       'driver_id': entity.driverId,
       'user_id': entity.userId,
       'vehicle_brand': entity.vehicleBrand,

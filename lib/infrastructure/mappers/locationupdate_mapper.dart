@@ -1,5 +1,4 @@
 // lib/infrastructure/mappers/locationupdate_mapper.dart
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../domain/entities/locationupdate.dart';
 import '../../backend/supabase/database/tables/location_updates.dart';
 import '../../domain/value_objects/location.dart';
@@ -8,8 +7,8 @@ class LocationUpdateMapper {
   LocationUpdate toDomain(LocationUpdatesRow row) {
     return LocationUpdate(
       id: row.id,
-      sharingId: row.sharingId,
-      timestamp: row.timestamp,
+      sharingId: row.sharingId ?? '',
+      timestamp: row.timestamp ?? DateTime.now(),
       locationLocation: row.latitude != null && row.longitude != null
           ? Location.fromCoordinates(row.latitude!, row.longitude!)
           : null,

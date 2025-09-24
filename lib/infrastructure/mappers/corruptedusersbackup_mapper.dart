@@ -1,5 +1,4 @@
 // lib/infrastructure/mappers/corruptedusersbackup_mapper.dart
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../domain/entities/corruptedusersbackup.dart';
 import '../../backend/supabase/database/tables/corrupted_users_backup.dart';
 
@@ -8,13 +7,13 @@ class CorruptedUsersBackupMapper {
   CorruptedUsersBackup toDomain(CorruptedUsersBackupRow row) {
     return CorruptedUsersBackup(
       id: row.id,
-      originalUserId: row.originalUserId,
-      originalFullName: row.originalFullName,
-      originalPhone: row.originalPhone,
-      originalEmail: row.originalEmail,
-      correctionReason: row.correctionReason,
-      restored: row.restored,
-      restoredAt: row.restoredAt,
+      originalUserId: row.originalUserId ?? '',
+      originalFullName: row.originalFullName ?? '',
+      originalPhone: row.originalPhone ?? '',
+      originalEmail: row.originalEmail ?? '',
+      correctionReason: row.correctionReason ?? '',
+      restored: row.restored ?? false,
+      restoredAt: row.restoredAt ?? DateTime.now(),
     );
   }
   

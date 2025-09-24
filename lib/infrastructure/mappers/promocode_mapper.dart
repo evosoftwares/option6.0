@@ -1,5 +1,4 @@
 // lib/infrastructure/mappers/promocode_mapper.dart
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../domain/entities/promocode.dart';
 import '../../backend/supabase/database/tables/promo_codes.dart';
 
@@ -8,21 +7,21 @@ class PromoCodeMapper {
   PromoCode toDomain(PromoCodesRow row) {
     return PromoCode(
       id: row.id,
-      code: row.code,
-      description: row.description,
-      discountType: row.discountType,
-      discountValue: row.discountValue,
-      maxDiscount: row.maxDiscount,
-      minTripValue: row.minTripValue,
-      maxUsesPerUser: row.maxUsesPerUser,
-      validFrom: row.validFrom,
-      validUntil: row.validUntil,
-      usageLimit: row.usageLimit,
-      usedCount: row.usedCount,
-      isFirstTripOnly: row.isFirstTripOnly,
-      isActive: row.isActive,
-      createdBy: row.createdBy,
-      createdAt: row.createdAt,
+      code: row.code ?? '',
+      description: row.description ?? '',
+      discountType: row.discountType ?? '',
+      discountValue: row.discountValue ?? 0.0,
+      maxDiscount: row.maxDiscount ?? 0.0,
+      minTripValue: row.minTripValue ?? 0.0,
+      maxUsesPerUser: row.maxUsesPerUser ?? 0,
+      validFrom: row.validFrom ?? DateTime.now(),
+      validUntil: row.validUntil ?? DateTime.now(),
+      usageLimit: row.usageLimit ?? 0,
+      usedCount: row.usedCount ?? 0,
+      isFirstTripOnly: row.isFirstTripOnly ?? false,
+      isActive: row.isActive ?? false,
+      createdBy: row.createdBy ?? '',
+      createdAt: row.createdAt ?? DateTime.now(),
       targetCities: row.targetCities,
       targetCategories: row.targetCategories,
     );
@@ -49,10 +48,5 @@ class PromoCodeMapper {
       'target_cities': entity.targetCities,
       'target_categories': entity.targetCategories,
     };
-  }
-
-  List<T> _convertList<T>(List<dynamic>? list, T Function(dynamic) converter) {
-    if (list == null) return [];
-    return list.map(converter).toList();
   }
 }

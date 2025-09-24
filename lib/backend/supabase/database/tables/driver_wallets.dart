@@ -21,17 +21,17 @@ class DriverWalletsRow extends SupabaseDataRow {
   String? get driverId => getField<String>('driver_id');
   set driverId(String? value) => setField<String>('driver_id', value);
 
-  dynamic? get availableBalance => getField<dynamic>('available_balance');
-  set availableBalance(dynamic? value) => setField<dynamic>('available_balance', value);
+  dynamic get availableBalance => getField<dynamic>('available_balance');
+  set availableBalance(dynamic value) => setField<dynamic>('available_balance', value);
 
-  dynamic? get pendingBalance => getField<dynamic>('pending_balance');
-  set pendingBalance(dynamic? value) => setField<dynamic>('pending_balance', value);
+  dynamic get pendingBalance => getField<dynamic>('pending_balance');
+  set pendingBalance(dynamic value) => setField<dynamic>('pending_balance', value);
 
-  dynamic? get totalEarned => getField<dynamic>('total_earned');
-  set totalEarned(dynamic? value) => setField<dynamic>('total_earned', value);
+  dynamic get totalEarned => getField<dynamic>('total_earned');
+  set totalEarned(dynamic value) => setField<dynamic>('total_earned', value);
 
-  dynamic? get totalWithdrawn => getField<dynamic>('total_withdrawn');
-  set totalWithdrawn(dynamic? value) => setField<dynamic>('total_withdrawn', value);
+  dynamic get totalWithdrawn => getField<dynamic>('total_withdrawn');
+  set totalWithdrawn(dynamic value) => setField<dynamic>('total_withdrawn', value);
 
   DateTime? get createdAt => getField<DateTime>('created_at');
   set createdAt(DateTime? value) => setField<DateTime>('created_at', value);

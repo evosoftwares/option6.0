@@ -143,8 +143,7 @@ Future<List<Map<String, dynamic>>> buscarMotoristasDisponiveis({
         'destino_condominio': isCondoDestination,
         'raio_maximo_km': 10.0,
       },
-    );
-
+    ).timeout(Duration(seconds: 8), onTimeout: () => []);
     List<Map<String, dynamic>> motoristasFormatados = [];
 
     for (var motorista in motoristasProximos) {
@@ -214,7 +213,7 @@ Future<Map<String, dynamic>> verificarDisponibilidadeMotoristas({
         'lon_origem': longitude,
         'raio_km': 10.0,
       },
-    );
+    ).timeout(Duration(seconds: 6), onTimeout: () => []);
 
     if (disponibilidade.isNotEmpty) {
       final dados = disponibilidade.first;

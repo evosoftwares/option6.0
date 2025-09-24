@@ -20,20 +20,20 @@ class TripLocationHistoryRow extends SupabaseDataRow {
   String? get tripId => getField<String>('trip_id');
   set tripId(String? value) => setField<String>('trip_id', value);
 
-  dynamic? get latitude => getField<dynamic>('latitude');
-  set latitude(dynamic? value) => setField<dynamic>('latitude', value);
+  dynamic get latitude => getField<dynamic>('latitude');
+  set latitude(dynamic value) => setField<dynamic>('latitude', value);
 
-  dynamic? get longitude => getField<dynamic>('longitude');
-  set longitude(dynamic? value) => setField<dynamic>('longitude', value);
+  dynamic get longitude => getField<dynamic>('longitude');
+  set longitude(dynamic value) => setField<dynamic>('longitude', value);
 
-  dynamic? get speedKmh => getField<dynamic>('speed_kmh');
-  set speedKmh(dynamic? value) => setField<dynamic>('speed_kmh', value);
+  dynamic get speedKmh => getField<dynamic>('speed_kmh');
+  set speedKmh(dynamic value) => setField<dynamic>('speed_kmh', value);
 
-  dynamic? get heading => getField<dynamic>('heading');
-  set heading(dynamic? value) => setField<dynamic>('heading', value);
+  dynamic get heading => getField<dynamic>('heading');
+  set heading(dynamic value) => setField<dynamic>('heading', value);
 
-  dynamic? get accuracyMeters => getField<dynamic>('accuracy_meters');
-  set accuracyMeters(dynamic? value) => setField<dynamic>('accuracy_meters', value);
+  dynamic get accuracyMeters => getField<dynamic>('accuracy_meters');
+  set accuracyMeters(dynamic value) => setField<dynamic>('accuracy_meters', value);
 
   DateTime? get recordedAt => getField<DateTime>('recorded_at');
   set recordedAt(DateTime? value) => setField<DateTime>('recorded_at', value);

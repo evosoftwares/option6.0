@@ -1,5 +1,4 @@
 // lib/infrastructure/mappers/drivereffectivestatu_mapper.dart
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../domain/entities/drivereffectivestatu.dart';
 import '../../backend/supabase/database/tables/driver_status.dart';
 

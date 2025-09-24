@@ -1,5 +1,4 @@
 // lib/infrastructure/mappers/promocodeusage_mapper.dart
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../domain/entities/promocodeusage.dart';
 import '../../backend/supabase/database/tables/promo_code_usage.dart';
 
@@ -8,11 +7,11 @@ class PromoCodeUsageMapper {
   PromoCodeUsage toDomain(PromoCodeUsageRow row) {
     return PromoCodeUsage(
       id: row.id,
-      promoCodeId: row.promoCodeId,
-      passengerId: row.passengerId,
-      tripId: row.tripId,
-      discountApplied: row.discountApplied,
-      usedAt: row.usedAt,
+      promoCodeId: row.promoCodeId ?? '',
+      passengerId: row.passengerId ?? '',
+      tripId: row.tripId ?? '',
+      discountApplied: row.discountApplied ?? 0.0,
+      usedAt: row.usedAt ?? DateTime.now(),
     );
   }
   

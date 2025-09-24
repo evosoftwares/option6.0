@@ -1,5 +1,4 @@
 // lib/infrastructure/mappers/backuppassengersbeforefkchange_mapper.dart
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../domain/entities/backuppassengersbeforefkchange.dart';
 import '../../backend/supabase/database/tables/backup_passengers_before_fk_change.dart';
 
@@ -8,12 +7,12 @@ class BackupPassengersBeforeFkChangeMapper {
   BackupPassengersBeforeFkChange toDomain(BackupPassengersBeforeFkChangeRow row) {
     return BackupPassengersBeforeFkChange(
       id: row.id,
-      totalTrips: row.totalTrips,
-      averageRating: row.averageRating,
-      paymentMethodId: row.paymentMethodId,
-      createdAt: row.createdAt,
-      updatedAt: row.updatedAt,
-      userId: row.userId,
+      totalTrips: row.totalTrips ?? 0,
+      averageRating: row.averageRating ?? 0.0,
+      paymentMethodId: row.paymentMethodId ?? '',
+      createdAt: row.createdAt ?? DateTime.now(),
+      updatedAt: row.updatedAt ?? DateTime.now(),
+      userId: row.userId ?? '',
     );
   }
   

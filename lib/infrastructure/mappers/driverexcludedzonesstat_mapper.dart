@@ -1,5 +1,4 @@
 // lib/infrastructure/mappers/driverexcludedzonesstat_mapper.dart
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../domain/entities/driverexcludedzonesstat.dart';
 import '../../backend/supabase/database/tables/driver_excluded_zones.dart';
 

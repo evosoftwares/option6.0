@@ -182,7 +182,7 @@ class _DocumentosMotoristaWidgetState extends State<DocumentosMotoristaWidget> {
         }
         await DriverDocumentsTable().update(
           data: currentUpdate,
-          matchingRows: (rows) => rows.eq('id', existing.first.id!),
+          matchingRows: (rows) => rows.eq('id', existing.first.id),
         );
       }
     } catch (e) {

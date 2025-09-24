@@ -4,7 +4,6 @@ import '../../domain/repositories/triplocationhistory_repository.dart';
 import '../../domain/value_objects/result.dart';
 import '../../backend/supabase/database/tables/trip_location_history.dart';
 import '../mappers/triplocationhistory_mapper.dart';
-import '../../domain/value_objects/location.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 

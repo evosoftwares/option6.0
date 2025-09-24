@@ -51,32 +51,32 @@ class DriversRow extends SupabaseDataRow {
   bool? get acceptsPet => getField<bool>('accepts_pet');
   set acceptsPet(bool? value) => setField<bool>('accepts_pet', value);
 
-  dynamic? get petFee => getField<dynamic>('pet_fee');
-  set petFee(dynamic? value) => setField<dynamic>('pet_fee', value);
+  dynamic get petFee => getField<dynamic>('pet_fee');
+  set petFee(dynamic value) => setField<dynamic>('pet_fee', value);
 
   bool? get acceptsGrocery => getField<bool>('accepts_grocery');
   set acceptsGrocery(bool? value) => setField<bool>('accepts_grocery', value);
 
-  dynamic? get groceryFee => getField<dynamic>('grocery_fee');
-  set groceryFee(dynamic? value) => setField<dynamic>('grocery_fee', value);
+  dynamic get groceryFee => getField<dynamic>('grocery_fee');
+  set groceryFee(dynamic value) => setField<dynamic>('grocery_fee', value);
 
   bool? get acceptsCondo => getField<bool>('accepts_condo');
   set acceptsCondo(bool? value) => setField<bool>('accepts_condo', value);
 
-  dynamic? get condoFee => getField<dynamic>('condo_fee');
-  set condoFee(dynamic? value) => setField<dynamic>('condo_fee', value);
+  dynamic get condoFee => getField<dynamic>('condo_fee');
+  set condoFee(dynamic value) => setField<dynamic>('condo_fee', value);
 
-  dynamic? get stopFee => getField<dynamic>('stop_fee');
-  set stopFee(dynamic? value) => setField<dynamic>('stop_fee', value);
+  dynamic get stopFee => getField<dynamic>('stop_fee');
+  set stopFee(dynamic value) => setField<dynamic>('stop_fee', value);
 
   String? get acPolicy => getField<String>('ac_policy');
   set acPolicy(String? value) => setField<String>('ac_policy', value);
 
-  dynamic? get customPricePerKm => getField<dynamic>('custom_price_per_km');
-  set customPricePerKm(dynamic? value) => setField<dynamic>('custom_price_per_km', value);
+  dynamic get customPricePerKm => getField<dynamic>('custom_price_per_km');
+  set customPricePerKm(dynamic value) => setField<dynamic>('custom_price_per_km', value);
 
-  dynamic? get customPricePerMinute => getField<dynamic>('custom_price_per_minute');
-  set customPricePerMinute(dynamic? value) => setField<dynamic>('custom_price_per_minute', value);
+  dynamic get customPricePerMinute => getField<dynamic>('custom_price_per_minute');
+  set customPricePerMinute(dynamic value) => setField<dynamic>('custom_price_per_minute', value);
 
   String? get bankAccountType => getField<String>('bank_account_type');
   set bankAccountType(String? value) => setField<String>('bank_account_type', value);
@@ -102,14 +102,14 @@ class DriversRow extends SupabaseDataRow {
   int? get totalTrips => getField<int>('total_trips');
   set totalTrips(int? value) => setField<int>('total_trips', value);
 
-  dynamic? get averageRating => getField<dynamic>('average_rating');
-  set averageRating(dynamic? value) => setField<dynamic>('average_rating', value);
+  dynamic get averageRating => getField<dynamic>('average_rating');
+  set averageRating(dynamic value) => setField<dynamic>('average_rating', value);
 
-  dynamic? get currentLatitude => getField<dynamic>('current_latitude');
-  set currentLatitude(dynamic? value) => setField<dynamic>('current_latitude', value);
+  dynamic get currentLatitude => getField<dynamic>('current_latitude');
+  set currentLatitude(dynamic value) => setField<dynamic>('current_latitude', value);
 
-  dynamic? get currentLongitude => getField<dynamic>('current_longitude');
-  set currentLongitude(dynamic? value) => setField<dynamic>('current_longitude', value);
+  dynamic get currentLongitude => getField<dynamic>('current_longitude');
+  set currentLongitude(dynamic value) => setField<dynamic>('current_longitude', value);
 
   DateTime? get lastLocationUpdate => getField<DateTime>('last_location_update');
   set lastLocationUpdate(DateTime? value) => setField<DateTime>('last_location_update', value);
@@ -129,8 +129,8 @@ class DriversRow extends SupabaseDataRow {
   DateTime? get lastNotificationAt => getField<DateTime>('last_notification_at');
   set lastNotificationAt(DateTime? value) => setField<DateTime>('last_notification_at', value);
 
-  dynamic? get approvalStatus => getField<dynamic>('approval_status');
-  set approvalStatus(dynamic? value) => setField<dynamic>('approval_status', value);
+  dynamic get approvalStatus => getField<dynamic>('approval_status');
+  set approvalStatus(dynamic value) => setField<dynamic>('approval_status', value);
 
   String? get onesignalPlayerId => getField<String>('onesignal_player_id');
   set onesignalPlayerId(String? value) => setField<String>('onesignal_player_id', value);

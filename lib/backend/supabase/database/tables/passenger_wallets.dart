@@ -23,17 +23,17 @@ class PassengerWalletsRow extends SupabaseDataRow {
   String? get email => getField<String>('email');
   set email(String? value) => setField<String>('email', value);
 
-  dynamic? get availableBalance => getField<dynamic>('available_balance');
-  set availableBalance(dynamic? value) => setField<dynamic>('available_balance', value);
+  dynamic get availableBalance => getField<dynamic>('available_balance');
+  set availableBalance(dynamic value) => setField<dynamic>('available_balance', value);
 
-  dynamic? get pendingBalance => getField<dynamic>('pending_balance');
-  set pendingBalance(dynamic? value) => setField<dynamic>('pending_balance', value);
+  dynamic get pendingBalance => getField<dynamic>('pending_balance');
+  set pendingBalance(dynamic value) => setField<dynamic>('pending_balance', value);
 
-  dynamic? get totalSpent => getField<dynamic>('total_spent');
-  set totalSpent(dynamic? value) => setField<dynamic>('total_spent', value);
+  dynamic get totalSpent => getField<dynamic>('total_spent');
+  set totalSpent(dynamic value) => setField<dynamic>('total_spent', value);
 
-  dynamic? get totalCashback => getField<dynamic>('total_cashback');
-  set totalCashback(dynamic? value) => setField<dynamic>('total_cashback', value);
+  dynamic get totalCashback => getField<dynamic>('total_cashback');
+  set totalCashback(dynamic value) => setField<dynamic>('total_cashback', value);
 
   DateTime? get createdAt => getField<DateTime>('created_at');
   set createdAt(DateTime? value) => setField<DateTime>('created_at', value);

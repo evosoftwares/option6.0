@@ -23,11 +23,11 @@ class PassengerWalletTransactionsRow extends SupabaseDataRow {
   String? get passengerId => getField<String>('passenger_id');
   set passengerId(String? value) => setField<String>('passenger_id', value);
 
-  dynamic? get type => getField<dynamic>('type');
-  set type(dynamic? value) => setField<dynamic>('type', value);
+  String? get type => getField<String>('type');
+  set type(String? value) => setField<String>('type', value);
 
-  dynamic? get amount => getField<dynamic>('amount');
-  set amount(dynamic? value) => setField<dynamic>('amount', value);
+  dynamic get amount => getField<dynamic>('amount');
+  set amount(dynamic value) => setField<dynamic>('amount', value);
 
   String? get description => getField<String>('description');
   set description(String? value) => setField<String>('description', value);
@@ -38,14 +38,14 @@ class PassengerWalletTransactionsRow extends SupabaseDataRow {
   String? get paymentMethodId => getField<String>('payment_method_id');
   set paymentMethodId(String? value) => setField<String>('payment_method_id', value);
 
-  dynamic? get asaasPaymentId => getField<dynamic>('asaas_payment_id');
-  set asaasPaymentId(dynamic? value) => setField<dynamic>('asaas_payment_id', value);
+  String? get asaasPaymentId => getField<String>('asaas_payment_id');
+  set asaasPaymentId(String? value) => setField<String>('asaas_payment_id', value);
 
-  dynamic? get status => getField<dynamic>('status');
-  set status(dynamic? value) => setField<dynamic>('status', value);
+  String? get status => getField<String>('status');
+  set status(String? value) => setField<String>('status', value);
 
-  dynamic? get metadata => getField<dynamic>('metadata');
-  set metadata(dynamic? value) => setField<dynamic>('metadata', value);
+  dynamic get metadata => getField<dynamic>('metadata');
+  set metadata(dynamic value) => setField<dynamic>('metadata', value);
 
   DateTime? get createdAt => getField<DateTime>('created_at');
   set createdAt(DateTime? value) => setField<DateTime>('created_at', value);

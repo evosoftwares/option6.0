@@ -1,5 +1,4 @@
 // lib/infrastructure/mappers/driverexcludedzone_mapper.dart
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../domain/entities/driverexcludedzone.dart';
 import '../../backend/supabase/database/tables/driver_excluded_zones.dart';
 
@@ -8,10 +7,10 @@ class DriverExcludedZoneMapper {
   DriverExcludedZone toDomain(DriverExcludedZonesRow row) {
     return DriverExcludedZone(
       id: row.id,
-      driverId: row.driverId,
-      type: row.type,
-      localName: row.localName,
-      createdAt: row.createdAt,
+      driverId: row.driverId ?? '',
+      type: row.type ?? '',
+      localName: row.localName ?? '',
+      createdAt: row.createdAt ?? DateTime.now(),
     );
   }
   

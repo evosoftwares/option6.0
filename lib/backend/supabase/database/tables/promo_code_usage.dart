@@ -26,8 +26,8 @@ class PromoCodeUsageRow extends SupabaseDataRow {
   String? get tripId => getField<String>('trip_id');
   set tripId(String? value) => setField<String>('trip_id', value);
 
-  dynamic? get discountApplied => getField<dynamic>('discount_applied');
-  set discountApplied(dynamic? value) => setField<dynamic>('discount_applied', value);
+  dynamic get discountApplied => getField<dynamic>('discount_applied');
+  set discountApplied(dynamic value) => setField<dynamic>('discount_applied', value);
 
   DateTime? get usedAt => getField<DateTime>('used_at');
   set usedAt(DateTime? value) => setField<DateTime>('used_at', value);

@@ -1,5 +1,4 @@
 // lib/infrastructure/mappers/asaaswebhookevent_mapper.dart
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../domain/entities/asaaswebhookevent.dart';
 import '../../backend/supabase/database/tables/asaas_webhook_events.dart';
 
@@ -8,12 +7,12 @@ class AsaasWebhookEventMapper {
   AsaasWebhookEvent toDomain(AsaasWebhookEventsRow row) {
     return AsaasWebhookEvent(
       id: row.id,
-      asaasEventId: row.asaasEventId,
-      eventType: row.eventType,
-      paymentId: row.paymentId,
+      asaasEventId: row.asaasEventId ?? '',
+      eventType: row.eventType ?? '',
+      paymentId: row.paymentId ?? '',
       payload: row.payload,
-      processedAt: row.processedAt,
-      createdAt: row.createdAt,
+      processedAt: row.processedAt ?? DateTime.now(),
+      createdAt: row.createdAt ?? DateTime.now(),
     );
   }
   

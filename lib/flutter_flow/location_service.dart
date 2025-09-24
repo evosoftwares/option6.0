@@ -6,6 +6,7 @@ import 'package:http/http.dart' as http;
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'place.dart';
 import 'lat_lng.dart';
+import 'dart:async';
 
 /// Sistema Inteligente de Geolocalização
 /// Fornece localização atual com fallbacks e cache
@@ -56,20 +57,52 @@ class LocationService {
         return await _getCachedLocation(); // Fallback para cache
       }
 
-      // 4. Obter localização atual
+      // 4. Usar última localização conhecida se for recente (até 5 min)
+      try {
+        final lastKnown = await Geolocator.getLastKnownPosition();
+        if (lastKnown != null) {
+          final now = DateTime.now();
+          final lastTime = lastKnown.timestamp ?? now;
+          if (now.difference(lastTime).inMinutes <= 5) {
+            final lastLocation = LatLng(lastKnown.latitude, lastKnown.longitude);
+            await _cacheLocation(lastLocation);
+            debugPrint('🕒 Usando última localização conhecida: ${lastLocation.latitude}, ${lastLocation.longitude}');
+            return lastLocation;
+          }
+        }
+      } catch (e) {
+        debugPrint('⚠️ Erro ao obter última localização conhecida: $e');
+      }
+
+      // 5. Obter localização atual com timeout curto
       debugPrint('🌍 Obtendo localização atual...');
-      final position = await Geolocator.getCurrentPosition(
-        desiredAccuracy: accuracy,
-        timeLimit: Duration(seconds: 10), // Timeout para evitar travamento
-      );
+      try {
+        final position = await Geolocator.getCurrentPosition(
+          desiredAccuracy: accuracy,
+          timeLimit: const Duration(seconds: 6), // Timeout curto para evitar travamento
+        );
 
-      final currentLocation = LatLng(position.latitude, position.longitude);
-
-      // 5. Armazenar no cache
-      await _cacheLocation(currentLocation);
-
-      debugPrint('✅ Localização obtida: ${currentLocation.latitude}, ${currentLocation.longitude}');
-      return currentLocation;
+        final currentLocation = LatLng(position.latitude, position.longitude);
+        await _cacheLocation(currentLocation);
+        debugPrint('✅ Localização obtida: ${currentLocation.latitude}, ${currentLocation.longitude}');
+        return currentLocation;
+      } catch (e) {
+        // Tentar novamente com baixa precisão e timeout ainda menor
+        debugPrint('⚠️ Primeira tentativa falhou (${e.toString()}). Tentando com baixa precisão...');
+        try {
+          final positionLow = await Geolocator.getCurrentPosition(
+            desiredAccuracy: LocationAccuracy.low,
+            timeLimit: const Duration(seconds: 4),
+          );
+          final lowAccLocation = LatLng(positionLow.latitude, positionLow.longitude);
+          await _cacheLocation(lowAccLocation);
+          debugPrint('✅ Localização obtida (baixa precisão): ${lowAccLocation.latitude}, ${lowAccLocation.longitude}');
+          return lowAccLocation;
+        } catch (e2) {
+          debugPrint('❌ Segunda tentativa de localização falhou: $e2');
+          return await _getCachedLocation(); // Fallback para cache
+        }
+      }
 
     } catch (e) {
       debugPrint('❌ Erro ao obter localização: $e');
@@ -85,7 +118,15 @@ class LocationService {
           '';
       if (key.isEmpty) {
         debugPrint('❌ Google API key não encontrada');
-        return null;
+        return FFPlace(
+          latLng: location,
+          name: 'Localização Atual',
+          address: 'Lat: ${location.latitude.toStringAsFixed(6)}, Lng: ${location.longitude.toStringAsFixed(6)}',
+          city: '',
+          state: '',
+          country: '',
+          zipCode: '',
+        );
       }
 
       debugPrint('🗺️ Fazendo reverse geocoding...');
@@ -101,22 +142,46 @@ class LocationService {
         },
       );
 
-      final response = await http.get(uri);
+      final response = await http.get(uri).timeout(const Duration(seconds: 8));
       if (response.statusCode != 200) {
         debugPrint('❌ Reverse Geocoding HTTP ${response.statusCode}');
-        return null;
+        return FFPlace(
+          latLng: location,
+          name: 'Localização Atual',
+          address: 'Lat: ${location.latitude.toStringAsFixed(6)}, Lng: ${location.longitude.toStringAsFixed(6)}',
+          city: '',
+          state: '',
+          country: '',
+          zipCode: '',
+        );
       }
 
       final data = jsonDecode(response.body) as Map<String, dynamic>;
       if (data['status'] != 'OK' || data['results'] == null) {
         debugPrint('❌ Reverse Geocoding error: ${data['status']}');
-        return null;
+        return FFPlace(
+          latLng: location,
+          name: 'Localização Atual',
+          address: 'Lat: ${location.latitude.toStringAsFixed(6)}, Lng: ${location.longitude.toStringAsFixed(6)}',
+          city: '',
+          state: '',
+          country: '',
+          zipCode: '',
+        );
       }
 
       final results = data['results'] as List;
       if (results.isEmpty) {
         debugPrint('❌ Nenhum resultado do reverse geocoding');
-        return null;
+        return FFPlace(
+          latLng: location,
+          name: 'Localização Atual',
+          address: 'Lat: ${location.latitude.toStringAsFixed(6)}, Lng: ${location.longitude.toStringAsFixed(6)}',
+          city: '',
+          state: '',
+          country: '',
+          zipCode: '',
+        );
       }
 
       // Pegar o primeiro resultado (mais preciso)
@@ -173,7 +238,7 @@ class LocationService {
       return place;
 
     } catch (e) {
-      debugPrint('❌ Erro no reverse geocoding: $e');
+      debugPrint('❌ Erro/timeout no reverse geocoding: $e');
       return FFPlace(
         latLng: location,
         name: 'Localização Atual',

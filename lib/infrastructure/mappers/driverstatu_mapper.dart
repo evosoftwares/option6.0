@@ -1,5 +1,4 @@
 // lib/infrastructure/mappers/driverstatu_mapper.dart
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../domain/entities/driverstatu.dart';
 import '../../backend/supabase/database/tables/driver_status.dart';
 
@@ -7,9 +6,10 @@ import '../../backend/supabase/database/tables/driver_status.dart';
 class DriverStatuMapper {
   DriverStatu toDomain(DriverStatusRow row) {
     return DriverStatu(
+      id: row.driverId,
       driverId: row.driverId,
-      onlineIntent: row.onlineIntent,
-      updatedAt: row.updatedAt,
+      onlineIntent: row.onlineIntent ?? false,
+      updatedAt: row.updatedAt ?? DateTime.now(),
     );
   }
   

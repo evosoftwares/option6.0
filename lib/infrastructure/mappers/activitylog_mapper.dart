@@ -1,5 +1,4 @@
 // lib/infrastructure/mappers/activitylog_mapper.dart
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../domain/entities/activitylog.dart';
 import '../../backend/supabase/database/tables/activity_logs.dart';
 
@@ -8,16 +7,16 @@ class ActivityLogMapper {
   ActivityLog toDomain(ActivityLogsRow row) {
     return ActivityLog(
       id: row.id,
-      userId: row.userId,
-      action: row.action,
-      entityType: row.entityType,
-      entityId: row.entityId,
+      userId: row.userId ?? '',
+      action: row.action ?? '',
+      entityType: row.entityType ?? '',
+      entityId: row.entityId ?? '',
       oldValues: row.oldValues,
       newValues: row.newValues,
       metadata: row.metadata,
-      ipAddress: row.ipAddress,
-      userAgent: row.userAgent,
-      createdAt: row.createdAt,
+      ipAddress: row.ipAddress ?? '',
+      userAgent: row.userAgent ?? '',
+      createdAt: row.createdAt ?? DateTime.now(),
     );
   }
   

@@ -127,11 +127,12 @@ class _CadastroSucessoWidgetState extends State<CadastroSucessoWidget> {
                     ),
                     FFButtonWidget(
                       onPressed: () async {
+                        // Corrigido: buscar app_user pelo Firebase UID em vez de fcm_token
                         _model.competencia = await AppUsersTable().queryRows(
-                          queryFn: (q) => q.eqOrNull(
-                            'fcm_token',
+                          queryFn: (q) => q.eq(
+                            'currentUser_UID_Firebase',
                             currentUserUid,
-                          ),
+                          ).limit(1),
                         );
                         if (_model.competencia?.firstOrNull?.userType ==
                             'driver') {

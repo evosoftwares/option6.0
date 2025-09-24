@@ -1,5 +1,4 @@
 // lib/infrastructure/mappers/securityalert_mapper.dart
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../../domain/entities/securityalert.dart';
 import '../../backend/supabase/database/tables/security_alerts.dart';
 
@@ -8,14 +7,14 @@ class SecurityAlertMapper {
   SecurityAlert toDomain(SecurityAlertsRow row) {
     return SecurityAlert(
       id: row.id,
-      alertType: row.alertType,
-      severity: row.severity,
-      description: row.description,
+      alertType: row.alertType ?? '',
+      severity: row.severity ?? '',
+      description: row.description ?? '',
       metadata: row.metadata,
-      resolved: row.resolved,
-      resolvedAt: row.resolvedAt,
-      resolvedBy: row.resolvedBy,
-      createdAt: row.createdAt,
+      resolved: row.resolved ?? false,
+      resolvedAt: row.resolvedAt ?? DateTime.now(),
+      resolvedBy: row.resolvedBy ?? '',
+      createdAt: row.createdAt ?? DateTime.now(),
     );
   }
   
