@@ -11,7 +11,7 @@ import '/custom_code/actions/index.dart' as actions;
 import 'package:mapbox_search/mapbox_search.dart' as mapbox;
 import 'package:stop_watch_timer/stop_watch_timer.dart';
 import 'package:flutter/material.dart';
-// import 'package:flutter/scheduler.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:collection/collection.dart';
 import '/actions/actions.dart' as action_blocks;
@@ -181,7 +181,7 @@ class _MainMotoristaWidgetState extends State<MainMotoristaWidget> {
     if (stackDriversRow?.isOnline == true) {
       children.add(
         Align(
-          alignment: AlignmentDirectional(-0.02, 0.72),
+          alignment: AlignmentDirectional(0.0, 1.0),
           child: Padding(
             padding: EdgeInsetsDirectional.fromSTEB(0.0, 0.0, 0.0, 22.0),
             child: InkWell(
@@ -485,6 +485,7 @@ class _MainMotoristaWidgetState extends State<MainMotoristaWidget> {
                                             .fontStyle,
                                       ),
                                       color: Colors.white,
+                                      fontSize: 14.0,
                                     ),
                               ),
                             ],
@@ -501,6 +502,7 @@ class _MainMotoristaWidgetState extends State<MainMotoristaWidget> {
                                         .fontStyle,
                                   ),
                                   color: Colors.white,
+                                  fontSize: 14.0,
                                 ),
                           ),
                   ),
@@ -978,7 +980,7 @@ class _MainMotoristaWidgetState extends State<MainMotoristaWidget> {
       Align(
         alignment: AlignmentDirectional(0.0, -1.0),
         child: Padding(
-          padding: EdgeInsetsDirectional.fromSTEB(0.0, 11.0, 0.0, 0.0),
+          padding: EdgeInsetsDirectional.fromSTEB(0.0, 41.0, 0.0, 0.0),
           child: Row(
             mainAxisSize: MainAxisSize.max,
             mainAxisAlignment: MainAxisAlignment.center,
@@ -1199,15 +1201,43 @@ class _MainMotoristaWidgetState extends State<MainMotoristaWidget> {
         body: FutureBuilder<List<DriversRow>>(
           future: (() async {
             try {
-              final appUserId = await UserIdConverter.getAppUserIdFromFirebaseUid(currentUserUid);
+              // Implementar timeout de 10 segundos para evitar carregamento infinito
+              final appUserId = await UserIdConverter.getAppUserIdFromFirebaseUid(currentUserUid)
+                  .timeout(Duration(seconds: 10));
+              
               debugPrint('MAIN_MOTORISTA: appUserId for query -> $appUserId');
+              
               if (appUserId == null) {
-                debugPrint('MAIN_MOTORISTA: appUserId not found, showing empty state');
+                debugPrint('MAIN_MOTORISTA: appUserId not found, trying fallback by email');
+                
+                // Fallback: tentar buscar por email se disponível
+                if (currentUserEmail.trim().isNotEmpty) {
+                  try {
+                    final byEmail = await AppUsersTable().queryRows(
+                      queryFn: (q) => q.eq('email', currentUserEmail.trim()).limit(1),
+                    ).timeout(Duration(seconds: 5));
+                    
+                    if (byEmail.isNotEmpty) {
+                      final fallbackAppUserId = byEmail.first.id;
+                      debugPrint('MAIN_MOTORISTA: Found user by email fallback: $fallbackAppUserId');
+                      
+                      final result = await DriversTable().querySingleRow(
+                        queryFn: (q) => q.eq('user_id', fallbackAppUserId),
+                      ).timeout(Duration(seconds: 5));
+                      return result ?? <DriversRow>[];
+                    }
+                  } catch (e) {
+                    debugPrint('MAIN_MOTORISTA: Email fallback failed: $e');
+                  }
+                }
+                
+                debugPrint('MAIN_MOTORISTA: No user found, showing empty state');
                 return <DriversRow>[];
               }
+              
               final result = await DriversTable().querySingleRow(
                 queryFn: (q) => q.eq('user_id', appUserId),
-              );
+              ).timeout(Duration(seconds: 5));
               return result ?? <DriversRow>[];
             } catch (e) {
               debugPrint('MAIN_MOTORISTA: Error loading driver: $e');

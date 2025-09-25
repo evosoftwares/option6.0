@@ -335,7 +335,7 @@ class _MeuVeiculoWidgetState extends State<MeuVeiculoWidget> {
                                   isSearchable: true,
                                   isMultiSelect: false,
                                   validator: (val) {
-                                    if (val == null || (val is String && val.trim().isEmpty)) {
+                                    if (val == null || (val.trim().isEmpty)) {
                                       return 'Obrigatório';
                                     }
                                     return null;
@@ -429,7 +429,7 @@ class _MeuVeiculoWidgetState extends State<MeuVeiculoWidget> {
                               isSearchable: true,
                               isMultiSelect: false,
                               validator: (val) {
-                                if (val == null || (val is String && val.trim().isEmpty)) {
+                                if (val == null || (val.trim().isEmpty)) {
                                   return 'Obrigatório';
                                 }
                                 return null;
@@ -520,7 +520,7 @@ class _MeuVeiculoWidgetState extends State<MeuVeiculoWidget> {
                               isSearchable: true,
                               isMultiSelect: false,
                               validator: (val) {
-                                if (val == null || (val is String && val.trim().isEmpty)) {
+                                if (val == null || (val.trim().isEmpty)) {
                                   return 'Obrigatório';
                                 }
                                 return null;
@@ -600,7 +600,7 @@ class _MeuVeiculoWidgetState extends State<MeuVeiculoWidget> {
                               isSearchable: false,
                               isMultiSelect: false,
                               validator: (val) {
-                                if (val == null || (val is String && val.trim().isEmpty)) {
+                                if (val == null || (val.trim().isEmpty)) {
                                   return 'Obrigatório';
                                 }
                                 return null;
@@ -799,7 +799,7 @@ class _MeuVeiculoWidgetState extends State<MeuVeiculoWidget> {
                               isSearchable: false,
                               isMultiSelect: false,
                               validator: (val) {
-                                if (val == null || (val is String && val.trim().isEmpty)) {
+                                if (val == null || (val.trim().isEmpty)) {
                                   return 'Obrigatório';
                                 }
                                 return null;
