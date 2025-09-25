@@ -35,7 +35,19 @@ bool get currentUserEmailVerified => currentUser?.emailVerified ?? false;
 String? _currentJwtToken;
 final jwtTokenStream = FirebaseAuth.instance
     .idTokenChanges()
-    .map((user) async => _currentJwtToken = await user?.getIdToken())
+    .asyncMap((user) async {
+      try {
+        _currentJwtToken = await user?.getIdToken();
+      } catch (e) {
+        // Network errors can happen (offline, DNS, etc.). Keep last known token.
+        debugPrint('⚠️ [AUTH] Falha ao obter JWT: $e');
+      }
+      return _currentJwtToken;
+    })
+    .handleError((e, __) {
+      // Ensure no unhandled errors propagate from this stream
+      debugPrint('⚠️ [AUTH] Erro no stream de JWT: $e');
+    })
     .asBroadcastStream();
 
 DocumentReference? get currentUserReference =>

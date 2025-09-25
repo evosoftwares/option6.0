@@ -6,28 +6,29 @@ import '../backend/supabase/database/tables/app_users.dart';
 class UserIdConverter {
   /// Converte Firebase UID para app_users.id (UUID)
   /// 
-  /// Busca o usuário na tabela app_users usando primeiramente o fcm_token (que
-  /// armazena o Firebase UID) e, em fallback, o campo currentUser_UID_Firebase.
+  /// Busca o usuário na tabela app_users usando primeiramente o campo
+  /// currentUser_UID_Firebase (Firebase UID persistido) e, como fallback
+  /// LEGADO, o campo fcm_token (em bases antigas pode ter armazenado o UID).
   /// Retorna o UUID correspondente ou null se não encontrado.
   static Future<String?> getAppUserIdFromFirebaseUid(String firebaseUid) async {
     try {
-      // 1) Tenta via fcm_token
-      final byFcm = await AppUsersTable().queryRows(
-        queryFn: (q) => q.eq('fcm_token', firebaseUid).limit(1),
-      );
-      if (byFcm.isNotEmpty) {
-        final appUserId = byFcm.first.id;
-        print('🔄 [UserIdConverter] Firebase UID "$firebaseUid" -> App User ID "$appUserId" (via fcm_token)');
-        return appUserId;
-      }
-
-      // 2) Fallback via currentUser_UID_Firebase
+      // 1) Preferido: currentUser_UID_Firebase
       final byCurrentUid = await AppUsersTable().queryRows(
         queryFn: (q) => q.eq('currentUser_UID_Firebase', firebaseUid).limit(1),
       );
       if (byCurrentUid.isNotEmpty) {
         final appUserId = byCurrentUid.first.id;
         print('🔄 [UserIdConverter] Firebase UID "$firebaseUid" -> App User ID "$appUserId" (via currentUser_UID_Firebase)');
+        return appUserId;
+      }
+
+      // 2) LEGADO: fcm_token pode ter armazenado o Firebase UID em bases antigas
+      final byFcm = await AppUsersTable().queryRows(
+        queryFn: (q) => q.eq('fcm_token', firebaseUid).limit(1),
+      );
+      if (byFcm.isNotEmpty) {
+        final appUserId = byFcm.first.id;
+        print('🔄 [UserIdConverter] Firebase UID "$firebaseUid" -> App User ID "$appUserId" (via fcm_token LEGADO)');
         return appUserId;
       }
 

@@ -11,7 +11,7 @@ import '/custom_code/actions/index.dart' as actions;
 import 'package:mapbox_search/mapbox_search.dart' as mapbox;
 import 'package:stop_watch_timer/stop_watch_timer.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter/scheduler.dart';
+// import 'package:flutter/scheduler.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:collection/collection.dart';
 import '/actions/actions.dart' as action_blocks;
@@ -19,6 +19,7 @@ import 'main_motorista_model.dart';
 export 'main_motorista_model.dart';
 import 'dart:async';
 import 'package:permission_handler/permission_handler.dart';
+// import '/flutter_flow/user_id_converter.dart';
 
  class MainMotoristaWidget extends StatefulWidget {
   const MainMotoristaWidget({super.key});
@@ -43,6 +44,7 @@ class _MainMotoristaWidgetState extends State<MainMotoristaWidget> {
   String? _destinationAddress;
   double? _estimatedFare;
   bool _isAccepting = false;
+  String? _appUserId;
 
   @override
   void initState() {
@@ -117,9 +119,24 @@ class _MainMotoristaWidgetState extends State<MainMotoristaWidget> {
         // falha silenciosa para não quebrar UI
         debugPrint('Falha ao iniciar escuta de notificações: $e');
       }
-    });
 
-    WidgetsBinding.instance.addPostFrameCallback((_) => safeSetState(() {}));
+      // Compute appUserId for streams and queries (com fallback por email)
+      var appUserIdInit = await UserIdConverter.getAppUserIdFromFirebaseUid(currentUserUid);
+      if (appUserIdInit == null && currentUserEmail.trim().isNotEmpty) {
+        try {
+          final byEmail = await AppUsersTable().queryRows(
+            queryFn: (q) => q.eq('email', currentUserEmail.trim()).limit(1),
+          );
+          if (byEmail.isNotEmpty) {
+            appUserIdInit = byEmail.first.id;
+          }
+        } catch (_) {}
+      }
+      _appUserId = appUserIdInit;
+      debugPrint('MAIN_MOTORISTA: appUserId resolved -> $_appUserId (from currentUserUid=$currentUserUid)');
+
+      WidgetsBinding.instance.addPostFrameCallback((_) => safeSetState(() {}));
+    });
   }
 
   @override
@@ -975,14 +992,16 @@ class _MainMotoristaWidgetState extends State<MainMotoristaWidget> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       StreamBuilder<List<DriverWalletsRow>>(
-                        stream: _model.containerSupabaseStream ??=
-                            SupaFlow.client
-                                .from("driver_wallets")
-                                .stream(primaryKey: ['id'])
-                                .eqOrNull('driver_id', currentUserUid)
-                                .map((list) => list
-                                    .map((item) => DriverWalletsRow(item))
-                                    .toList()),
+                        stream: _appUserId == null
+                            ? Stream.value(<DriverWalletsRow>[]) // offline/sem usuário resolvido
+                            : (_model.containerSupabaseStream ??=
+                                SupaFlow.client
+                                    .from("driver_wallets")
+                                    .stream(primaryKey: ['id'])
+                                    .eq('driver_id', _appUserId!)
+                                    .map((list) => list
+                                        .map((item) => DriverWalletsRow(item))
+                                        .toList())),
                         builder: (context, snapshot) {
                           if (!snapshot.hasData) {
                             return Center(
@@ -997,6 +1016,77 @@ class _MainMotoristaWidgetState extends State<MainMotoristaWidget> {
                               ),
                             );
                           }
+                          if (snapshot.data!.isEmpty) {
+                            return Material(
+                              color: Colors.transparent,
+                              elevation: 1.0,
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(18.0),
+                              ),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  borderRadius: BorderRadius.circular(18.0),
+                                ),
+                                child: Padding(
+                                  padding: EdgeInsets.all(10.0),
+                                  child: Column(
+                                    mainAxisSize: MainAxisSize.min,
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Ganhos de hoje',
+                                        style: FlutterFlowTheme.of(context)
+                                            .bodyMedium
+                                            .override(
+                                              font: GoogleFonts.inter(
+                                                fontWeight: FlutterFlowTheme.of(context)
+                                                    .bodyMedium
+                                                    .fontWeight,
+                                                fontStyle: FlutterFlowTheme.of(context)
+                                                    .bodyMedium
+                                                    .fontStyle,
+                                              ),
+                                              color: FlutterFlowTheme.of(context)
+                                                  .secondaryText,
+                                              letterSpacing: 0.0,
+                                              fontWeight: FlutterFlowTheme.of(context)
+                                                  .bodyMedium
+                                                  .fontWeight,
+                                              fontStyle: FlutterFlowTheme.of(context)
+                                                  .bodyMedium
+                                                  .fontStyle,
+                                            ),
+                                      ),
+                                      Text(
+                                        _appUserId == null
+                                            ? 'Offline ou usuário não resolvido'
+                                            : 'R\$ --',
+                                        style: FlutterFlowTheme.of(context)
+                                            .displaySmall
+                                            .override(
+                                              font: GoogleFonts.roboto(
+                                                fontWeight: FontWeight.bold,
+                                                fontStyle: FlutterFlowTheme.of(context)
+                                                    .displaySmall
+                                                    .fontStyle,
+                                              ),
+                                              color: FlutterFlowTheme.of(context)
+                                                  .primaryText,
+                                              letterSpacing: 0.0,
+                                              fontWeight: FontWeight.bold,
+                                              fontStyle: FlutterFlowTheme.of(context)
+                                                  .displaySmall
+                                                  .fontStyle,
+                                            ),
+                                      ),
+                                    ],
+                                  ),
+                                ),
+                              ),
+                            );
+                          }
+
                           return Material(
                             color: Colors.transparent,
                             elevation: 1.0,
@@ -1107,33 +1197,75 @@ class _MainMotoristaWidgetState extends State<MainMotoristaWidget> {
         key: scaffoldKey,
         backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
         body: FutureBuilder<List<DriversRow>>(
-          future: DriversTable().querySingleRow(
-            queryFn: (q) => q.eqOrNull(
-              'user_id',
-              currentUserUid,
-            ),
-          ),
+          future: (() async {
+            try {
+              final appUserId = await UserIdConverter.getAppUserIdFromFirebaseUid(currentUserUid);
+              debugPrint('MAIN_MOTORISTA: appUserId for query -> $appUserId');
+              if (appUserId == null) {
+                debugPrint('MAIN_MOTORISTA: appUserId not found, showing empty state');
+                return <DriversRow>[];
+              }
+              final result = await DriversTable().querySingleRow(
+                queryFn: (q) => q.eq('user_id', appUserId),
+              );
+              return result ?? <DriversRow>[];
+            } catch (e) {
+              debugPrint('MAIN_MOTORISTA: Error loading driver: $e');
+              return <DriversRow>[];
+            }
+          })(),
           builder: (context, snapshot) {
-            // Customize what your widget looks like when it's loading.
-            if (!snapshot.hasData) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
               return Center(
-                child: SizedBox(
-                  width: 50.0,
-                  height: 50.0,
-                  child: CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(
-                      FlutterFlowTheme.of(context).primary,
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    CircularProgressIndicator(
+                      valueColor: AlwaysStoppedAnimation<Color>(
+                        FlutterFlowTheme.of(context).primary,
+                      ),
                     ),
-                  ),
+                    SizedBox(height: 16),
+                    Text('Carregando dados do motorista...'),
+                  ],
                 ),
               );
             }
-            List<DriversRow> stackDriversRowList = snapshot.data!;
 
-            final stackDriversRow = stackDriversRowList.isNotEmpty
-                ? stackDriversRowList.first
-                : null;
+            if (snapshot.hasError) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('Não foi possível carregar agora.'),
+                    SizedBox(height: 8),
+                    FFButtonWidget(
+                      onPressed: () => setState(() {}),
+                      text: 'Tentar novamente',
+                      options: FFButtonOptions(height: 40.0, padding: EdgeInsets.symmetric(horizontal: 16.0)),
+                    ),
+                  ],
+                ),
+              );
+            }
 
+            if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return Center(
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Text('Dados do motorista indisponíveis.'),
+                    SizedBox(height: 8),
+                    FFButtonWidget(
+                      onPressed: () => context.goNamed(EscolhaSeuPerfilWidget.routeName),
+                      text: 'Definir perfil',
+                      options: FFButtonOptions(height: 40.0, padding: EdgeInsets.symmetric(horizontal: 16.0)),
+                    ),
+                  ],
+                ),
+              );
+            }
+            final stackDriversRow = snapshot.data!.first;
             return Stack(
               children: _buildStackChildren(stackDriversRow),
             );

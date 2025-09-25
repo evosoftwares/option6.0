@@ -85,8 +85,68 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
         FFRoute(
           name: '_initialize',
           path: '/',
-          builder: (context, _) =>
-              appStateNotifier.loggedIn ? MainMotoristaWidget() : LoginWidget(),
+          builder: (context, _) {
+            if (!appStateNotifier.loggedIn) return LoginWidget();
+
+            // Determine user_type on first load and return appropriate main screen.
+            return FutureBuilder<String?>(
+              future: (() async {
+                try {
+                  // Try lookup by email first
+                  List<AppUsersRow> appUsers = [];
+                  if (currentUserEmail.trim().isNotEmpty) {
+                    appUsers = await AppUsersTable().queryRows(
+                      queryFn: (q) => q.eq('email', currentUserEmail.trim()).limit(1),
+                    );
+                  }
+
+                  // Fallback to Firebase UID column
+                  if (appUsers.isEmpty) {
+                    appUsers = await AppUsersTable().queryRows(
+                      queryFn: (q) => q.eq('currentUser_UID_Firebase', currentUserUid).limit(1),
+                    );
+                  }
+
+                  // Legacy fallback to fcm_token
+                  if (appUsers.isEmpty) {
+                    appUsers = await AppUsersTable().queryRows(
+                      queryFn: (q) => q.eq('fcm_token', currentUserUid).limit(1),
+                    );
+                  }
+
+                  if (appUsers.isEmpty) return '';
+                  return appUsers.first.userType;
+                } catch (e) {
+                  debugPrint('ROUTE_INIT: erro ao resolver app_user user_type: $e');
+                  return '';
+                }
+              })()
+                  .timeout(const Duration(seconds: 8), onTimeout: () => ''),
+              builder: (context, snapshot) {
+                // While resolving, show splash/loading
+                if (!snapshot.hasData) {
+                  return Container(
+                    color: Colors.transparent,
+                    child: Center(
+                      child: Image.asset(
+                        'assets/images/Logotipo_Vertical_Color.png',
+                        width: 200.0,
+                        height: 200.0,
+                        fit: BoxFit.contain,
+                      ),
+                    ),
+                  );
+                }
+
+                final userType = snapshot.data?.trim().toLowerCase();
+                if (userType == 'passenger' || userType == 'passageiro') {
+                  return MainPassageiroWidget();
+                }
+
+                return MainMotoristaWidget();
+              },
+            );
+          },
         ),
         FFRoute(
           name: LoginWidget.routeName,

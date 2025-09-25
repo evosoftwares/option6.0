@@ -7,8 +7,6 @@ const List<String> REQUIRED_DOCUMENT_TYPES = [
   'CNH_BACK',       // CNH Verso
   'CRLV',           // CRLV
   'VEHICLE_FRONT',  // Foto do Veículo (Frente)
-  'VEHICLE_SIDE',   // Foto do Veículo (Lateral)
-  'VEHICLE_BACK',   // Foto do Veículo (Traseira)
 ];
 
 /// Valida se o motorista tem todos os documentos obrigatórios aprovados
@@ -26,6 +24,7 @@ Future<bool> validarDocumentosMotorista() async {
     }
 
     print('👤 [DOC_VALIDATION] Driver ID: $driverId');
+    print('🔎 [DOC_VALIDATION] debug: driverId resolved');
 
     // Buscar todos os documentos aprovados do motorista
     final approvedDocs = await DriverDocumentsTable().queryRows(
@@ -36,6 +35,7 @@ Future<bool> validarDocumentosMotorista() async {
     );
 
     print('📋 [DOC_VALIDATION] Documentos aprovados encontrados: ${approvedDocs.length}');
+    print('🔎 [DOC_VALIDATION] debug: CAPTURADO approvedDocTypes a partir de approvedDocs');
 
     // Verificar se todos os tipos de documento obrigatórios estão presentes
     final approvedDocTypes = approvedDocs
@@ -45,7 +45,13 @@ Future<bool> validarDocumentosMotorista() async {
         .toSet();
 
     print('📄 [DOC_VALIDATION] Tipos de documento aprovados: $approvedDocTypes');
-    print('✅ [DOC_VALIDATION] Documentos obrigatórios: $REQUIRED_DOCUMENT_TYPES');
+    print('🔎 [DOC_VALIDATION] debug: Documentos obrigatórios: $REQUIRED_DOCUMENT_TYPES');
+    final missingTypes = REQUIRED_DOCUMENT_TYPES.where((t) => !approvedDocTypes.contains(t)).toList();
+    if (missingTypes.isNotEmpty) {
+      print('❌ [DOC_VALIDATION] Documentos obrigatórios ausentes: $missingTypes');
+    } else {
+      print('✅ [DOC_VALIDATION] Todos os documentos obrigatórios presentes');
+    }
 
     // Verificar se todos os documentos obrigatórios estão aprovados
     for (String requiredType in REQUIRED_DOCUMENT_TYPES) {

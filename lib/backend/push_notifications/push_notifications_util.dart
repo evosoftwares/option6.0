@@ -20,15 +20,23 @@ class UserTokenInfo {
 Stream<UserTokenInfo> getFcmTokenStream(String userPath) =>
     Stream.value(!kIsWeb && (Platform.isIOS || Platform.isAndroid))
         .where((shouldGetToken) => shouldGetToken)
-        .asyncMap<String?>(
-            (_) => FirebaseMessaging.instance.requestPermission().then(
-                  (settings) => settings.authorizationStatus ==
-                          AuthorizationStatus.authorized
-                      ? FirebaseMessaging.instance.getToken()
-                      : null,
-                ))
-        .switchMap((fcmToken) => Stream.value(fcmToken)
-            .merge(FirebaseMessaging.instance.onTokenRefresh))
+        .asyncMap<String?>((_) async {
+          try {
+            final settings = await FirebaseMessaging.instance.requestPermission();
+            if (settings.authorizationStatus == AuthorizationStatus.authorized) {
+              return await FirebaseMessaging.instance.getToken();
+            }
+          } catch (e) {
+            debugPrint('⚠️ [FCM] Falha ao obter token: $e');
+          }
+          return null;
+        })
+        .switchMap((fcmToken) =>
+            Stream.value(fcmToken).merge(FirebaseMessaging.instance.onTokenRefresh))
+        .handleError((e) {
+          // Evita que erros de rede derrubem o stream de FCM
+          debugPrint('⚠️ [FCM] Erro no stream de token: $e');
+        })
         .where((fcmToken) => fcmToken != null && fcmToken.isNotEmpty)
         .map((token) => UserTokenInfo(userPath, token!));
 
@@ -37,13 +45,20 @@ final fcmTokenUserStream = authenticatedUserStream
     .map((user) => user!.reference.path)
     .distinct()
     .switchMap(getFcmTokenStream)
-    .map(
-      (userTokenInfo) => makeCloudCall(
-        'addFcmToken',
-        {
-          'userDocPath': userTokenInfo.userPath,
-          'fcmToken': userTokenInfo.fcmToken,
-          'deviceType': Platform.isIOS ? 'iOS' : 'Android',
-        },
-      ),
-    );
+    .asyncMap((userTokenInfo) async {
+      try {
+        return await makeCloudCall(
+          'addFcmToken',
+          {
+            'userDocPath': userTokenInfo.userPath,
+            'fcmToken': userTokenInfo.fcmToken,
+            'deviceType': Platform.isIOS ? 'iOS' : 'Android',
+          },
+          suppressErrors: true,
+          timeout: const Duration(seconds: 8),
+        );
+      } catch (_) {
+        // Silencia erros aqui; já há tratamento silencioso em makeCloudCall
+        return {};
+      }
+    });

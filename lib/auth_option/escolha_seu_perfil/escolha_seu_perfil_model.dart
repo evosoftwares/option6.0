@@ -17,6 +17,7 @@ class EscolhaSeuPerfilModel extends FlutterFlowModel<EscolhaSeuPerfilWidget> {
   AppUsersRow? currentAppUser;
   Timer? _validationTimer;
   VoidCallback? updateUI;
+  String? lastValidationError;
 
   @override
   void initState(BuildContext context) {
@@ -54,9 +55,11 @@ class EscolhaSeuPerfilModel extends FlutterFlowModel<EscolhaSeuPerfilWidget> {
   /// Valida se o usuário atual tem user_type preenchido na tabela app_users
   Future<void> _validateAppUser() async {
     if (isValidatingUser) return; // Evitar validações simultâneas
+    if (isDriverCreationInProgress || isPassengerCreationInProgress) return; // Evitar conflito com criação
 
     try {
       isValidatingUser = true;
+      lastValidationError = null;
       print('🔍 [VALIDATION] Validando user_type para currentUserUid: $currentUserUid');
 
       if (currentUserUid.isEmpty) {
@@ -69,23 +72,29 @@ class EscolhaSeuPerfilModel extends FlutterFlowModel<EscolhaSeuPerfilWidget> {
       // Buscar por email primeiro
       List<AppUsersRow> appUsers = [];
       if (currentUserEmail.trim().isNotEmpty) {
-        appUsers = await AppUsersTable().queryRows(
-          queryFn: (q) => q.eq('email', currentUserEmail.trim()).limit(1),
-        );
+        appUsers = await AppUsersTable()
+            .queryRows(
+              queryFn: (q) => q.eq('email', currentUserEmail.trim()).limit(1),
+            )
+            .timeout(const Duration(seconds: 8));
       }
 
       // Se não encontrou por email, buscar por Firebase UID (coluna correta)
       if (appUsers.isEmpty) {
-        appUsers = await AppUsersTable().queryRows(
-          queryFn: (q) => q.eq('currentUser_UID_Firebase', currentUserUid).limit(1),
-        );
+        appUsers = await AppUsersTable()
+            .queryRows(
+              queryFn: (q) => q.eq('currentUser_UID_Firebase', currentUserUid).limit(1),
+            )
+            .timeout(const Duration(seconds: 8));
       }
 
       // Fallback legado: buscar por fcm_token igual ao Firebase UID (para compatibilidade)
       if (appUsers.isEmpty) {
-        appUsers = await AppUsersTable().queryRows(
-          queryFn: (q) => q.eq('fcm_token', currentUserUid).limit(1),
-        );
+        appUsers = await AppUsersTable()
+            .queryRows(
+              queryFn: (q) => q.eq('fcm_token', currentUserUid).limit(1),
+            )
+            .timeout(const Duration(seconds: 8));
       }
 
       if (appUsers.isNotEmpty) {
@@ -113,6 +122,7 @@ class EscolhaSeuPerfilModel extends FlutterFlowModel<EscolhaSeuPerfilWidget> {
 
     } catch (e) {
       print('💥 [VALIDATION] Erro ao validar app_user: $e');
+      lastValidationError = e.toString();
       hasValidAppUser = false;
       currentAppUser = null;
     } finally {

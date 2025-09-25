@@ -124,9 +124,12 @@ class _EscolhaSeuPerfilWidgetState extends State<EscolhaSeuPerfilWidget> {
         color: Colors.blue,
       );
     } else {
+      final msg = _model.lastValidationError?.contains('Failed host lookup') == true
+          ? 'Sem conexão com o servidor. Escolha um perfil para criarmos quando a conexão voltar.'
+          : 'Escolha uma das opções abaixo para começar:';
       return _buildInfoMessage(
         icon: Icons.info_outline,
-        message: 'Escolha uma das opções abaixo para começar:',
+        message: msg,
         color: Colors.blue,
       );
     }

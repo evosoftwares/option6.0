@@ -6,6 +6,7 @@ import '/backend/firebase_storage/storage.dart';
 import '/flutter_flow/upload_data.dart';
 import '/custom_code/actions/validar_documentos_motorista.dart';
 import 'package:mime_type/mime_type.dart';
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'documentos_motorista_model.dart';
 import '/backend/supabase/supabase.dart';
@@ -28,7 +29,9 @@ class _DocumentosMotoristaWidgetState extends State<DocumentosMotoristaWidget> {
   final scaffoldKey = GlobalKey<ScaffoldState>();
   bool _canNavigateAway = false;
   bool _allDocumentsUploaded = false;
-  bool _showSuccessMessage = false;
+  bool _navigatedAfterApproval = false;
+  StreamSubscription<List<Map<String, dynamic>>>? _docsRealtimeSub;
+  String? _driverId;
 
   @override
   void initState() {
@@ -37,14 +40,19 @@ class _DocumentosMotoristaWidgetState extends State<DocumentosMotoristaWidget> {
 
     // Verificar se o motorista pode sair da tela de documentos
     _checkDocumentStatus();
+    _initializeRealtimeWatcher();
   }
 
   /// Verifica se todos os documentos estão aprovados
   Future<void> _checkDocumentStatus() async {
     try {
       final hasAllDocuments = await validarDocumentosMotorista();
+      debugPrint('DOCS_STATUS: hasAllDocuments=$hasAllDocuments; driverId=$_driverId');
       setState(() {
         _canNavigateAway = hasAllDocuments;
+        if (hasAllDocuments) {
+          _allDocumentsUploaded = false;
+        }
       });
 
       if (hasAllDocuments) {
@@ -70,15 +78,12 @@ class _DocumentosMotoristaWidgetState extends State<DocumentosMotoristaWidget> {
     if (allUploaded && !_allDocumentsUploaded) {
       setState(() {
         _allDocumentsUploaded = true;
-        _showSuccessMessage = true;
       });
       
       // Esconder a mensagem após 5 segundos
       Future.delayed(Duration(seconds: 5), () {
         if (mounted) {
-          setState(() {
-            _showSuccessMessage = false;
-          });
+          setState(() {});
         }
       });
     } else {
@@ -90,6 +95,7 @@ class _DocumentosMotoristaWidgetState extends State<DocumentosMotoristaWidget> {
 
   @override
   void dispose() {
+    _docsRealtimeSub?.cancel();
     _model.dispose();
     super.dispose();
   }
@@ -126,6 +132,64 @@ class _DocumentosMotoristaWidgetState extends State<DocumentosMotoristaWidget> {
     }
   }
 
+  /// Inicializa watcher Realtime para aprovações de documentos
+  Future<void> _initializeRealtimeWatcher() async {
+    try {
+      _driverId = await _getDriverIdForCurrentUser(context);
+      if (_driverId == null) return;
+
+      // Cancelar assinatura anterior, se houver
+      await _docsRealtimeSub?.cancel();
+
+      final stream = SupaFlow.client
+          .from('driver_documents')
+          .stream(primaryKey: ['id']);
+
+      _docsRealtimeSub = stream.listen((rows) async {
+        // Filtra apenas documentos do motorista atual e marcados como atuais
+        final relevant = rows.where((r) =>
+            r['driver_id'] == _driverId && (r['is_current'] == true));
+        if (relevant.isEmpty) return;
+
+        // Revalidar status sempre que houver mudança relevante
+        final hasAllDocuments = await validarDocumentosMotorista();
+        if (mounted) {
+          setState(() {
+            _canNavigateAway = hasAllDocuments;
+            if (hasAllDocuments) {
+              _allDocumentsUploaded = false;
+            }
+          });
+        }
+
+        if (hasAllDocuments && !_navigatedAfterApproval) {
+          _navigatedAfterApproval = true;
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text('✅ Documentos aprovados! Você será redirecionado.'),
+                backgroundColor: Colors.green,
+                duration: Duration(seconds: 2),
+              ),
+            );
+          }
+          // Pequeno delay para o usuário ver o feedback visual
+          await Future.delayed(Duration(milliseconds: 1400));
+          if (mounted) {
+            context.goNamed('menuMotorista');
+          }
+        }
+      });
+    } catch (e) {
+      print('💥 [DOCS_SCREEN] Erro ao iniciar watcher realtime: $e');
+    }
+  }
+
+  void _navigateToMenuMotorista() {
+    if (!mounted) return;
+    context.goNamed('menuMotorista');
+  }
+
   Future<void> _saveDocumentToSupabase({
     required BuildContext context,
     required String driverId,
@@ -142,44 +206,33 @@ class _DocumentosMotoristaWidgetState extends State<DocumentosMotoristaWidget> {
         'file_url': fileUrl,
         'file_size': fileSize,
         'is_current': true,
+        'status': 'pending',
       };
       if (mimeTypeValue != null) {
         docInsert['mime_type'] = mimeTypeValue;
       }
-
-      await DriverDocumentsTable().insert(docInsert);
-
-      // Consulta registro atual
       final existing = await DriverDocumentsTable().queryRows(
         queryFn: (q) => q
             .eq('driver_id', driverId)
             .eq('document_type', documentType)
+            .eq('is_current', true)
             .limit(1),
       );
 
       if (existing.isEmpty) {
-        final Map<String, dynamic> currentInsert = {
-          'driver_id': driverId,
-          'document_type': documentType,
-          'file_url': fileUrl,
-          'file_size': fileSize,
-          'is_current': true,
-          'url_might_be_stale': false,
-        };
-        if (mimeTypeValue != null) {
-          currentInsert['mime_type'] = mimeTypeValue;
-        }
-        await DriverDocumentsTable().insert(currentInsert);
+        debugPrint('DOCS_UPLOAD: Inserindo novo documento $documentType para driver $driverId');
+        await DriverDocumentsTable().insert(docInsert);
       } else {
         final Map<String, dynamic> currentUpdate = {
           'file_url': fileUrl,
           'file_size': fileSize,
           'is_current': true,
-          'url_might_be_stale': false,
+          'status': 'pending',
         };
         if (mimeTypeValue != null) {
           currentUpdate['mime_type'] = mimeTypeValue;
         }
+        debugPrint('DOCS_UPLOAD: Atualizando documento existente ${existing.first.id} ($documentType) para driver $driverId');
         await DriverDocumentsTable().update(
           data: currentUpdate,
           matchingRows: (rows) => rows.eq('id', existing.first.id),
@@ -220,7 +273,7 @@ class _DocumentosMotoristaWidgetState extends State<DocumentosMotoristaWidget> {
         appBar: AppBar(
           backgroundColor: FlutterFlowTheme.of(context).primary,
           automaticallyImplyLeading: false,
-          leading: _canNavigateAway ? FlutterFlowIconButton(
+          leading: FlutterFlowIconButton(
             borderColor: Colors.transparent,
             borderRadius: 30.0,
             borderWidth: 1.0,
@@ -230,12 +283,20 @@ class _DocumentosMotoristaWidgetState extends State<DocumentosMotoristaWidget> {
               color: Colors.white,
               size: 30.0,
             ),
-            onPressed: () async {
-              if (context.mounted) {
+            onPressed: () {
+              if (_canNavigateAway && context.mounted) {
                 context.pop();
+              } else {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Envie e aguarde aprovação de todos os documentos antes de sair.'),
+                    backgroundColor: Colors.orange,
+                    duration: Duration(seconds: 2),
+                  ),
+                );
               }
             },
-          ) : null,
+          ),
           title: Text(
             'Documentos',
             style: FlutterFlowTheme.of(context).headlineMedium.override(
@@ -245,7 +306,20 @@ class _DocumentosMotoristaWidgetState extends State<DocumentosMotoristaWidget> {
                   letterSpacing: 0.0,
                 ),
           ),
-          actions: [],
+          actions: [
+            FlutterFlowIconButton(
+              borderColor: Colors.transparent,
+              borderRadius: 30.0,
+              borderWidth: 1.0,
+              buttonSize: 60.0,
+              icon: Icon(
+                Icons.menu,
+                color: Colors.white,
+                size: 30.0,
+              ),
+              onPressed: _navigateToMenuMotorista,
+            ),
+          ],
           centerTitle: true,
           elevation: 2.0,
         ),
@@ -317,33 +391,9 @@ class _DocumentosMotoristaWidgetState extends State<DocumentosMotoristaWidget> {
                               ),
                             )
                           else
-                            Container(
-                              margin: EdgeInsets.only(top: 16.0),
-                              padding: EdgeInsets.all(12.0),
-                              decoration: BoxDecoration(
-                                color: Colors.green.withValues(alpha: 0.1),
-                                borderRadius: BorderRadius.circular(8.0),
-                                border: Border.all(color: Colors.green),
-                              ),
-                              child: Row(
-                                children: [
-                                  Icon(Icons.check_circle, color: Colors.green, size: 20),
-                                  SizedBox(width: 8.0),
-                                  Expanded(
-                                    child: Text(
-                                      'Todos os documentos foram aprovados! Você pode acessar outras funcionalidades.',
-                                      style: FlutterFlowTheme.of(context).bodySmall.override(
-                                        fontFamily: 'Readex Pro',
-                                        color: Colors.green.shade700,
-                                        letterSpacing: 0.0,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ),
+                            SizedBox.shrink(),
                           // Feedback visual para todos os documentos enviados
-                          if (_showSuccessMessage)
+                          if (_allDocumentsUploaded && !_canNavigateAway)
                             AnimatedContainer(
                               duration: Duration(milliseconds: 500),
                               margin: EdgeInsets.only(top: 16.0),

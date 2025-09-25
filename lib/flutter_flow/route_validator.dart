@@ -14,7 +14,7 @@ class RouteValidator {
 
   // Constantes de validação
   static const double _minDistanceMeters = 500.0; // Mínimo 500m
-  static const double _maxDistanceKm = 150.0; // Máximo 150km
+  static const double _maxDistanceKm = 300.0; // Máximo 300km (dobrado)
   static const double _maxStopsDistance = 50.0; // Máximo 50km entre paradas
   static const int _maxStops = 4; // Máximo 4 paradas
 

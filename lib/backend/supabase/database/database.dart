@@ -55,3 +55,4 @@ export 'tables/driver_wallets.dart';
 export 'tables/promo_codes.dart';
 
 export 'tables/zona_exclusao_code_logs.dart';
+export 'tables/driver_preference_fees.dart';

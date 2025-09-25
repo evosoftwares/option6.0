@@ -59,11 +59,20 @@ class _PreferenciasMotoristaWidgetState
         queryFn: (q) => q.eqOrNull('user_id', appUserId),
       );
 
-      if (driversQuery.isNotEmpty) {
-        final driver = driversQuery.first;
-        _model.initializeWithDriverData(driver);
-        safeSetState(() {});
+      if (driversQuery.isEmpty) {
+        return;
       }
+
+      final driver = driversQuery.first;
+      _model.initializeWithDriverData(driver);
+
+      // Load additional preference fees from SQL
+      final prefRows = await DriverPreferenceFeesTable().queryRows(
+        queryFn: (q) => q.eqOrNull('driver_id', driver.id),
+      );
+      _model.initializeAdditionalPreferencesFromRows(prefRows);
+
+      safeSetState(() {});
     } catch (e) {
       print('Error loading driver data: $e');
     }
@@ -193,6 +202,66 @@ class _PreferenciasMotoristaWidgetState
 
                           // Taxa por Parada
                           _buildStopFeeCard(),
+
+                          SizedBox(height: 20.0),
+
+                          // Ar-condicionado
+                          _buildServiceCard(
+                            title: 'Ar-condicionado',
+                            description: 'Disponibilizo ar-condicionado',
+                            icon: Icons.ac_unit,
+                            switchValue: _model.providesAcValue ?? false,
+                            onSwitchChanged: (value) {
+                              safeSetState(() {
+                                _model.providesAcValue = value;
+                              });
+                            },
+                            controller: _model.acFeeTextController,
+                            focusNode: _model.acFeeFocusNode,
+                            validator: _model.acFeeTextControllerValidator,
+                            enabled: _model.providesAcValue ?? false,
+                          ),
+
+                          SizedBox(height: 20.0),
+
+                          // Cadeira infantil
+                          _buildServiceCard(
+                            title: 'Cadeira infantil',
+                            description: 'Disponibilizo cadeira para criança',
+                            icon: Icons.child_care,
+                            switchValue: _model.providesChildSeatValue ?? false,
+                            onSwitchChanged: (value) {
+                              safeSetState(() {
+                                _model.providesChildSeatValue = value;
+                              });
+                            },
+                            controller: _model.childSeatFeeTextController,
+                            focusNode: _model.childSeatFeeFocusNode,
+                            validator: _model.childSeatFeeTextControllerValidator,
+                            enabled: _model.providesChildSeatValue ?? false,
+                          ),
+
+                          SizedBox(height: 20.0),
+
+                          // Acessibilidade (cadeirante)
+                          _buildServiceCard(
+                            title: 'Acessibilidade',
+                            description: 'Veículo adaptado para cadeirante',
+                            icon: Icons.accessible,
+                            switchValue:
+                                _model.providesWheelchairAccessValue ?? false,
+                            onSwitchChanged: (value) {
+                              safeSetState(() {
+                                _model.providesWheelchairAccessValue = value;
+                              });
+                            },
+                            controller: _model.wheelchairFeeTextController,
+                            focusNode: _model.wheelchairFeeFocusNode,
+                            validator:
+                                _model.wheelchairFeeTextControllerValidator,
+                            enabled:
+                                _model.providesWheelchairAccessValue ?? false,
+                          ),
 
                           SizedBox(height: 20.0),
                         ],
@@ -541,6 +610,16 @@ class _PreferenciasMotoristaWidgetState
           : 0.0;
       final stopFee = _model.parseCurrency(_model.stopFeeTextController?.text ?? '');
 
+      final acFee = (_model.providesAcValue ?? false)
+          ? _model.parseCurrency(_model.acFeeTextController?.text ?? '')
+          : 0.0;
+      final childSeatFee = (_model.providesChildSeatValue ?? false)
+          ? _model.parseCurrency(_model.childSeatFeeTextController?.text ?? '')
+          : 0.0;
+      final wheelchairFee = (_model.providesWheelchairAccessValue ?? false)
+          ? _model.parseCurrency(_model.wheelchairFeeTextController?.text ?? '')
+          : 0.0;
+
       // Converter Firebase UID para Supabase UUID
       final appUserId = await UserIdConverter.getAppUserIdFromFirebaseUid(currentUserUid);
       if (appUserId == null) {
@@ -561,6 +640,40 @@ class _PreferenciasMotoristaWidgetState
         },
         matchingRows: (rows) => rows.eqOrNull('user_id', appUserId),
       );
+
+      // Persist additional preferences: AC, Child Seat, Wheelchair
+      final driverRow = await DriversTable().queryRows(
+        queryFn: (q) => q.eqOrNull('user_id', appUserId).limit(1),
+      );
+      if (driverRow.isNotEmpty) {
+        final driverId = driverRow.first.id;
+        final upserts = [
+          {
+            'driver_id': driverId,
+            'preference_key': 'needs_ac',
+            'enabled': _model.providesAcValue ?? false,
+            'fee': acFee,
+          },
+          {
+            'driver_id': driverId,
+            'preference_key': 'needs_child_seat',
+            'enabled': _model.providesChildSeatValue ?? false,
+            'fee': childSeatFee,
+          },
+          {
+            'driver_id': driverId,
+            'preference_key': 'needs_wheelchair_access',
+            'enabled': _model.providesWheelchairAccessValue ?? false,
+            'fee': wheelchairFee,
+          },
+        ];
+
+        for (final data in upserts) {
+          await SupaFlow.client
+              .from('driver_preference_fees')
+              .upsert(data, onConflict: 'driver_id,preference_key');
+        }
+      }
 
       // Show success message
       ScaffoldMessenger.of(context).showSnackBar(

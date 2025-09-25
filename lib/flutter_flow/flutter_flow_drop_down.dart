@@ -37,6 +37,7 @@ class FlutterFlowDropDown<T> extends StatefulWidget {
     this.labelText,
     this.labelTextStyle,
     this.optionsHasValueKeys = false,
+    this.validator,
   }) : assert(
           isMultiSelect
               ? (controller == null &&
@@ -80,6 +81,7 @@ class FlutterFlowDropDown<T> extends StatefulWidget {
   final String? labelText;
   final TextStyle? labelTextStyle;
   final bool optionsHasValueKeys;
+  final String? Function(T?)? validator;
 
   @override
   State<FlutterFlowDropDown<T>> createState() => _FlutterFlowDropDownState<T>();
@@ -90,6 +92,7 @@ class _FlutterFlowDropDownState<T> extends State<FlutterFlowDropDown<T>> {
   FormFieldController<T?> get controller => widget.controller!;
   FormFieldController<List<T>?> get multiSelectController =>
       widget.multiSelectController!;
+  final GlobalKey<FormFieldState<T>> _formFieldKey = GlobalKey<FormFieldState<T>>();
 
   T? get currentValue {
     final value = isMultiSelect
@@ -135,7 +138,11 @@ class _FlutterFlowDropDownState<T> extends State<FlutterFlowDropDown<T>> {
           () => widget.onMultiSelectChanged!(multiSelectController.value);
       multiSelectController.addListener(_listener);
     } else {
-      _listener = () => widget.onChanged!(controller.value);
+      _listener = () {
+        widget.onChanged!(controller.value);
+        // Notify FormField of value changes to trigger validation and UI updates
+        _formFieldKey.currentState?.didChange(controller.value);
+      };
       controller.addListener(_listener);
     }
   }
@@ -153,25 +160,53 @@ class _FlutterFlowDropDownState<T> extends State<FlutterFlowDropDown<T>> {
   @override
   Widget build(BuildContext context) {
     final dropdownWidget = _buildDropdownWidget();
-    return SizedBox(
-      width: widget.width,
-      height: widget.height,
-      child: DecoratedBox(
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(widget.borderRadius),
-          border: Border.all(
-            color: widget.borderColor,
-            width: widget.borderWidth,
-          ),
-          color: widget.fillColor,
-        ),
-        child: Padding(
-          padding: _useDropdown2() ? EdgeInsets.zero : widget.margin,
-          child: widget.hidesUnderline
-              ? DropdownButtonHideUnderline(child: dropdownWidget)
-              : dropdownWidget,
-        ),
-      ),
+    return FormField<T>(
+      key: _formFieldKey,
+      initialValue: currentValue,
+      autovalidateMode: AutovalidateMode.onUserInteraction,
+      validator: (val) => widget.validator?.call(val),
+      builder: (state) {
+        final effectiveBorderColor = state.hasError
+            ? Theme.of(context).colorScheme.error
+            : widget.borderColor;
+        return Column(
+          mainAxisSize: MainAxisSize.min,
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            SizedBox(
+              width: widget.width,
+              height: widget.height,
+              child: DecoratedBox(
+                decoration: BoxDecoration(
+                  borderRadius: BorderRadius.circular(widget.borderRadius),
+                  border: Border.all(
+                    color: effectiveBorderColor,
+                    width: widget.borderWidth,
+                  ),
+                  color: widget.fillColor,
+                ),
+                child: Padding(
+                  padding: _useDropdown2() ? EdgeInsets.zero : widget.margin,
+                  child: widget.hidesUnderline
+                      ? DropdownButtonHideUnderline(child: dropdownWidget)
+                      : dropdownWidget,
+                ),
+              ),
+            ),
+            if (state.hasError)
+              Padding(
+                padding: const EdgeInsets.only(left: 12.0, top: 6.0),
+                child: Text(
+                  state.errorText ?? '',
+                  style: Theme.of(context)
+                      .textTheme
+                      .bodySmall
+                      ?.copyWith(color: Theme.of(context).colorScheme.error),
+                ),
+              ),
+          ],
+        );
+      },
     );
   }
 

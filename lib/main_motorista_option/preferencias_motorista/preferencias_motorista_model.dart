@@ -35,12 +35,32 @@ class PreferenciasMotoristaModel
   // Driver data
   DriversRow? driverData;
 
+  // Additional preferences: AC, Child Seat, Wheelchair Accessibility
+  bool? providesAcValue;
+  FocusNode? acFeeFocusNode;
+  TextEditingController? acFeeTextController;
+  String? Function(BuildContext, String?)? acFeeTextControllerValidator;
+
+  bool? providesChildSeatValue;
+  FocusNode? childSeatFeeFocusNode;
+  TextEditingController? childSeatFeeTextController;
+  String? Function(BuildContext, String?)? childSeatFeeTextControllerValidator;
+
+  bool? providesWheelchairAccessValue;
+  FocusNode? wheelchairFeeFocusNode;
+  TextEditingController? wheelchairFeeTextController;
+  String? Function(BuildContext, String?)? wheelchairFeeTextControllerValidator;
+
   @override
   void initState(BuildContext context) {
     petFeeTextControllerValidator = _validateCurrency;
     groceryFeeTextControllerValidator = _validateCurrency;
     condoFeeTextControllerValidator = _validateCurrency;
     stopFeeTextControllerValidator = _validateCurrency;
+
+    acFeeTextControllerValidator = _validateCurrency;
+    childSeatFeeTextControllerValidator = _validateCurrency;
+    wheelchairFeeTextControllerValidator = _validateCurrency;
   }
 
   @override
@@ -56,6 +76,15 @@ class PreferenciasMotoristaModel
 
     stopFeeFocusNode?.dispose();
     stopFeeTextController?.dispose();
+
+    acFeeFocusNode?.dispose();
+    acFeeTextController?.dispose();
+
+    childSeatFeeFocusNode?.dispose();
+    childSeatFeeTextController?.dispose();
+
+    wheelchairFeeFocusNode?.dispose();
+    wheelchairFeeTextController?.dispose();
   }
 
   // Helper method to format currency
@@ -113,5 +142,41 @@ class PreferenciasMotoristaModel
     groceryFeeFocusNode = FocusNode();
     condoFeeFocusNode = FocusNode();
     stopFeeFocusNode = FocusNode();
+
+    // Defaults for additional preferences (will be overridden by DB rows if exist)
+    providesAcValue = false;
+    acFeeTextController = TextEditingController(text: '');
+    acFeeFocusNode = FocusNode();
+
+    providesChildSeatValue = false;
+    childSeatFeeTextController = TextEditingController(text: '');
+    childSeatFeeFocusNode = FocusNode();
+
+    providesWheelchairAccessValue = false;
+    wheelchairFeeTextController = TextEditingController(text: '');
+    wheelchairFeeFocusNode = FocusNode();
+  }
+
+  // Initialize additional preferences from driver_preference_fees rows
+  void initializeAdditionalPreferencesFromRows(
+      List<DriverPreferenceFeesRow> rows) {
+    final Map<String, DriverPreferenceFeesRow> byKey = {
+      for (final r in rows) r.preferenceKey: r
+    };
+
+    final ac = byKey['needs_ac'];
+    providesAcValue = ac?.enabled ?? false;
+    acFeeTextController ??= TextEditingController();
+    acFeeTextController!.text = formatCurrency(ac?.fee);
+
+    final child = byKey['needs_child_seat'];
+    providesChildSeatValue = child?.enabled ?? false;
+    childSeatFeeTextController ??= TextEditingController();
+    childSeatFeeTextController!.text = formatCurrency(child?.fee);
+
+    final wheelchair = byKey['needs_wheelchair_access'];
+    providesWheelchairAccessValue = wheelchair?.enabled ?? false;
+    wheelchairFeeTextController ??= TextEditingController();
+    wheelchairFeeTextController!.text = formatCurrency(wheelchair?.fee);
   }
 }

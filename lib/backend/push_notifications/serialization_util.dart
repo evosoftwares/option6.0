@@ -178,9 +178,6 @@ T? getParameter<T>(Map<String, dynamic> data, String paramName) {
       case LocationSharingRow:
         return LocationSharingRow(json.decode(param) as Map<String, dynamic>)
             as T;
-      case DriverDocumentsRow:
-        return DriverDocumentsRow(json.decode(param) as Map<String, dynamic>)
-            as T;
       case BackupDriversMigrationRow:
         return BackupDriversMigrationRow(
             json.decode(param) as Map<String, dynamic>) as T;

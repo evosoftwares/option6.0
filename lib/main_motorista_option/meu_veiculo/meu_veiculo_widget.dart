@@ -11,6 +11,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'meu_veiculo_model.dart';
 export 'meu_veiculo_model.dart';
+// import '/flutter_flow/user_id_converter.dart';
 
 class MeuVeiculoWidget extends StatefulWidget {
   const MeuVeiculoWidget({
@@ -213,7 +214,7 @@ class _MeuVeiculoWidgetState extends State<MeuVeiculoWidget> {
                 children: [
                   Form(
                     key: _model.formKey,
-                    autovalidateMode: AutovalidateMode.disabled,
+                    autovalidateMode: AutovalidateMode.onUserInteraction,
                     child: Column(
                       mainAxisSize: MainAxisSize.max,
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -333,6 +334,12 @@ class _MeuVeiculoWidgetState extends State<MeuVeiculoWidget> {
                                   hidesUnderline: true,
                                   isSearchable: true,
                                   isMultiSelect: false,
+                                  validator: (val) {
+                                    if (val == null || (val is String && val.trim().isEmpty)) {
+                                      return 'Obrigatório';
+                                    }
+                                    return null;
+                                  },
                                 );
                               },
                             ),
@@ -421,6 +428,12 @@ class _MeuVeiculoWidgetState extends State<MeuVeiculoWidget> {
                               hidesUnderline: true,
                               isSearchable: true,
                               isMultiSelect: false,
+                              validator: (val) {
+                                if (val == null || (val is String && val.trim().isEmpty)) {
+                                  return 'Obrigatório';
+                                }
+                                return null;
+                              },
                             ),
                           ].divide(SizedBox(height: 8.0)),
                         ),
@@ -506,6 +519,12 @@ class _MeuVeiculoWidgetState extends State<MeuVeiculoWidget> {
                               hidesUnderline: true,
                               isSearchable: true,
                               isMultiSelect: false,
+                              validator: (val) {
+                                if (val == null || (val is String && val.trim().isEmpty)) {
+                                  return 'Obrigatório';
+                                }
+                                return null;
+                              },
                             ),
                           ].divide(SizedBox(height: 8.0)),
                         ),
@@ -580,6 +599,12 @@ class _MeuVeiculoWidgetState extends State<MeuVeiculoWidget> {
                               hidesUnderline: true,
                               isSearchable: false,
                               isMultiSelect: false,
+                              validator: (val) {
+                                if (val == null || (val is String && val.trim().isEmpty)) {
+                                  return 'Obrigatório';
+                                }
+                                return null;
+                              },
                             ),
                           ].divide(SizedBox(height: 8.0)),
                         ),
@@ -651,21 +676,21 @@ class _MeuVeiculoWidgetState extends State<MeuVeiculoWidget> {
                                   ),
                                   focusedBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
-                                      color: Color(0x00000000),
+                                      color: FlutterFlowTheme.of(context).primary,
                                       width: 1.0,
                                     ),
                                     borderRadius: BorderRadius.circular(8.0),
                                   ),
                                   errorBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
-                                      color: Color(0x00000000),
+                                      color: FlutterFlowTheme.of(context).error,
                                       width: 1.0,
                                     ),
                                     borderRadius: BorderRadius.circular(8.0),
                                   ),
                                   focusedErrorBorder: OutlineInputBorder(
                                     borderSide: BorderSide(
-                                      color: Color(0x00000000),
+                                      color: FlutterFlowTheme.of(context).error,
                                       width: 1.0,
                                     ),
                                     borderRadius: BorderRadius.circular(8.0),
@@ -773,6 +798,12 @@ class _MeuVeiculoWidgetState extends State<MeuVeiculoWidget> {
                               hidesUnderline: true,
                               isSearchable: false,
                               isMultiSelect: false,
+                              validator: (val) {
+                                if (val == null || (val is String && val.trim().isEmpty)) {
+                                  return 'Obrigatório';
+                                }
+                                return null;
+                              },
                             ),
                           ].divide(SizedBox(height: 8.0)),
                         ),
@@ -784,6 +815,9 @@ class _MeuVeiculoWidgetState extends State<MeuVeiculoWidget> {
                       alignment: AlignmentDirectional(0.0, 1.0),
                       child: FFButtonWidget(
                         onPressed: () async {
+                          // Logs detalhados iniciais do salvamento
+                          debugPrint('SEU VEÍCULO: salvar iniciado. payload atual -> categoria=$_model.dropDownValue1, marca=$_model.dropDownValue2, modelo=$_model.dropDownValue3, ano=$_model.dropDownValue4, cor=$_model.dropDownValue5, placa=${_model.textController.text}');
+                          debugPrint('SEU VEÍCULO: valores coletados -> categoria: ${_model.dropDownValue1}, marca: ${_model.dropDownValue2}, modelo: ${_model.dropDownValue3}, ano: ${_model.dropDownValue4}, cor: ${_model.dropDownValue5}, placa: ${_model.textController.text}');
                           if (_model.formKey.currentState == null ||
                               !_model.formKey.currentState!.validate()) {
                             return;
@@ -801,37 +835,65 @@ class _MeuVeiculoWidgetState extends State<MeuVeiculoWidget> {
                             return;
                           }
                           if (_model.dropDownValue5 == null) {
+                            debugPrint('SEU VEÍCULO: cor não preenchida');
                             return;
                           }
-                          await DriversTable().update(
-                            data: {
-                              'vehicle_brand': _model.dropDownValue2,
-                              'vehicle_year': int.tryParse(_model.dropDownValue4 ?? ''),
-                              'vehicle_model': _model.dropDownValue3,
-                              'vehicle_color': _model.dropDownValue5,
-                              'vehicle_plate': _model.textController.text,
-                              'vehicle_category': _model.dropDownValue1,
-                            },
-                            matchingRows: (rows) => rows.eqOrNull(
-                              'user_id',
-                              currentUserUid,
-                            ),
-                          );
-
-                          context.pushNamed(MainMotoristaWidget.routeName);
-
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            SnackBar(
-                              content: Text(
-                                'Salvo com sucesso',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                ),
+                          final payload = {
+                            'vehicle_brand': _model.dropDownValue2,
+                            'vehicle_year': int.tryParse(_model.dropDownValue4 ?? ''),
+                            'vehicle_model': _model.dropDownValue3,
+                            'vehicle_color': _model.dropDownValue5,
+                            'vehicle_plate': _model.textController.text,
+                            'vehicle_category': _model.dropDownValue1,
+                          };
+                          debugPrint('SEU VEÍCULO: payload preparado -> $payload');
+                          debugPrint('SEU VEÍCULO: enviando payload para Supabase...');
+                          try {
+                            // Garantir que usamos o UUID do app_user (não o Firebase UID)
+                            final appUserId = await UserIdConverter.getAppUserIdFromFirebaseUid(currentUserUid);
+                            debugPrint('SEU VEÍCULO: appUserId resolvido -> $appUserId (a partir de currentUserUid=$currentUserUid)');
+                            if (appUserId == null) {
+                              throw Exception('Não foi possível resolver appUserId a partir do Firebase UID');
+                            }
+                            final updateResult = await DriversTable().update(
+                              data: payload,
+                              matchingRows: (rows) => rows.eqOrNull(
+                                'user_id',
+                                appUserId,
                               ),
-                              duration: Duration(milliseconds: 4000),
-                              backgroundColor: Color(0xFF007047),
-                            ),
-                          );
+                            );
+                            debugPrint('SEU VEÍCULO: update concluído. result -> $updateResult');
+                            debugPrint('SEU VEÍCULO: navegando para ${MainMotoristaWidget.routeName}');
+
+                            context.pushNamed(MainMotoristaWidget.routeName);
+                            debugPrint('SEU VEÍCULO: navegação concluída');
+
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  'Salvo com sucesso',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                  ),
+                                ),
+                                duration: Duration(milliseconds: 4000),
+                                backgroundColor: Color(0xFF007047),
+                              ),
+                            );
+                          } catch (e, s) {
+                            debugPrint('SEU VEÍCULO: erro ao salvar: $e');
+                            debugPrint('SEU VEÍCULO: stacktrace: $s');
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text(
+                                  'Erro ao salvar veículo. Tente novamente.',
+                                  style: TextStyle(color: Colors.white),
+                                ),
+                                backgroundColor: FlutterFlowTheme.of(context).error,
+                                duration: Duration(seconds: 4),
+                              ),
+                            );
+                          }
                         },
                         text: 'Salvar',
                         options: FFButtonOptions(

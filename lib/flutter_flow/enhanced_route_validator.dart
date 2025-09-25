@@ -22,6 +22,7 @@ class EnhancedRouteValidator {
 
   // Configurações da API (adicionar no .env)
   static const String _googleMapsApiKey = 'YOUR_GOOGLE_MAPS_API_KEY';
+  // ignore: unused_field
   static const String _mapboxApiKey = 'YOUR_MAPBOX_API_KEY';
 
   // Constantes de precificação dinâmica
@@ -31,6 +32,7 @@ class EnhancedRouteValidator {
   static const double _stopRate = 5.0; // R$ 5,00 por parada
   static const double _waitingRate = 0.5; // R$ 0,50 por minuto de espera
   static const double _nightSurcharge = 1.2; // 20% adicional noturno
+  // ignore: unused_field
   static const double _rainSurcharge = 1.15; // 15% adicional chuva
 
   /// Validação avançada com dados reais de roteamento
