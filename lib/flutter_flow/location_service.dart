@@ -194,6 +194,8 @@ class LocationService {
       String country = '';
       String zipCode = '';
       String neighborhood = '';
+      String routeName = '';
+      String streetNumber = '';
 
       // Extrair componentes do endereço
       final components = (result['address_components'] as List?)?.cast<Map<String, dynamic>>() ?? [];
@@ -203,9 +205,9 @@ class LocationService {
         final shortName = component['short_name'] as String? ?? '';
 
         if (types.contains('street_number')) {
-          name = '$longName $name'.trim();
+          streetNumber = longName;
         } else if (types.contains('route')) {
-          name = '$name $longName'.trim();
+          routeName = longName;
         } else if (types.contains('neighborhood')) {
           neighborhood = longName;
         } else if (types.contains('locality')) {
@@ -219,10 +221,36 @@ class LocationService {
         }
       }
 
-      // Se não conseguiu extrair nome da rua, usar endereço formatado
-      if (name.isEmpty) {
-        name = formattedAddress.split(',').first.trim();
+      // Compor nome preferindo "Rua/Avenida, Número"
+      String finalName = '';
+      // Tratar casos de "Estrada sem nome"/"Unnamed Road" e similares
+      final lowerRoute = routeName.toLowerCase();
+      const unnamedPatterns = [
+        'unnamed road',
+        'estrada sem nome',
+        'rua sem nome',
+        'avenida sem nome',
+      ];
+      final isUnnamedRoute = routeName.isEmpty || unnamedPatterns.any((p) => lowerRoute.contains(p));
+      if (!isUnnamedRoute) {
+        finalName = streetNumber.isNotEmpty ? '$routeName, $streetNumber' : routeName;
+      } else {
+        // Fallbacks quando a via não tem nome
+        final firstPart = formattedAddress.split(',').first.trim();
+        final firstIsUnnamed = unnamedPatterns.any((p) => firstPart.toLowerCase().contains(p));
+        if (!firstIsUnnamed && firstPart.isNotEmpty) {
+          finalName = firstPart;
+        } else if (neighborhood.isNotEmpty && city.isNotEmpty) {
+          finalName = '$neighborhood - $city';
+        } else if (city.isNotEmpty) {
+          finalName = city;
+        } else {
+          finalName = 'Localização Atual';
+        }
       }
+      name = finalName.isNotEmpty ? finalName : (formattedAddress.split(',').first.trim().isNotEmpty
+          ? formattedAddress.split(',').first.trim()
+          : 'Localização Atual');
 
       final place = FFPlace(
         latLng: location,
