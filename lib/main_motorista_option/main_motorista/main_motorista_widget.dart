@@ -18,6 +18,7 @@ export 'main_motorista_model.dart';
 import 'dart:async';
 import 'package:permission_handler/permission_handler.dart';
 import '/flutter_flow/flutter_flow_google_map.dart';
+import '/flutter_flow/location_service.dart';
 // import '/flutter_flow/user_id_converter.dart';
 
  class MainMotoristaWidget extends StatefulWidget {
@@ -44,6 +45,19 @@ class _MainMotoristaWidgetState extends State<MainMotoristaWidget> {
   double? _estimatedFare;
   bool _isAccepting = false;
   String? _appUserId;
+
+  // Helper para formatar moeda no padrão BRL: R$X,XX (sem espaço, vírgula decimal)
+  String formatBRL(num? value, {String placeholder = 'R\$0,00'}) {
+    if (value == null) return placeholder;
+    final formatted = formatNumber(
+      value,
+      formatType: FormatType.decimal,
+      decimalType: DecimalType.commaDecimal,
+      currency: 'BRL',
+    );
+    // Garantir ausência de espaços entre símbolo e valor
+    return 'R\$' + formatted.replaceAll(' ', '');
+  }
 
   @override
   void initState() {
@@ -149,6 +163,117 @@ class _MainMotoristaWidgetState extends State<MainMotoristaWidget> {
     super.dispose();
   }
 
+  // Helper: verifica se um ponto (lat, lng) está dentro dos bounds (com suporte ao antimeridiano)
+  bool _boundsContainsLatLng(LatLngBounds bounds, double lat, double lng) {
+    final sw = bounds.southwest;
+    final ne = bounds.northeast;
+    final withinLat = lat >= sw.latitude && lat <= ne.latitude;
+    final crossesAntimeridian = sw.longitude > ne.longitude;
+    final withinLng = crossesAntimeridian
+        ? (lng >= sw.longitude || lng <= ne.longitude)
+        : (lng >= sw.longitude && lng <= ne.longitude);
+    return withinLat && withinLng;
+  }
+
+  // Aguarda o GoogleMap estar realmente pronto no Android antes de enviar comandos pela channel
+  Future<bool> _ensureMapReady(GoogleMapController controller, {int retries = 10}) async {
+    for (var i = 0; i < retries; i++) {
+      try {
+        // Se a chamada não lançar exceção, consideramos o mapa pronto.
+        await controller.getVisibleRegion();
+        return true;
+      } catch (e) {
+        debugPrint('[MAP_READY] getVisibleRegion failed (attempt ${i + 1}/$retries): $e');
+      }
+      await Future.delayed(const Duration(milliseconds: 200));
+    }
+    return false;
+  }
+
+  Future<void> _centerMapOnUserLocation({bool showFeedback = true}) async {
+    try {
+      final userLocation = await LocationService.instance.getCurrentLocation();
+      if (userLocation == null) {
+        if (!mounted) return;
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Não foi possível obter sua localização. Verifique as permissões.')),
+        );
+        return;
+      }
+
+      final controller = await _model.googleMapsController.future;
+
+      // Garante que o mapa esteja realmente inicializado (evita: Unable to establish connection on channel)
+      final isReady = await _ensureMapReady(controller);
+      if (!isReady) {
+        debugPrint('[AUTO_CENTER] Map not ready yet, aborting camera animation for now.');
+        if (mounted && showFeedback) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Mapa ainda inicializando. Tente novamente em alguns segundos.')),
+          );
+        }
+        return;
+      }
+
+      final target = userLocation.toGoogleMaps();
+
+      bool centered = false;
+
+      try {
+        await controller.animateCamera(
+          CameraUpdate.newCameraPosition(
+            CameraPosition(target: target, zoom: 16),
+          ),
+        );
+        await Future.delayed(const Duration(milliseconds: 350));
+        final visibleRegion = await controller.getVisibleRegion();
+        centered = _boundsContainsLatLng(
+          visibleRegion,
+          target.latitude,
+          target.longitude,
+        );
+      } catch (e) {
+        debugPrint('[AUTO_CENTER] animateCamera failed: $e');
+      }
+
+      if (!centered) {
+        try {
+          await Future.delayed(const Duration(milliseconds: 250));
+          await controller.moveCamera(CameraUpdate.newLatLng(target));
+          await Future.delayed(const Duration(milliseconds: 300));
+          final visibleRegion2 = await controller.getVisibleRegion();
+          centered = _boundsContainsLatLng(
+            visibleRegion2,
+            target.latitude,
+            target.longitude,
+          );
+        } catch (e) {
+          debugPrint('[AUTO_CENTER] moveCamera fallback failed: $e');
+        }
+      }
+
+      if (centered) {
+        if (showFeedback && mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Mapa centralizado na sua localização.')),
+          );
+        }
+      } else {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Não foi possível centralizar o mapa agora.')),
+          );
+        }
+      }
+    } catch (e) {
+      debugPrint('[AUTO_CENTER] Error: $e');
+      if (!mounted) return;
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Erro ao centralizar o mapa.')),
+      );
+    }
+  }
+
   List<Widget> _buildStackChildren(DriversRow? stackDriversRow) {
     List<Widget> children = [];
 
@@ -171,12 +296,37 @@ class _MainMotoristaWidgetState extends State<MainMotoristaWidget> {
             allowInteraction: true,
             allowZoom: true,
             showZoomControls: true,
-            showLocation: true,
+            showLocation: false, // Desabilita o botão nativo do Google Maps
             showCompass: false,
             showMapToolbar: false,
             showTraffic: false,
             centerMapOnMarkerTap: true,
             mapTakesGesturePreference: false,
+          ),
+        ),
+      ),
+    );
+
+    // Botão "minha localização" customizado - reposicionado para canto inferior esquerdo
+    children.add(
+      Align(
+        alignment: AlignmentDirectional(-1.0, 1.0), // Canto inferior esquerdo
+        child: Padding(
+          padding: EdgeInsetsDirectional.fromSTEB(12.0, 0.0, 0.0, 100.0), // Margem esquerda
+          child: FlutterFlowIconButton(
+            borderColor: Color(0x1F000000),
+            borderRadius: 100.0,
+            borderWidth: 1.0,
+            buttonSize: 50.0,
+            fillColor: FlutterFlowTheme.of(context).secondaryBackground,
+            icon: Icon(
+              Icons.my_location,
+              color: FlutterFlowTheme.of(context).primaryText,
+              size: 24.0,
+            ),
+            onPressed: () async {
+              await _centerMapOnUserLocation(showFeedback: true);
+            },
           ),
         ),
       ),
@@ -633,14 +783,7 @@ class _MainMotoristaWidgetState extends State<MainMotoristaWidget> {
                                           .headlineSmall
                                           .override(
                                             font: GoogleFonts.roboto(
-                                              fontWeight:
-                                                  FlutterFlowTheme.of(context)
-                                                      .headlineSmall
-                                                      .fontWeight,
-                                              fontStyle:
-                                                  FlutterFlowTheme.of(context)
-                                                      .headlineSmall
-                                                      .fontStyle,
+                                              fontWeight: FontWeight.bold,
                                             ),
                                             color: FlutterFlowTheme.of(context)
                                                 .secondaryBackground,
@@ -856,8 +999,8 @@ class _MainMotoristaWidgetState extends State<MainMotoristaWidget> {
                               ),
                               Text(
                                 _estimatedFare != null
-                                    ? 'R\$ ${_estimatedFare!.toStringAsFixed(2)}'
-                                    : 'R\$ --',
+                                    ? formatBRL(_estimatedFare)
+                                    : 'R\$0,00',
                                 style: FlutterFlowTheme.of(context)
                                     .headlineMedium
                                     .override(
@@ -1074,7 +1217,7 @@ class _MainMotoristaWidgetState extends State<MainMotoristaWidget> {
                                       Text(
                                         _appUserId == null
                                             ? 'Offline ou usuário não resolvido'
-                                            : 'R\$ --',
+                                            : 'R\$0,00',
                                         style: FlutterFlowTheme.of(context)
                                             .displaySmall
                                             .override(
@@ -1142,7 +1285,7 @@ class _MainMotoristaWidgetState extends State<MainMotoristaWidget> {
                                           ),
                                     ),
                                     Text(
-                                      'R\$ 123,45',
+                                      'R\$123,45',
                                       style: FlutterFlowTheme.of(context)
                                           .displaySmall
                                           .override(
@@ -1186,7 +1329,8 @@ class _MainMotoristaWidgetState extends State<MainMotoristaWidget> {
                     size: 24.0,
                   ),
                   onPressed: () async {
-                    context.pushNamed(MenuMotoristaWidget.routeName);
+                    print('🔍 [MAIN_MOTORISTA] Navegando para menu do motorista');
+                    context.pushNamed('menuMotorista');
                   },
                 ),
               ),
@@ -1526,7 +1670,7 @@ class _MainMotoristaWidgetState extends State<MainMotoristaWidget> {
                             SizedBox(width: 8.0),
                             Text(
                               _estimatedFare != null
-                                  ? 'R\$ ${_estimatedFare!.toStringAsFixed(2)}'
+                                  ? formatBRL(_estimatedFare)
                                   : '—',
                               style: FlutterFlowTheme.of(context)
                                   .titleMedium
