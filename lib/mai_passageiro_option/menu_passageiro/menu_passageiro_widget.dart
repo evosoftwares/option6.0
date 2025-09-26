@@ -232,7 +232,56 @@ class _MenuPassageiroWidgetState extends State<MenuPassageiroWidget> {
                           ),
                         ),
                       ),
-
+                      SizedBox(height: 16.0),
+                      
+                      // ### NOVO BOTÃO ADICIONADO AQUI ###
+                      // Minhas Avaliações
+                      InkWell(
+                        splashColor: Colors.transparent,
+                        focusColor: Colors.transparent,
+                        hoverColor: Colors.transparent,
+                        highlightColor: Colors.transparent,
+                        onTap: () async {
+                          print('🔍 [MENU_PASSAGEIRO] Navegando para Minhas Avaliações');
+                          context.pushNamed('review_page'); 
+                        },
+                        child: Container(
+                          width: double.infinity,
+                          height: 60.0,
+                          decoration: BoxDecoration(
+                            color: FlutterFlowTheme.of(context).secondaryBackground,
+                            borderRadius: BorderRadius.circular(8.0),
+                            border: Border.all(
+                              color: FlutterFlowTheme.of(context).alternate,
+                              width: 1.0,
+                            ),
+                          ),
+                          child: Padding(
+                            padding: EdgeInsetsDirectional.fromSTEB(16.0, 16.0, 16.0, 16.0),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.max,
+                              children: [
+                                Icon(
+                                  Icons.star_outline, // Ícone de estrela
+                                  color: FlutterFlowTheme.of(context).primary,
+                                  size: 26.0,
+                                ),
+                                Text(
+                                  'Minhas Avaliações',
+                                  style: FlutterFlowTheme.of(context)
+                                      .bodyMedium
+                                      .override(
+                                        font: GoogleFonts.inter(),
+                                        letterSpacing: 0.0,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                ),
+                              ].divide(SizedBox(width: 12.0)),
+                            ),
+                          ),
+                        ),
+                      ),
+                      
                     ],
                   ),
                 ),

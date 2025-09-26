@@ -1,4 +1,4 @@
-#!/usr/bin/env python3
+#!/usr/bin/env python3 oi
 """
 Script to automatically add Supabase imports to Dart files that need them.
 """

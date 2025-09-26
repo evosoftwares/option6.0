@@ -38,10 +38,8 @@ export '/main_motorista_option/minhas_viagens/minhas_viagens_widget.dart'
 export '/main_motorista_option/preferencias_motorista/preferencias_motorista_widget.dart'
     show PreferenciasMotoristaWidget;
 
-export '/avaliacao_option/avaliar_motorista/avaliar_motorista_widget.dart'
-    show AvaliarMotoristaWidget;
-export '/avaliacao_option/avaliar_passageiro/avaliar_passageiro_widget.dart'
-    show AvaliarPassageiroWidget;
+export '/avaliacao_option/avaliacao_component.dart' show TelaDeAvaliacaoWidget, TipoAvaliacao;
+
 export '/mai_passageiro_option/menu_passageiro/menu_passageiro_widget.dart'
     show MenuPassageiroWidget;
 export '/mai_passageiro_option/minhas_viagens_pax/minhas_viagens_pax_widget.dart' show MinhasViagensPaxWidget;

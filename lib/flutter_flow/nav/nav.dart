@@ -13,6 +13,7 @@ import '/auth/firebase_auth/auth_util.dart';
 import '/custom_code/actions/validar_documentos_motorista.dart';
 
 import '/index.dart';
+import 'package:option/avaliacao_option/avaliacao_component.dart';
 
 export 'package:go_router/go_router.dart';
 export 'serialization_util.dart';
@@ -296,41 +297,26 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
         ),
 
         FFRoute(
-          name: AvaliarMotoristaWidget.routeName,
-          path: AvaliarMotoristaWidget.routePath,
-          builder: (context, params) => AvaliarMotoristaWidget(
-            tripId: params.getParam(
-              'tripId',
+          name: 'telaDeAvaliacao',
+          path: '/avaliarViagem',
+          builder: (context, params) {
+            final tipoString = params.getParam(
+              'tipoAvaliacao',
               ParamType.String,
-            )!,
-            motoristaNome: params.getParam(
-              'motoristaNome',
-              ParamType.String,
-            ),
-            veiculoInfo: params.getParam(
-              'veiculoInfo',
-              ParamType.String,
-            ),
-          ),
+            );
+            final tipoEnum = fromString(tipoString, TipoAvaliacao.values) ?? TipoAvaliacao.motorista; 
+
+            return TelaDeAvaliacaoWidget(
+              tipo: tipoEnum,
+              tripId: params.getParam('tripId', ParamType.String),
+              driverUserId: params.getParam('driverUserId', ParamType.String),
+              passengerUserId: params.getParam('passengerUserId', ParamType.String),
+              nomePrincipal: params.getParam('nomePrincipal', ParamType.String),
+              infoSecundaria: params.getParam('infoSecundaria', ParamType.String),
+            );
+          },
         ),
-        FFRoute(
-          name: AvaliarPassageiroWidget.routeName,
-          path: AvaliarPassageiroWidget.routePath,
-          builder: (context, params) => AvaliarPassageiroWidget(
-            tripId: params.getParam(
-              'tripId',
-              ParamType.String,
-            )!,
-            passageiroNome: params.getParam(
-              'passageiroNome',
-              ParamType.String,
-            ),
-            origemDestino: params.getParam(
-              'origemDestino',
-              ParamType.String,
-            ),
-          ),
-        ),
+
         FFRoute(
           name: PreferenciasPassageiroWidget.routeName,
           path: PreferenciasPassageiroWidget.routePath,
@@ -817,5 +803,15 @@ extension GoRouterLocationExtension on GoRouter {
         ? lastMatch.matches
         : routerDelegate.currentConfiguration;
     return matchList.uri.toString();
+  }
+}
+
+// função para converter uma String para um valor de Enum
+T? fromString<T>(String? value, List<T> values) {
+  if (value == null) return null;
+  try {
+    return values.firstWhere((e) => e.toString().split('.').last == value);
+  } catch (e) {
+    return null;
   }
 }

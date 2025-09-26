@@ -344,6 +344,7 @@ class _PreferenciasMotoristaWidgetState
                     children: [
                       Text(
                         title,
+
                         style: FlutterFlowTheme.of(context).bodyLarge.override(
                               font: GoogleFonts.inter(),
                               fontWeight: FontWeight.w600,
@@ -364,15 +365,24 @@ class _PreferenciasMotoristaWidgetState
                 Switch.adaptive(
                   value: switchValue,
                   onChanged: onSwitchChanged,
-                  activeThumbColor: Colors.white,
-                  activeTrackColor: FlutterFlowTheme.of(context).primary,
-                  inactiveTrackColor: FlutterFlowTheme.of(context).alternate,
-                  inactiveThumbColor:
-                      FlutterFlowTheme.of(context).secondaryText,
+                  thumbColor: MaterialStateProperty.resolveWith<Color?>((states) {
+                    if (states.contains(MaterialState.selected)) {
+                      return Colors.white; // Cor da bolinha quando LIGADO
+                    }
+                    return FlutterFlowTheme.of(context).secondaryText; // Cor da bolinha quando DESLIGADO
+                  }),
+                  activeColor: FlutterFlowTheme.of(context).primary,
+
+
+                  trackColor: MaterialStateProperty.resolveWith<Color?>((states) {
+                    if (states.contains(MaterialState.selected)) {
+                      return FlutterFlowTheme.of(context).primary; // Cor da pista quando LIGADO
+                    }
+                    return FlutterFlowTheme.of(context).alternate; // Cor da pista quando DESLIGADO
+                  }),
                 ),
               ],
-            ),
-
+            ), 
             // Fee input field (only shown when service is enabled)
             if (enabled) ...[
               SizedBox(height: 16.0),

@@ -11,7 +11,7 @@ import '/custom_code/actions/index.dart' as actions;
 import 'package:mapbox_search/mapbox_search.dart' as mapbox;
 import 'package:stop_watch_timer/stop_watch_timer.dart';
 import 'package:flutter/material.dart';
-// import 'package:flutter/scheduler.dart';
+import 'package:flutter/scheduler.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:collection/collection.dart';
 import '/actions/actions.dart' as action_blocks;
