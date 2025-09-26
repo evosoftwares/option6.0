@@ -3,7 +3,7 @@ import { serve } from 'https://deno.land/std@0.168.0/http/server.ts';
 
 // Define a estrutura esperada do payload do webhook de transferência do Asaas.
 interface AsaasTransferPayload {
-  event: 'TRANSFER_COMPLETED' | 'TRANSFER_FAILED' | 'TRANSFER_CANCELLED' | string;
+  event: 'TRANSFER_DONE' | 'TRANSFER_FAILED' | 'TRANSFER_CANCELLED' | string;
   transfer: {
     id: string; // ID da transferência no Asaas
     value: number;
@@ -32,7 +32,7 @@ serve(async (req: Request) => {
 
     // 2. PROCESSAMENTO DO EVENTO
     // Focamos apenas em eventos que finalizam uma transferência (sucesso ou falha).
-    if (payload.event !== 'TRANSFER_COMPLETED' && payload.event !== 'TRANSFER_FAILED' && payload.event !== 'TRANSFER_CANCELLED') {
+    if (payload.event !== 'TRANSFER_DONE' && payload.event !== 'TRANSFER_FAILED' && payload.event !== 'TRANSFER_CANCELLED') {
       console.log(`Evento de transferência '${payload.event}' ignorado.`);
       return new Response(`Evento '${payload.event}' ignorado.`, { status: 200 });
     }
@@ -63,7 +63,7 @@ serve(async (req: Request) => {
     }
 
     // 4. ATUALIZAÇÃO DO STATUS E SALDO
-    if (payload.event === 'TRANSFER_COMPLETED') {
+    if (payload.event === 'TRANSFER_DONE') {
       // Se o saque foi concluído com sucesso, debitamos o valor da carteira.
       const { error: rpcError } = await supabaseAdmin.rpc('debitar_saque_motorista', {
         p_wallet_id: withdrawal.driver_wallets.id,
