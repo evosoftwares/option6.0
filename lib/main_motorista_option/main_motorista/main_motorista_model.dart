@@ -5,6 +5,7 @@ import '/index.dart';
 import 'main_motorista_widget.dart' show MainMotoristaWidget;
 import 'package:stop_watch_timer/stop_watch_timer.dart';
 import 'package:flutter/material.dart';
+import '/flutter_flow/flutter_flow_google_map.dart';
 
 class MainMotoristaModel extends FlutterFlowModel<MainMotoristaWidget> {
   ///  State fields for stateful widgets in this page.
@@ -27,6 +28,12 @@ class MainMotoristaModel extends FlutterFlowModel<MainMotoristaWidget> {
 
   // Prevent double taps on online/offline toggle
   bool isTogglingOnline = false;
+
+  // Google Map state
+  LatLng? googleMapsCenter;
+  final googleMapsController = Completer<GoogleMapController>();
+  // Markers to display on the map (e.g., trip origin/destination)
+  List<FlutterFlowMarker> mapMarkers = [];
 
   @override
   void initState(BuildContext context) {}

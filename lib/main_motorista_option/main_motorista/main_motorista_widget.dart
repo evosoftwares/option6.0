@@ -1,14 +1,12 @@
 import '/auth/firebase_auth/auth_util.dart';
 import '/backend/supabase/supabase.dart';
 import '/flutter_flow/flutter_flow_icon_button.dart';
-import '/flutter_flow/flutter_flow_static_map.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_timer.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import '/index.dart';
 import '/custom_code/actions/index.dart' as actions;
-import 'package:mapbox_search/mapbox_search.dart' as mapbox;
 import 'package:stop_watch_timer/stop_watch_timer.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
@@ -19,6 +17,7 @@ import 'main_motorista_model.dart';
 export 'main_motorista_model.dart';
 import 'dart:async';
 import 'package:permission_handler/permission_handler.dart';
+import '/flutter_flow/flutter_flow_google_map.dart';
 // import '/flutter_flow/user_id_converter.dart';
 
  class MainMotoristaWidget extends StatefulWidget {
@@ -157,22 +156,28 @@ class _MainMotoristaWidgetState extends State<MainMotoristaWidget> {
     children.add(
       Align(
         alignment: AlignmentDirectional(0.0, 0.0),
-        child: FlutterFlowStaticMap(
-          location: LatLng(9.341465, -79.891704),
-          apiKey: 'pk.eyJ1IjoiYWJyYW1zaHZpbGxpIiwiYSI6ImNrd2N6OGN1d2d3bGQyb3BnbzZnajV0MzMifQ.K8Oqewp1e0CZ6viw6T2yUA',
-          style: mapbox.MapBoxStyle.Streets,
+        child: Container(
           width: double.infinity,
           height: double.infinity,
-          fit: BoxFit.cover,
-          borderRadius: BorderRadius.only(
-            bottomLeft: Radius.circular(0.0),
-            bottomRight: Radius.circular(0.0),
-            topLeft: Radius.circular(0.0),
-            topRight: Radius.circular(0.0),
+          child: FlutterFlowGoogleMap(
+            controller: _model.googleMapsController,
+            onCameraIdle: (latLng) => _model.googleMapsCenter = latLng,
+            initialLocation: _model.googleMapsCenter ??= LatLng(13.106061, -59.613158),
+            markers: _model.mapMarkers,
+            markerColor: GoogleMarkerColor.violet,
+            mapType: MapType.normal,
+            style: GoogleMapStyle.standard,
+            initialZoom: 14.0,
+            allowInteraction: true,
+            allowZoom: true,
+            showZoomControls: true,
+            showLocation: true,
+            showCompass: false,
+            showMapToolbar: false,
+            showTraffic: false,
+            centerMapOnMarkerTap: true,
+            mapTakesGesturePreference: false,
           ),
-          zoom: 12,
-          tilt: 0,
-          rotation: 0,
         ),
       ),
     );
@@ -254,37 +259,43 @@ class _MainMotoristaWidgetState extends State<MainMotoristaWidget> {
                   safeSetState(() {});
                 }
               },
-              child: Container(
-                width: 80.0,
-                height: 80.0,
-                decoration: BoxDecoration(
-                  color: Color(0xFFC00000),
-                  shape: BoxShape.circle,
+              child: Material(
+                color: Colors.transparent,
+                elevation: 0.0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(100.0),
                 ),
-                child: Align(
-                  alignment: AlignmentDirectional(0.0, 0.0),
-                  child: Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: Text(
-                      'Sair',
-                      style: FlutterFlowTheme.of(context)
-                          .headlineMedium
-                          .override(
-                            font: GoogleFonts.roboto(
-                              fontWeight: FontWeight.w600,
-                              fontStyle: FlutterFlowTheme.of(context)
-                                  .headlineMedium
-                                  .fontStyle,
-                            ),
-                            color: FlutterFlowTheme.of(context)
-                                .primaryBackground,
-                            letterSpacing: 0.0,
-                            fontWeight: FontWeight.w600,
-                            fontStyle: FlutterFlowTheme.of(context)
-                                .headlineMedium
-                                .fontStyle,
-                          ),
+                child: Container(
+                  width: 220.0,
+                  height: 47.0,
+                  decoration: BoxDecoration(
+                    color: FlutterFlowTheme.of(context).secondaryBackground,
+                    borderRadius: BorderRadius.circular(100.0),
+                    border: Border.all(
+                      color: Color(0xFF2AAD22),
                     ),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.max,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(
+                        Icons.power_settings_new_rounded,
+                        color: Color(0xFF2AAD22),
+                        size: 24.0,
+                      ),
+                      SizedBox(width: 8.0),
+                      Text(
+                        'Sair',
+                        style: FlutterFlowTheme.of(context).titleMedium.override(
+                              font: GoogleFonts.roboto(
+                                fontWeight: FontWeight.bold,
+                              ),
+                              color: Color(0xFF2AAD22),
+                              letterSpacing: 0.0,
+                            ),
+                      ),
+                    ],
                   ),
                 ),
               ),
@@ -502,7 +513,7 @@ class _MainMotoristaWidgetState extends State<MainMotoristaWidget> {
                                         .fontStyle,
                                   ),
                                   color: Colors.white,
-                                  fontSize: 14.0,
+                                  fontSize: 18.0,
                                 ),
                           ),
                   ),
@@ -1267,39 +1278,387 @@ class _MainMotoristaWidgetState extends State<MainMotoristaWidget> {
                 child: Column(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Text('Não foi possível carregar agora.'),
-                    SizedBox(height: 8),
-                    FFButtonWidget(
-                      onPressed: () => setState(() {}),
-                      text: 'Tentar novamente',
-                      options: FFButtonOptions(height: 40.0, padding: EdgeInsets.symmetric(horizontal: 16.0)),
-                    ),
+                    Icon(Icons.error, color: Colors.red, size: 48),
+                    SizedBox(height: 12),
+                    Text('Erro ao carregar dados do motorista'),
                   ],
                 ),
               );
             }
 
-            if (!snapshot.hasData || snapshot.data!.isEmpty) {
-              return Center(
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text('Dados do motorista indisponíveis.'),
-                    SizedBox(height: 8),
-                    FFButtonWidget(
-                      onPressed: () => context.goNamed(EscolhaSeuPerfilWidget.routeName),
-                      text: 'Definir perfil',
-                      options: FFButtonOptions(height: 40.0, padding: EdgeInsets.symmetric(horizontal: 16.0)),
-                    ),
-                  ],
-                ),
-              );
+            final driversRow = snapshot.data?.firstOrNull;
+
+            final children = _buildStackChildren(driversRow);
+
+            // Overlay de solicitação de corrida
+            if (_showTripRequest) {
+              children.add(_buildTripRequestOverlay());
             }
-            final stackDriversRow = snapshot.data!.first;
-            return Stack(
-              children: _buildStackChildren(stackDriversRow),
-            );
+
+            return Stack(children: children);
           },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTripRequestOverlay() {
+    // Mover o overlay existente para um método para permitir adicionar lógica de limpeza
+    return Align(
+      alignment: AlignmentDirectional(0.0, 0.0),
+      child: Material(
+        color: Colors.transparent,
+        child: Container(
+          width: double.infinity,
+          height: double.infinity,
+          decoration: BoxDecoration(
+            color: Color(0xB2000000),
+          ),
+          child: Align(
+            alignment: AlignmentDirectional(0.0, 0.0),
+            child: Padding(
+              padding: EdgeInsetsDirectional.fromSTEB(16.0, 100.0, 16.0, 60.0),
+              child: Material(
+                color: Colors.transparent,
+                elevation: 5.0,
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(16.0),
+                ),
+                child: Container(
+                  width: double.infinity,
+                  decoration: BoxDecoration(
+                    color: FlutterFlowTheme.of(context).secondaryBackground,
+                    borderRadius: BorderRadius.circular(16.0),
+                  ),
+                  child: Padding(
+                    padding: EdgeInsets.all(16.0),
+                    child: Column(
+                      mainAxisSize: MainAxisSize.min,
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Text(
+                              'Nova Solicitação de Corrida',
+                              style: FlutterFlowTheme.of(context)
+                                  .headlineSmall
+                                  .override(
+                                    font: GoogleFonts.roboto(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    color: FlutterFlowTheme.of(context)
+                                        .primaryText,
+                                    letterSpacing: 0.0,
+                                  ),
+                            ),
+                            FlutterFlowTimer(
+                              initialTime: _model.timerInitialTimeMs,
+                              getDisplayTime: (value) =>
+                                  StopWatchTimer.getDisplayTime(
+                                value,
+                                hours: false,
+                                minute: false,
+                                milliSecond: false,
+                              ),
+                              controller: _model.timerController,
+                              updateStateInterval: Duration(milliseconds: 1000),
+                              onChanged: (value, displayTime, shouldUpdate) {
+                                _model.timerMilliseconds = value;
+                                _model.timerValue = displayTime;
+                                if (shouldUpdate) safeSetState(() {});
+                              },
+                              onEnded: () async {
+                                // Timer expirou: marcar notificação como lida e ocultar overlay
+                                if (_currentNotificationId != null) {
+                                  await actions.SistemaNotificacoesTempoReal
+                                      .instance
+                                      .marcarComoLida(_currentNotificationId!);
+                                }
+                                _model.timerController.onStopTimer();
+                                // Limpar marcadores
+                                _model.mapMarkers = [];
+                                if (mounted) {
+                                  safeSetState(() {
+                                    _showTripRequest = false;
+                                  });
+                                }
+                              },
+                              textAlign: TextAlign.start,
+                              style: FlutterFlowTheme.of(context)
+                                  .headlineSmall
+                                  .override(
+                                    font: GoogleFonts.roboto(
+                                      fontWeight: FontWeight.bold,
+                                    ),
+                                    color: FlutterFlowTheme.of(context)
+                                        .primaryText,
+                                    letterSpacing: 0.0,
+                                  ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 12.0),
+                        Text(
+                          'Origem',
+                          style: FlutterFlowTheme.of(context)
+                              .labelLarge
+                              .override(
+                                font: GoogleFonts.inter(
+                                  fontWeight: FlutterFlowTheme.of(context)
+                                      .labelLarge
+                                      .fontWeight,
+                                  fontStyle: FlutterFlowTheme.of(context)
+                                      .labelLarge
+                                      .fontStyle,
+                                ),
+                                color:
+                                    FlutterFlowTheme.of(context).secondaryText,
+                                letterSpacing: 0.0,
+                                fontWeight: FlutterFlowTheme.of(context)
+                                    .labelLarge
+                                    .fontWeight,
+                                fontStyle: FlutterFlowTheme.of(context)
+                                    .labelLarge
+                                    .fontStyle,
+                              ),
+                        ),
+                        Text(
+                          _originAddress ?? '-',
+                          style: FlutterFlowTheme.of(context)
+                              .titleMedium
+                              .override(
+                                font: GoogleFonts.roboto(
+                                  fontWeight: FlutterFlowTheme.of(context)
+                                      .titleMedium
+                                      .fontWeight,
+                                  fontStyle: FlutterFlowTheme.of(context)
+                                      .titleMedium
+                                      .fontStyle,
+                                ),
+                                color:
+                                    FlutterFlowTheme.of(context).primaryText,
+                                letterSpacing: 0.0,
+                                fontWeight: FlutterFlowTheme.of(context)
+                                    .titleMedium
+                                    .fontWeight,
+                                fontStyle: FlutterFlowTheme.of(context)
+                                    .titleMedium
+                                    .fontStyle,
+                              ),
+                        ),
+                        SizedBox(height: 12.0),
+                        Text(
+                          'Destino',
+                          style: FlutterFlowTheme.of(context)
+                              .labelLarge
+                              .override(
+                                font: GoogleFonts.inter(
+                                  fontWeight: FlutterFlowTheme.of(context)
+                                      .labelLarge
+                                      .fontWeight,
+                                  fontStyle: FlutterFlowTheme.of(context)
+                                      .labelLarge
+                                      .fontStyle,
+                                ),
+                                color:
+                                    FlutterFlowTheme.of(context).secondaryText,
+                                letterSpacing: 0.0,
+                                fontWeight: FlutterFlowTheme.of(context)
+                                    .labelLarge
+                                    .fontWeight,
+                                fontStyle: FlutterFlowTheme.of(context)
+                                    .labelLarge
+                                    .fontStyle,
+                              ),
+                        ),
+                        Text(
+                          _destinationAddress ?? '-',
+                          style: FlutterFlowTheme.of(context)
+                              .titleMedium
+                              .override(
+                                font: GoogleFonts.roboto(
+                                  fontWeight: FlutterFlowTheme.of(context)
+                                      .titleMedium
+                                      .fontWeight,
+                                  fontStyle: FlutterFlowTheme.of(context)
+                                      .titleMedium
+                                      .fontStyle,
+                                ),
+                                color:
+                                    FlutterFlowTheme.of(context).primaryText,
+                                letterSpacing: 0.0,
+                                fontWeight: FlutterFlowTheme.of(context)
+                                    .titleMedium
+                                    .fontWeight,
+                                fontStyle: FlutterFlowTheme.of(context)
+                                    .titleMedium
+                                    .fontStyle,
+                              ),
+                        ),
+                        SizedBox(height: 12.0),
+                        Row(
+                          children: [
+                            Text(
+                              'Valor estimado:',
+                              style: FlutterFlowTheme.of(context)
+                                  .titleMedium
+                                  .override(
+                                    font: GoogleFonts.roboto(
+                                      fontWeight: FlutterFlowTheme.of(context)
+                                          .titleMedium
+                                          .fontWeight,
+                                      fontStyle: FlutterFlowTheme.of(context)
+                                          .titleMedium
+                                          .fontStyle,
+                                    ),
+                                    color: FlutterFlowTheme.of(context)
+                                        .secondaryText,
+                                    letterSpacing: 0.0,
+                                    fontWeight: FlutterFlowTheme.of(context)
+                                        .titleMedium
+                                        .fontWeight,
+                                    fontStyle: FlutterFlowTheme.of(context)
+                                        .titleMedium
+                                        .fontStyle,
+                                  ),
+                            ),
+                            SizedBox(width: 8.0),
+                            Text(
+                              _estimatedFare != null
+                                  ? 'R\$ ${_estimatedFare!.toStringAsFixed(2)}'
+                                  : '—',
+                              style: FlutterFlowTheme.of(context)
+                                  .titleMedium
+                                  .override(
+                                    font: GoogleFonts.roboto(
+                                      fontWeight: FlutterFlowTheme.of(context)
+                                          .titleMedium
+                                          .fontWeight,
+                                      fontStyle: FlutterFlowTheme.of(context)
+                                          .titleMedium
+                                          .fontStyle,
+                                    ),
+                                    color: FlutterFlowTheme.of(context)
+                                        .primaryText,
+                                    letterSpacing: 0.0,
+                                    fontWeight: FlutterFlowTheme.of(context)
+                                        .titleMedium
+                                        .fontWeight,
+                                    fontStyle: FlutterFlowTheme.of(context)
+                                        .titleMedium
+                                        .fontStyle,
+                                  ),
+                            ),
+                          ],
+                        ),
+                        SizedBox(height: 16.0),
+                        // Action buttons
+                        Row(
+                          mainAxisSize: MainAxisSize.max,
+                          children: [
+                            FlutterFlowIconButton(
+                              borderRadius: 24.0,
+                              buttonSize: 48.0,
+                              fillColor: Colors.black,
+                              icon: Icon(
+                                Icons.close_rounded,
+                                color: FlutterFlowTheme.of(context)
+                                    .secondaryBackground,
+                                size: 24.0,
+                              ),
+                              onPressed: () async {
+                                // Recusar/fechar
+                                if (_currentNotificationId != null) {
+                                  await actions.SistemaNotificacoesTempoReal
+                                      .instance
+                                      .marcarComoLida(
+                                          _currentNotificationId!);
+                                }
+                                _model.timerController.onStopTimer();
+                                // Limpar marcadores
+                                _model.mapMarkers = [];
+                                if (mounted) {
+                                  safeSetState(() {
+                                    _showTripRequest = false;
+                                  });
+                                }
+                              },
+                            ),
+                            SizedBox(width: 12.0),
+                            FFButtonWidget(
+                              onPressed: () async {
+                                if (_isAccepting ||
+                                    _pendingTripRequestId == null) return;
+                                setState(() => _isAccepting = true);
+                                final result = await actions
+                                    .aceitarViagemSupabase(
+                                  tripRequestId: _pendingTripRequestId!,
+                                  context: context,
+                                );
+                                if (result['sucesso'] == true) {
+                                  if (_currentNotificationId != null) {
+                                    await actions
+                                        .SistemaNotificacoesTempoReal
+                                        .instance
+                                        .marcarComoLida(
+                                            _currentNotificationId!);
+                                  }
+                                  _model.timerController.onStopTimer();
+                                  // Limpar marcadores
+                                  _model.mapMarkers = [];
+                                  if (mounted) {
+                                    safeSetState(() {
+                                      _showTripRequest = false;
+                                    });
+                                  }
+                                  // Navegar para tela de rota
+                                  context.pushNamed(
+                                      ACaminhoDoPassageiroWidget.routeName);
+                                } else {
+                                  await action_blocks.alertaNegativo(
+                                    context,
+                                    mensagem: (result['erro'] as String?) ??
+                                        'Não foi possível aceitar a corrida.',
+                                  );
+                                }
+                                if (mounted) {
+                                  setState(() => _isAccepting = false);
+                                }
+                              },
+                              text: _isAccepting
+                                  ? 'Aceitando...'
+                                  : 'Aceitar Corrida',
+                              options: FFButtonOptions(
+                                height: 48.0,
+                                padding: EdgeInsets.all(0.0),
+                                iconPadding:
+                                    EdgeInsetsDirectional.fromSTEB(
+                                        0.0, 0.0, 0.0, 0.0),
+                                color: Color(0xFF2AAD22),
+                                textStyle: FlutterFlowTheme.of(context)
+                                    .titleMedium
+                                    .override(
+                                      font: GoogleFonts.roboto(
+                                        fontWeight: FontWeight.w600,
+                                      ),
+                                      color: FlutterFlowTheme.of(context)
+                                          .secondaryBackground,
+                                      letterSpacing: 0.0,
+                                    ),
+                                borderSide: BorderSide(width: 0.0),
+                                borderRadius: BorderRadius.circular(6.0),
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ),
         ),
       ),
     );
