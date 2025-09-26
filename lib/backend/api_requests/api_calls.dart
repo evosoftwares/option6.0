@@ -1,13 +1,11 @@
 import 'dart:convert';
-
 import 'package:flutter/foundation.dart';
-
+import '/auth/firebase_auth/auth_util.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import 'api_manager.dart';
 
 export 'api_manager.dart' show ApiCallResponse;
 
-// ignore: unused_element
 const _kPrivateApiFunctionName = 'ffPrivateApiCall';
 
 class GoogleConvertGeocodeCall {
@@ -38,16 +36,21 @@ class ObterQRCodeCall {
   static Future<ApiCallResponse> call({
     String? id = '',
   }) async {
+    final ffApiRequestBody = '''
+{
+  "paymentId": "${id}"
+}''';
     return ApiManager.instance.makeApiCall(
       callName: 'Obter QR Code',
-      apiUrl: 'https://api.asaas.com/v3/payments/${id}/pixQrCode',
-      callType: ApiCallType.GET,
+      apiUrl:
+          'https://qlbwacmavngtonauxnte.supabase.co/functions/v1/obter-qr-code',
+      callType: ApiCallType.POST,
       headers: {
-        'accept': 'application/json',
-        'access_token':
-            '\$aact_prod_000MzkwODA2MWY2OGM3MWRlMDU2NWM3MzJlNzZmNGZhZGY6OmI0YTYxN2MyLTFlOWItNDRjMS1hM2U0LTBjYzU0MDQ4ZmNkYTo6JGFhY2hfMmFkMGU4MjMtMTAwNC00OTMxLTljYmEtMjg5Yjc2ZmE1YzYx',
+        'Content-Type': 'application/json',
       },
       params: {},
+      body: ffApiRequestBody,
+      bodyType: BodyType.JSON,
       returnBody: true,
       encodeBodyUtf8: false,
       decodeUtf8: false,
@@ -71,16 +74,21 @@ class ChecaStatusCobrancaCall {
   static Future<ApiCallResponse> call({
     String? id = '',
   }) async {
+    final ffApiRequestBody = '''
+{
+  "paymentId": "${id}"
+}''';
     return ApiManager.instance.makeApiCall(
       callName: 'Checa Status Cobranca',
-      apiUrl: 'https://api.asaas.com/v3/payments/${id}/status',
-      callType: ApiCallType.GET,
+      apiUrl:
+          'https://qlbwacmavngtonauxnte.supabase.co/functions/v1/checar-status-cobranca',
+      callType: ApiCallType.POST,
       headers: {
-        'accept': 'application/json',
-        'access_token':
-            '\$aact_prod_000MzkwODA2MWY2OGM3MWRlMDU2NWM3MzJlNzZmNGZhZGY6OmI0YTYxN2MyLTFlOWItNDRjMS1hM2U0LTBjYzU0MDQ4ZmNkYTo6JGFhY2hfMmFkMGU4MjMtMTAwNC00OTMxLTljYmEtMjg5Yjc2ZmE1YzYx',
+        'Content-Type': 'application/json',
       },
       params: {},
+      body: ffApiRequestBody,
+      bodyType: BodyType.JSON,
       returnBody: true,
       encodeBodyUtf8: false,
       decodeUtf8: false,
@@ -116,13 +124,11 @@ class CriarClienteAsaasCall {
 }''';
     return ApiManager.instance.makeApiCall(
       callName: 'Criar Cliente Asaas',
-      apiUrl: 'https://api.asaas.com/v3/customers',
+      apiUrl:
+          'https://qlbwacmavngtonauxnte.supabase.co/functions/v1/criar-cliente-asaas',
       callType: ApiCallType.POST,
       headers: {
-        'accept': 'application/json',
-        'access_token':
-            '\$aact_prod_000MzkwODA2MWY2OGM3MWRlMDU2NWM3MzJlNzZmNGZhZGY6OmI0YTYxN2MyLTFlOWItNDRjMS1hM2U0LTBjYzU0MDQ4ZmNkYTo6JGFhY2hfMmFkMGU4MjMtMTAwNC00OTMxLTljYmEtMjg5Yjc2ZmE1YzYx',
-        'content-type': 'application/json',
+        'Content-Type': 'application/json',
       },
       params: {},
       body: ffApiRequestBody,
@@ -187,14 +193,12 @@ class CriarCobrancaAsaasCall {
   "remoteIp": "${escapeStringForJson(remoteIp)}"
 }''';
     return ApiManager.instance.makeApiCall(
-      callName: 'Criar Cobranca Asaas',
-      apiUrl: 'https://api.asaas.com/v3/lean/payments/',
+      callName: 'Criar Cobranca Asaas via Edge Function',
+      apiUrl:
+          'https://qlbwacmavngtonauxnte.supabase.co/functions/v1/criar-cobranca-asaas',
       callType: ApiCallType.POST,
       headers: {
-        'accept': 'application/json',
-        'access_token':
-            '\$aact_prod_000MzkwODA2MWY2OGM3MWRlMDU2NWM3MzJlNzZmNGZhZGY6OmI0YTYxN2MyLTFlOWItNDRjMS1hM2U0LTBjYzU0MDQ4ZmNkYTo6JGFhY2hfMmFkMGU4MjMtMTAwNC00OTMxLTljYmEtMjg5Yjc2ZmE1YzYx',
-        'content-type': 'application/json',
+        'Content-Type': 'application/json',
       },
       params: {},
       body: ffApiRequestBody,
@@ -233,13 +237,11 @@ class SaqueCall {
 }''';
     return ApiManager.instance.makeApiCall(
       callName: 'Saque',
-      apiUrl: 'https://api.asaas.com/v3/transfers',
+      apiUrl:
+          'https://qlbwacmavngtonauxnte.supabase.co/functions/v1/iniciar-saque-asaas',
       callType: ApiCallType.POST,
       headers: {
-        'accept': 'application/json',
-        'access_token':
-            '\$aact_prod_000MzkwODA2MWY2OGM3MWRlMDU2NWM3MzJlNzZmNGZhZGY6OmI0YTYxN2MyLTFlOWItNDRjMS1hM2U0LTBjYzU0MDQ4ZmNkYTo6JGFhY2hfMmFkMGU4MjMtMTAwNC00OTMxLTljYmEtMjg5Yjc2ZmE1YzYx',
-        'content-type': 'application/json',
+        'Content-Type': 'application/json',
       },
       params: {},
       body: ffApiRequestBody,
@@ -341,7 +343,6 @@ String _toEncodable(dynamic item) {
   return item;
 }
 
-// ignore: unused_element
 String _serializeList(List? list) {
   list ??= <String>[];
   try {
