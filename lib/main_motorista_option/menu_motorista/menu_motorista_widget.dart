@@ -11,6 +11,7 @@ import 'menu_motorista_model.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:permission_handler/permission_handler.dart';
 import '/backend/supabase/supabase.dart';
+import 'package:firebase_auth/firebase_auth.dart'; // <-- IMPORTAÇÃO ADICIONADA
 export 'menu_motorista_model.dart';
 
 class MenuMotoristaWidget extends StatefulWidget {
@@ -54,7 +55,7 @@ class _MenuMotoristaWidgetState extends State<MenuMotoristaWidget> {
         FocusManager.instance.primaryFocus?.unfocus();
       },
       child: Scaffold(
-        key: scaffoldKey,
+          key: scaffoldKey,
         backgroundColor: Colors.white,
         appBar: AppBar(
           backgroundColor: Colors.white,
@@ -369,6 +370,73 @@ class _MenuMotoristaWidgetState extends State<MenuMotoristaWidget> {
                                 Text(
                                   'Ajuda',
                                   style: FlutterFlowTheme.of(context)
+                      .bodyMedium
+                                      .override(
+                                        font: GoogleFonts.inter(),
+                                        letterSpacing: 0.0,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                ),
+                              ].divide(SizedBox(width: 12.0)),
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      // ### NOVO BOTÃO ADICIONADO AQUI ###
+                      SizedBox(height: 16.0),
+                      InkWell(
+                        splashColor: Colors.transparent,
+                        focusColor: Colors.transparent,
+                        hoverColor: Colors.transparent,
+                        highlightColor: Colors.transparent,
+                        onTap: () async {
+                          print('🔍 [MENU_MOTORISTA] Navegando para Minhas Avaliações');
+                          final user = FirebaseAuth.instance.currentUser;
+                          if (user != null) {
+                            context.pushNamed(
+                              'review_page',
+                              queryParameters: {
+                                'userId': serializeParam(
+                                  user.uid,
+                                  ParamType.String,
+                                ),
+                                'userType': serializeParam(
+                                  'motorista',
+                                  ParamType.String,
+                                ),
+                              }.withoutNulls,
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Erro: Você precisa estar logado.')),
+                            );
+                          }
+                        },
+                        child: Container(
+                          width: double.infinity,
+                          height: 60.0,
+                          decoration: BoxDecoration(
+                            color: FlutterFlowTheme.of(context).secondaryBackground,
+                            borderRadius: BorderRadius.circular(8.0),
+                            border: Border.all(
+                              color: FlutterFlowTheme.of(context).alternate,
+                              width: 1.0,
+                            ),
+                          ),
+                          child: Padding(
+                            padding: EdgeInsetsDirectional.fromSTEB(16.0, 16.0, 16.0, 16.0),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.max,
+                              children: [
+                                Icon(
+                                  Icons.star_outline,
+                                  color: FlutterFlowTheme.of(context).primary,
+                                  size: 24.0,
+                                ),
+                                Text(
+                                  'Minhas Avaliações',
+                                  style: FlutterFlowTheme.of(context)
                                       .bodyMedium
                                       .override(
                                         font: GoogleFonts.inter(),
@@ -381,9 +449,7 @@ class _MenuMotoristaWidgetState extends State<MenuMotoristaWidget> {
                           ),
                         ),
                       ),
-                      SizedBox(height: 16.0),
-
-
+                      
                       SizedBox(height: 16.0),
 
                       // Privacidade e Localização - Revogar consentimento
@@ -521,7 +587,7 @@ class _MenuMotoristaWidgetState extends State<MenuMotoristaWidget> {
                                         } else {
                                           ScaffoldMessenger.of(context).showSnackBar(
                                             const SnackBar(
-                                              content: Text('Não foi possível configurar todas as permissões. Verifique as configurações do dispositivo.'),
+                                              content: Text('Não foi possível configurar todas as permissões...'),
                                               backgroundColor: Colors.orange,
                                               duration: Duration(seconds: 4),
                                             ),
@@ -682,7 +748,7 @@ class _MenuMotoristaWidgetState extends State<MenuMotoristaWidget> {
                             ),
                           ),
                         ),
-                      ),
+                     ),
                       SizedBox(height: 12.0),
 
                       // Upload de Documentos - JÁ CLICÁVEL

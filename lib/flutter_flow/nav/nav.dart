@@ -14,6 +14,7 @@ import '/custom_code/actions/validar_documentos_motorista.dart';
 
 import '/index.dart';
 import 'package:option/avaliacao_option/avaliacao_component.dart';
+import 'package:option/avaliacao_option/review_page.dart';
 
 export 'package:go_router/go_router.dart';
 export 'serialization_util.dart';
@@ -280,6 +281,23 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
             ),
           ),
         ),
+
+        FFRoute(
+          name: 'review_page', 
+          path: '/minhas-avaliacoes', 
+          builder: (context, params) => ReviewsScreen(
+            firebaseUid: params.getParam(
+              'userId',
+              ParamType.String,
+            ),
+            userType: fromString( 
+              params.getParam('userType', ParamType.String),
+              TipoAvaliacao.values,
+            ) ?? TipoAvaliacao.passageiro, // Valor padrão
+          ),
+        
+        ),
+
         FFRoute(
           name: MinhasViagensWidget.routeName,
           path: MinhasViagensWidget.routePath,

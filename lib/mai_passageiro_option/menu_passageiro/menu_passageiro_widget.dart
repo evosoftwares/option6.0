@@ -1,4 +1,3 @@
-// import '/auth/firebase_auth/auth_util.dart';
 import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
@@ -7,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'menu_passageiro_model.dart';
 export 'menu_passageiro_model.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class MenuPassageiroWidget extends StatefulWidget {
   const MenuPassageiroWidget({super.key});
@@ -241,10 +241,37 @@ class _MenuPassageiroWidgetState extends State<MenuPassageiroWidget> {
                         focusColor: Colors.transparent,
                         hoverColor: Colors.transparent,
                         highlightColor: Colors.transparent,
+                        
                         onTap: () async {
-                          print('🔍 [MENU_PASSAGEIRO] Navegando para Minhas Avaliações');
-                          context.pushNamed('review_page'); 
+                          print(' [MENU_PASSAGEIRO] A navegar para As Minhas Avaliações');
+  
+                           // 1. Obtém o utilizador atual do Firebase
+                          final user = FirebaseAuth.instance.currentUser;
+  
+                           // 2. Verifica se o utilizador está realmente autenticado
+                          if (user != null) {
+                            // 3. Se estiver autenticado, navega para a página
+                             context.pushNamed(
+                              'review_page',
+                                queryParameters: {
+                                  'userId': serializeParam(
+                                    user.uid, // Agora o 'user' está definido e o erro desaparece
+                                    ParamType.String,
+                                  ),
+                                  'userType': serializeParam(
+                                    'passageiro', 
+                                    ParamType.String,
+                                  ),
+                                }.withoutNulls,                       
+                            );
+                          } else {
+                            print('Erro: Nenhum utilizador autenticado para ver as avaliações.');
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(content: Text('Erro: Precisa de estar autenticado.'))
+                            );                        
+                          }                       
                         },
+                        
                         child: Container(
                           width: double.infinity,
                           height: 60.0,

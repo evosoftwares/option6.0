@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:phosphor_flutter/phosphor_flutter.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:option/avaliacao_option/avaliacao_component.dart';
 
 // --- Modelo de Dados para uma Avaliação ---
 class Review {
@@ -22,12 +23,14 @@ class Review {
   factory Review.fromMap(Map<String, dynamic> map, TipoAvaliacao quemFoiAvaliado) {
     bool eAvaliacaoDeMotorista = quemFoiAvaliado == TipoAvaliacao.motorista;
     
-    final chaveDadosAvaliador = eAvaliacaoDeMotorista ? 'passenger_user_id' : 'driver_user_id';
-    final avaliador = map[chaveDadosAvaliador] as Map<String, dynamic>?;
+    final chaveDadosAvaliador = eAvaliacaoDeMotorista ? 'passengers' : 'drivers';
+    // Dentro de 'passengers' ou 'drivers', temos a relação com 'app_users'
+    final dadosAvaliador = map[chaveDadosAvaliador] as Map<String, dynamic>?;
+    final perfilAvaliador = dadosAvaliador?['app_users'] as Map<String, dynamic>?;
     
     return Review(
-      name: avaliador?['full_name'] ?? 'Usuário Anônimo',
-      avatarUrl: avaliador?['photo_url'] ?? 'https://i.pravatar.cc/150', // URL padrão
+      name: perfilAvaliador?['full_name'] ?? 'Usuário Anônimo',
+      avatarUrl: perfilAvaliador?['photo_url'] ?? 'https://i.pravatar.cc/150', // URL padrão
       ratedAt: DateTime.parse(eAvaliacaoDeMotorista ? map['driver_rated_at'] : map['passenger_rated_at']),
       rating: eAvaliacaoDeMotorista ? map['driver_rating'] : map['passenger_rating'],
       comment: eAvaliacaoDeMotorista ? map['driver_rating_comment'] : map['passenger_rating_comment'],
@@ -35,23 +38,17 @@ class Review {
   }
 }
 
-// Enum para saber de quem é avaliações
-enum TipoAvaliacao { 
-  motorista, 
-  passageiro 
-}
-
-
 // --- EPRINCIPAL E LÓGICA ---
 
 class ReviewsScreen extends StatefulWidget {
   const ReviewsScreen({
     super.key,
-    required this.userId,
+    required this.firebaseUid, // Agora recebemos o UID do Firebase
     required this.userType,
   });
   
-  final String userId;
+  // ID do Firebase do usuario (motorista ou passageiro) cujas avaliações queremos ver
+  final String firebaseUid;
   final TipoAvaliacao userType;
 
   @override
@@ -67,34 +64,38 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
     _reviewsFuture = _fetchReviews();
   }
 
+  /// Procura as avaliações do usuario no Supabase usando o UID do Firebase
   Future<List<Review>> _fetchReviews() async {
     final supabase = Supabase.instance.client;
     
-    final colunaUsuarioAvaliado = widget.userType == TipoAvaliacao.motorista 
-      ? 'driver_user_id' 
-      : 'passenger_user_id';
+    // Define qual perfil (motorista ou passageiro) estamos a procurar
+    final perfilAvaliado = widget.userType == TipoAvaliacao.motorista 
+      ? 'drivers' 
+      : 'passengers';
+
+    // Define de qual avaliador (o outro perfil) queremos os dados
+    final perfilAvaliador = widget.userType == TipoAvaliacao.motorista
+      ? 'passengers'
+      : 'drivers';
       
+    // Define qual a classificação que não deve ser nula
     final colunaRating = widget.userType == TipoAvaliacao.motorista
       ? 'driver_rating'
       : 'passenger_rating';
 
-    final colunaUsuarioAvaliador = widget.userType == TipoAvaliacao.motorista
-      ? 'passenger_user_id'
-      : 'driver_user_id';
-
     try {
-      // Consulta para procurar as avaliações, incluindo dados de quem avaliou
-      // através de um JOIN com a tabela app_users
+      // Consulta complexa que filtra pelo "currentUser_UID_Firebase" na tabela aninhada app_users
       final response = await supabase
           .from('ratings')
-          .select('*, $colunaUsuarioAvaliador:app_users!inner(*)')
-          .eq(colunaUsuarioAvaliado, widget.userId)
-          .not(colunaRating, 'is', null) 
+          .select('*, $perfilAvaliador(*, app_users(*))') // Pega os dados do avaliador e o seu perfil em app_users
+          .eq('$perfilAvaliado.app_users.currentUser_UID_Firebase', widget.firebaseUid) // <-- A LÓGICA CORRIGIDA ESTÁ AQUI
+          .not(colunaRating, 'is', null)
           .order(
             widget.userType == TipoAvaliacao.motorista ? 'driver_rated_at' : 'passenger_rated_at',
             ascending: false
           );
 
+      // Converte a lista de mapas numa lista de objetos Review
       final reviews = response
           .map<Review>((item) => Review.fromMap(item, widget.userType))
           .toList();
@@ -123,25 +124,17 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
       body: FutureBuilder<List<Review>>(
         future: _reviewsFuture,
         builder: (context, snapshot) {
-          // Estado de carregamento
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           }
-
-          // Estado de erro
           if (snapshot.hasError) {
             return Center(child: Text('Erro: ${snapshot.error}'));
           }
-
-          // Dados carregados com sucesso
           final reviews = snapshot.data ?? [];
-
-          // Se não houver avaliações
           if (reviews.isEmpty) {
             return const Center(child: Text('Nenhuma avaliação recebida ainda.'));
           }
           
-          // Renderiza a lista de avaliações
           return ListView(
             padding: const EdgeInsets.all(16.0),
             children: [
@@ -164,7 +157,8 @@ class _ReviewsScreenState extends State<ReviewsScreen> {
   }
 }
 
-// --- WIDGETS DA UI  ---
+// --- WIDGETS DA UI (Sem alterações) ---
+// ... (O resto do seu código para _RatingsSummaryCard, _OverallRating, _ReviewCard, etc. permanece o mesmo) ...
 
 class _RatingsSummaryCard extends StatelessWidget {
   final List<Review> reviews;
@@ -174,7 +168,6 @@ class _RatingsSummaryCard extends StatelessWidget {
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
     
-    // Calcula a média e a distribuição
     final totalReviews = reviews.length;
     final averageRating = totalReviews > 0 
         ? reviews.map((r) => r.rating).reduce((a, b) => a + b) / totalReviews
@@ -331,7 +324,7 @@ class _ReviewCard extends StatelessWidget {
           CircleAvatar(
             radius: 20,
             backgroundImage: NetworkImage(review.avatarUrl),
-            onBackgroundImageError: (_, __) {}, // Evita o crash se a imagem falhar
+            onBackgroundImageError: (_, __) {},
           ),
           const SizedBox(width: 12),
           Expanded(
@@ -390,4 +383,3 @@ class StarRating extends StatelessWidget {
     );
   }
 }
-
