@@ -9,3 +9,69 @@ entrypoint = "./functions/asaas-webhook-handler/index.ts"
 # Specifies static files to be bundled with the function. Supports glob patterns.
 # For example, if you want to serve static HTML pages in your function:
 # static_files = [ "./functions/asaas-webhook-handler/*.html" ]
+
+[functions.asaas-transfer-webhook]
+enabled = true
+verify_jwt = true
+import_map = "./functions/asaas-transfer-webhook/deno.json"
+# Uncomment to specify a custom file path to the entrypoint.
+# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
+entrypoint = "./functions/asaas-transfer-webhook/index.ts"
+# Specifies static files to be bundled with the function. Supports glob patterns.
+# For example, if you want to serve static HTML pages in your function:
+# static_files = [ "./functions/asaas-transfer-webhook/*.html" ]
+
+[functions.criar-cobranca-asaas]
+enabled = true
+verify_jwt = true
+import_map = "./functions/criar-cobranca-asaas/deno.json"
+# Uncomment to specify a custom file path to the entrypoint.
+# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
+entrypoint = "./functions/criar-cobranca-asaas/index.ts"
+# Specifies static files to be bundled with the function. Supports glob patterns.
+# For example, if you want to serve static HTML pages in your function:
+# static_files = [ "./functions/criar-cobranca-asaas/*.html" ]
+
+[functions.criar-cliente-asaas]
+enabled = true
+verify_jwt = true
+import_map = "./functions/criar-cliente-asaas/deno.json"
+# Uncomment to specify a custom file path to the entrypoint.
+# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
+entrypoint = "./functions/criar-cliente-asaas/index.ts"
+# Specifies static files to be bundled with the function. Supports glob patterns.
+# For example, if you want to serve static HTML pages in your function:
+# static_files = [ "./functions/criar-cliente-asaas/*.html" ]
+
+[functions.iniciar-saque-asaas]
+enabled = true
+verify_jwt = true
+import_map = "./functions/iniciar-saque-asaas/deno.json"
+# Uncomment to specify a custom file path to the entrypoint.
+# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
+entrypoint = "./functions/iniciar-saque-asaas/index.ts"
+# Specifies static files to be bundled with the function. Supports glob patterns.
+# For example, if you want to serve static HTML pages in your function:
+# static_files = [ "./functions/iniciar-saque-asaas/*.html" ]
+
+[functions.obter-qr-code]
+enabled = true
+verify_jwt = true
+import_map = "./functions/obter-qr-code/deno.json"
+# Uncomment to specify a custom file path to the entrypoint.
+# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
+entrypoint = "./functions/obter-qr-code/index.ts"
+# Specifies static files to be bundled with the function. Supports glob patterns.
+# For example, if you want to serve static HTML pages in your function:
+# static_files = [ "./functions/obter-qr-code/*.html" ]
+
+[functions.checar-status-cobranca]
+enabled = true
+verify_jwt = true
+import_map = "./functions/checar-status-cobranca/deno.json"
+# Uncomment to specify a custom file path to the entrypoint.
+# Supported file extensions are: .ts, .js, .mjs, .jsx, .tsx
+entrypoint = "./functions/checar-status-cobranca/index.ts"
+# Specifies static files to be bundled with the function. Supports glob patterns.
+# For example, if you want to serve static HTML pages in your function:
+# static_files = [ "./functions/checar-status-cobranca/*.html" ]
