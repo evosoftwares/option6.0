@@ -1,5 +1,4 @@
 // Automatic FlutterFlow imports
-import '/backend/backend.dart';
 import '/backend/schema/structs/index.dart';
 import '/backend/schema/enums/enums.dart';
 import '/backend/supabase/supabase.dart';
@@ -11,21 +10,6 @@ import '/flutter_flow/custom_functions.dart'; // Imports custom functions
 import 'package:flutter/material.dart';
 // Begin custom action code
 // DO NOT REMOVE OR MODIFY THE CODE ABOVE!
-
-/*import '/backend/backend.dart';
-
-import 'package:public_ip_address/public_ip_address.dart';
-
-Future<String?> pegarIp() async {
-  // Add your function code here!
-
-  IpAddress _ipAddress = IpAddress();
-  var ip = await _ipAddress.getIp();
-  print(ip);
-  return ip;
-}*/
-
-// ... (NÃO MUDE OS IMPORTS AUTOMÁTICOS) ...
 
 import 'dart:convert';
 import 'package:http/http.dart' as http;

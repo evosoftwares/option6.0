@@ -1,5 +1,9 @@
+// DEPRECATED: Legacy Firebase categories system
+// This file has been commented out during Firebase to Supabase migration
+// Replaced by Supabase-based vehicle categories management system
+
+/*
 // Automatic FlutterFlow imports
-import '/backend/backend.dart';
 import '/backend/schema/structs/index.dart';
 import '/backend/schema/enums/enums.dart';
 import '/backend/supabase/supabase.dart';
@@ -12,7 +16,18 @@ import 'package:flutter/material.dart';
 // Begin custom action code
 // DO NOT REMOVE OR MODIFY THE CODE ABOVE!
 
-import 'package:cloud_firestore/cloud_firestore.dart';
+// DEPRECATED: Legacy Firebase function - replaced by Supabase implementation
+import 'dart:convert';
+import 'dart:math' as math;
+// DEPRECATED: Removed cloud_firestore import for Supabase migration
+
+Future<List<dynamic>> getEligibleCategories(
+  LatLng userLocation,
+  double maxDistance,
+) async {
+  // DEPRECATED: Return empty list for legacy function
+  return [];
+}
 
 Future<List<DocumentReference>> getEligibleCategories(
   int anoVeiculo,
@@ -79,4 +94,18 @@ Future<List<DocumentReference>> getEligibleCategories(
   }
 
   return categoriasElegiveis;
+}
+*/
+
+// Placeholder function to maintain compatibility
+Future<List<String>> getEligibleCategories(
+  int anoVeiculo,
+  String tipoVeiculo,
+  bool veiculoTemAr,
+  bool veiculoTem4Portas,
+  bool veiculoTemCouro,
+) async {
+  // This function has been deprecated and replaced by Supabase-based vehicle categories management
+  print('getEligibleCategories: Function deprecated - migrated to Supabase');
+  return [];
 }

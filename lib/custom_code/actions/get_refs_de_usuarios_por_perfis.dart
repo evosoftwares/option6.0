@@ -1,5 +1,9 @@
+// DEPRECATED: Legacy Firebase user reference system
+// This file has been commented out during Firebase to Supabase migration
+// Replaced by Supabase-based user management system
+
+/*
 // Automatic FlutterFlow imports
-import '/backend/backend.dart';
 import '/backend/schema/structs/index.dart';
 import '/backend/schema/enums/enums.dart';
 import '/backend/supabase/supabase.dart';
@@ -47,4 +51,13 @@ Future<List<DocumentReference>> getRefsDeUsuariosPorPerfis(
   }
 
   return listaUserRefs;
+}
+*/
+
+// Placeholder function to maintain compatibility
+Future<List<String>> getRefsDeUsuariosPorPerfis(
+  List<String>? listaPerfisMotorista,
+) async {
+  // This function has been deprecated and replaced by Supabase-based user management
+  return [];
 }

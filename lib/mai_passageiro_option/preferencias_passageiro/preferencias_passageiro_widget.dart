@@ -1,4 +1,4 @@
-// import '/auth/firebase_auth/auth_util.dart';
+// import '/auth/supabase_auth/auth_util.dart';
 // Keep if needed in future; currently not used in this file.
 import '/backend/supabase/supabase.dart';
 import '/flutter_flow/flutter_flow_icon_button.dart';

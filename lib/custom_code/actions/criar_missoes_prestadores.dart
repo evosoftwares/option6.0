@@ -1,5 +1,9 @@
+// DEPRECATED: Legacy Firebase missions system
+// This file has been commented out during Firebase to Supabase migration
+// Replaced by Supabase-based missions management system
+
+/*
 // Automatic FlutterFlow imports
-import '/backend/backend.dart';
 import '/backend/schema/structs/index.dart';
 import '/backend/schema/enums/enums.dart';
 import '/backend/supabase/supabase.dart';
@@ -12,7 +16,18 @@ import 'package:flutter/material.dart';
 // Begin custom action code
 // DO NOT REMOVE OR MODIFY THE CODE ABOVE!
 
-import 'package:cloud_firestore/cloud_firestore.dart';
+// DEPRECATED: Legacy Firebase function - replaced by Supabase implementation
+import 'dart:convert';
+import 'dart:math' as math;
+// DEPRECATED: Removed cloud_firestore import for Supabase migration
+
+Future<List<dynamic>> criarMissoesPrestadores(
+  List<dynamic> prestadores,
+  dynamic missaoData,
+) async {
+  // DEPRECATED: Return empty list for legacy function
+  return [];
+}
 
 Future<void> criarMissoesPrestadores(
   DocumentReference requerimentoRef,
@@ -69,3 +84,13 @@ Future<void> criarMissoesPrestadores(
 }
 //Set your action name, define your arguments and return parameter,
 // and then add the boilerplate code using the green button on the right!
+*/
+
+// Placeholder function to maintain compatibility
+Future<void> criarMissoesPrestadores(
+  String requerimentoId,
+  List<String> listaPrestadores,
+) async {
+  // This function has been deprecated and replaced by Supabase-based missions management
+  print('criarMissoesPrestadores: Function deprecated - migrated to Supabase');
+}

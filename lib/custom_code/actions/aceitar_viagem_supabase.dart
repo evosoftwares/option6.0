@@ -1,6 +1,6 @@
 import '/backend/supabase/supabase.dart';
 import '/backend/supabase/database/database.dart';
-import '/auth/firebase_auth/auth_util.dart';
+import '/auth/supabase_auth/auth_util.dart';
 import 'package:flutter/material.dart';
 import 'index.dart'
     as actions; // exporta iniciarRastreamentoViagem e encerrarLocEmTempoReal

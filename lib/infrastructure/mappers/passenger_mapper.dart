@@ -8,7 +8,7 @@ class PassengerMapper {
   Passenger toDomain(PassengersRow row) {
     return Passenger(
       id: row.id,
-      userId: row.userId ?? '',
+      userId: row.userId,
       totalTrips: row.totalTrips ?? 0,
       consecutiveCancellations: row.consecutiveCancellations ?? 0,
       averageRating: row.averageRating ?? 0.0,

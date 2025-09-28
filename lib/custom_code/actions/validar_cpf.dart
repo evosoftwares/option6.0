@@ -1,5 +1,4 @@
 // Automatic FlutterFlow imports
-import '/backend/backend.dart';
 import '/backend/schema/structs/index.dart';
 import '/backend/schema/enums/enums.dart';
 import '/backend/supabase/supabase.dart';
@@ -13,7 +12,6 @@ import 'package:flutter/material.dart';
 // DO NOT REMOVE OR MODIFY THE CODE ABOVE!
 
 // Imports adicionais podem ser necessários dependendo do seu ambiente completo.
-// import '/backend/backend.dart'; // Já incluído acima
 // import '/backend/schema/enums/enums.dart'; // Já incluído acima
 
 Future<bool> validarCpf(String cpfInput) async {

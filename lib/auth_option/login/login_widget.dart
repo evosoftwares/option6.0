@@ -1,5 +1,5 @@
-import '/auth/firebase_auth/auth_util.dart';
-import '/custom_code/actions/fcm_service_completo.dart';
+import '/auth/supabase_auth/auth_util.dart';
+import '/custom_code/actions/onesignal_service_completo.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
@@ -445,6 +445,11 @@ class _LoginWidgetState extends State<LoginWidget> {
                             return;
                           }
 
+                          // Armazenar currentUser_UID_Firebase no app state persistente
+                          print('🔄 [LOGIN] Armazenando UID no app state...');
+                          FFAppState().currentUserUIDSupabase = user.uid ?? '';
+                          print('✅ [LOGIN] currentUser_UID_Firebase armazenado: ${user.uid}');
+
                           _model.idusuario = await AppUsersTable().queryRows(
                             queryFn: (q) => q.eqOrNull(
                               'currentUser_UID_Firebase',
@@ -452,22 +457,22 @@ class _LoginWidgetState extends State<LoginWidget> {
                             ),
                           );
 
-                          // Atualizar FCM token no login se necessário
+                          // Atualizar OneSignal player ID no login se necessário
                           if (_model.idusuario != null && _model.idusuario!.isNotEmpty) {
                             final user = _model.idusuario!.first;
-                            // Obter o FCM token atual
+                            // Obter o OneSignal player ID atual
                             try {
-                              final realFcmToken = FCMServiceCompleto.instance.tokenFCM;
-                              if (realFcmToken != null && realFcmToken != user.fcmToken) {
-                                print('🔄 [LOGIN] Atualizando FCM token para usuário: ${user.id}');
+                              final playerId = OneSignalServiceCompleto.instance.playerId;
+                              if (playerId != null && playerId != user.fcmToken) {
+                                print('🔄 [LOGIN] Atualizando OneSignal player ID para usuário: ${user.id}');
                                 await AppUsersTable().update(
-                                  data: {'fcm_token': realFcmToken},
+                                  data: {'fcm_token': playerId},
                                   matchingRows: (rows) => rows.eq('id', user.id),
                                 );
-                                print('✅ [LOGIN] FCM token atualizado com sucesso!');
+                                print('✅ [LOGIN] OneSignal player ID atualizado com sucesso!');
                               }
                             } catch (e) {
-                              print('⚠️ [LOGIN] Erro ao atualizar FCM token: $e');
+                              print('⚠️ [LOGIN] Erro ao atualizar OneSignal player ID: $e');
                             }
                           }
 

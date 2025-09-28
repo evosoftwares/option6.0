@@ -1,7 +1,7 @@
 import '/backend/supabase/supabase.dart';
-import '/auth/firebase_auth/auth_util.dart';
+import '/auth/supabase_auth/auth_util.dart';
 import 'package:flutter/material.dart';
-import 'fcm_service_completo.dart';
+import 'onesignal_service_completo.dart';
 import 'sistema_notificacoes_tempo_real.dart';
 
 /// Inicialização completa do FCM no app

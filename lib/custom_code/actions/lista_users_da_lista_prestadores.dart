@@ -1,5 +1,9 @@
+// DEPRECATED: Legacy Firebase user list system
+// This file has been commented out during Firebase to Supabase migration
+// Replaced by Supabase-based user management system
+
+/*
 // Automatic FlutterFlow imports
-import '/backend/backend.dart';
 import '/backend/schema/structs/index.dart';
 import '/backend/schema/enums/enums.dart';
 import '/backend/supabase/supabase.dart';
@@ -12,7 +16,17 @@ import 'package:flutter/material.dart';
 // Begin custom action code
 // DO NOT REMOVE OR MODIFY THE CODE ABOVE!
 
-import 'package:cloud_firestore/cloud_firestore.dart';
+// DEPRECATED: Legacy Firebase function - replaced by Supabase implementation
+import 'dart:convert';
+import 'dart:math' as math;
+// DEPRECATED: Removed cloud_firestore import for Supabase migration
+
+Future<List<dynamic>> listaUsersDaListaPrestadores(
+  List<dynamic> prestadores,
+) async {
+  // DEPRECATED: Return empty list for legacy function
+  return [];
+}
 
 Future<List<DocumentReference>> listaUsersDaListaPrestadores(
   List<String> listaPrestadores,
@@ -48,4 +62,13 @@ Future<List<DocumentReference>> listaUsersDaListaPrestadores(
   print(
       'Finalizando, lista de referências de usuários encontrada tem ${referenciasUsuarios.length} itens.');
   return referenciasUsuarios;
+}
+*/
+
+// Placeholder function to maintain compatibility
+Future<List<String>> listaUsersDaListaPrestadores(
+  List<String> listaPrestadores,
+) async {
+  // This function has been deprecated and replaced by Supabase-based user management
+  return [];
 }

@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
-import '../auth/firebase_auth/auth_util.dart';
+import '../auth/supabase_auth/auth_util.dart';
 import '../backend/supabase/database/tables/app_users.dart';
-import '../custom_code/actions/fcm_service_completo.dart';
+import '../custom_code/actions/onesignal_service_completo.dart';
 import '/backend/supabase/supabase.dart';
 
 Future alertaNegativo(
@@ -39,19 +39,19 @@ Future updateUserSupabase(BuildContext context) async {
     if (userQuery.isNotEmpty) {
       final user = userQuery.first;
       
-      // Atualizar FCM token se necessário
+      // Atualizar OneSignal player ID se necessário
       try {
-        final realFcmToken = FCMServiceCompleto.instance.tokenFCM;
-        if (realFcmToken != null && realFcmToken != user.fcmToken) {
-          print('🔄 [updateUserSupabase] Atualizando FCM token para usuário: ${user.id}');
+        final playerId = OneSignalServiceCompleto.instance.playerId;
+        if (playerId != null && playerId != user.fcmToken) {
+          print('🔄 [updateUserSupabase] Atualizando OneSignal player ID para usuário: ${user.id}');
           await AppUsersTable().update(
-            data: {'fcm_token': realFcmToken},
+            data: {'fcm_token': playerId},
             matchingRows: (rows) => rows.eq('id', user.id),
           );
-          print('✅ [updateUserSupabase] FCM token atualizado com sucesso!');
+          print('✅ [updateUserSupabase] OneSignal player ID atualizado com sucesso!');
         }
       } catch (e) {
-        print('⚠️ [updateUserSupabase] Erro ao atualizar FCM token: $e');
+        print('⚠️ [updateUserSupabase] Erro ao atualizar OneSignal player ID: $e');
       }
     } else {
       print('⚠️ [updateUserSupabase] Usuário não encontrado no Supabase');

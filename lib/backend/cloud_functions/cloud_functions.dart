@@ -1,38 +1,16 @@
-import 'package:cloud_functions/cloud_functions.dart';
+// DEPRECATED: Firebase Cloud Functions removido
+// Substituído por Supabase Edge Functions ou lógica no backend
 import 'package:flutter/foundation.dart';
 
+@Deprecated('Use Supabase Edge Functions ou lógica no backend')
 Future<Map<String, dynamic>> makeCloudCall(
   String callName,
   Map<String, dynamic> input, {
   bool suppressErrors = false,
   Duration? timeout,
 }) async {
-  try {
-    Future<HttpsCallableResult<dynamic>> future = FirebaseFunctions.instance
-        .httpsCallable(callName, options: HttpsCallableOptions())
-        .call(input);
-
-    if (timeout != null) {
-      future = future.timeout(timeout);
-    }
-
-    final response = await future;
-    return response.data is Map
-        ? Map<String, dynamic>.from(response.data as Map)
-        : {};
-  } on FirebaseFunctionsException catch (e) {
-    if (!suppressErrors) {
-      debugPrint(
-        'Cloud call error!\n ${callName}'
-        'Code: ${e.code}\n'
-        'Details: ${e.details}\n'
-        'Message: ${e.message}',
-      );
-    }
-  } catch (e) {
-    if (!suppressErrors) {
-      debugPrint('Cloud call error:${callName} $e');
-    }
+  if (!suppressErrors) {
+    debugPrint('⚠️ DEPRECATED: makeCloudCall não é mais suportado. Use Supabase Edge Functions.');
   }
   return {};
 }

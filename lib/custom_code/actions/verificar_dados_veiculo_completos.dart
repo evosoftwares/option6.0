@@ -1,4 +1,4 @@
-import '/auth/firebase_auth/auth_util.dart';
+import '/auth/supabase_auth/auth_util.dart';
 import '/backend/supabase/supabase.dart';
 import '/backend/supabase/database/database.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
@@ -10,7 +10,7 @@ import '../../flutter_flow/user_id_converter.dart';
 /// Retorna true se completo, false caso contrário
 Future<bool> verificarDadosVeiculoCompletos() async {
   // Convert Firebase UID to app_users.id for database queries
-  final appUserId = await UserIdConverter.getAppUserIdFromFirebaseUid(currentUserUid);
+  final appUserId = await UserIdConverter.getAppUserIdFromSupabaseUid(currentUserUid);
   
   if (appUserId == null) {
     return false; // User not found
@@ -52,7 +52,7 @@ Future<void> redirecionarParaVeiculoSeIncompleto(BuildContext context) async {
 
   if (!isComplete) {
     // Convert Firebase UID to app_users.id for database queries
-    final appUserId = await UserIdConverter.getAppUserIdFromFirebaseUid(currentUserUid);
+    final appUserId = await UserIdConverter.getAppUserIdFromSupabaseUid(currentUserUid);
     
     if (appUserId == null) {
       return; // User not found
@@ -110,7 +110,7 @@ Future<void> redirecionarParaVeiculoSeIncompleto(BuildContext context) async {
 /// Usado para validações em tempo real
 Future<VehicleCompletionStatus> obterStatusVeiculo() async {
   // Convert Firebase UID to app_users.id for database queries
-  final appUserId = await UserIdConverter.getAppUserIdFromFirebaseUid(currentUserUid);
+  final appUserId = await UserIdConverter.getAppUserIdFromSupabaseUid(currentUserUid);
   
   if (appUserId == null) {
     return VehicleCompletionStatus(

@@ -1,8 +1,9 @@
-import 'package:supabase_flutter/supabase_flutter.dart'
-    ;
+import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 export 'database/database.dart';
+export 'auth/supabase_auth_manager.dart';
+export 'auth/supabase_user_provider.dart';
 
 String _kSupabaseUrl = dotenv.env['SUPABASE_URL'] ?? 'https://qlbwacmavngtonauxnte.supabase.co';
 String _kSupabaseAnonKey =

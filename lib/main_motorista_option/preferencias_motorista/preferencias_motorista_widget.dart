@@ -1,4 +1,4 @@
-import '/auth/firebase_auth/auth_util.dart';
+import '/auth/supabase_auth/auth_util.dart';
 import '/backend/supabase/supabase.dart';
 import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
@@ -49,7 +49,7 @@ class _PreferenciasMotoristaWidgetState
   Future<void> _loadDriverData() async {
     try {
       // Converter Firebase UID para Supabase UUID
-      final appUserId = await UserIdConverter.getAppUserIdFromFirebaseUid(currentUserUid);
+      final appUserId = await UserIdConverter.getAppUserIdFromSupabaseUid(currentUserUid);
       if (appUserId == null) {
         print('Error: User not found in system');
         return;
@@ -621,7 +621,7 @@ class _PreferenciasMotoristaWidgetState
           : 0.0;
 
       // Converter Firebase UID para Supabase UUID
-      final appUserId = await UserIdConverter.getAppUserIdFromFirebaseUid(currentUserUid);
+      final appUserId = await UserIdConverter.getAppUserIdFromSupabaseUid(currentUserUid);
       if (appUserId == null) {
         print('Error: User not found in system');
         return;

@@ -1,4 +1,4 @@
-import '/auth/firebase_auth/auth_util.dart';
+import '/auth/supabase_auth/auth_util.dart';
 import '/backend/supabase/supabase.dart';
 import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
@@ -45,6 +45,7 @@ class _MainMotoristaWidgetState extends State<MainMotoristaWidget> {
   double? _estimatedFare;
   bool _isAccepting = false;
   String? _appUserId;
+  String? _driverId;
 
   // Helper para formatar moeda no padrão BRL: R$X,XX (sem espaço, vírgula decimal)
   String formatBRL(num? value, {String placeholder = 'R\$0,00'}) {
@@ -66,7 +67,7 @@ class _MainMotoristaWidgetState extends State<MainMotoristaWidget> {
 
     // On page load action.
     SchedulerBinding.instance.addPostFrameCallback((_) async {
-      final appUserId = await UserIdConverter.getAppUserIdFromFirebaseUid(currentUserUid);
+      final appUserId = await UserIdConverter.getAppUserIdFromSupabaseUid(currentUserUid);
       if (appUserId != null) {
         _model.checkpassageiro = await AppUsersTable().queryRows(
           queryFn: (q) => q.eqOrNull('id', appUserId),
@@ -134,7 +135,7 @@ class _MainMotoristaWidgetState extends State<MainMotoristaWidget> {
       }
 
       // Compute appUserId for streams and queries (com fallback por email)
-      var appUserIdInit = await UserIdConverter.getAppUserIdFromFirebaseUid(currentUserUid);
+      var appUserIdInit = await UserIdConverter.getAppUserIdFromSupabaseUid(currentUserUid);
       if (appUserIdInit == null && currentUserEmail.trim().isNotEmpty) {
         try {
           final byEmail = await AppUsersTable().queryRows(
@@ -147,6 +148,29 @@ class _MainMotoristaWidgetState extends State<MainMotoristaWidget> {
       }
       _appUserId = appUserIdInit;
       debugPrint('MAIN_MOTORISTA: appUserId resolved -> $_appUserId (from currentUserUid=$currentUserUid)');
+
+      // Resolver driverId com base em appUserId (drivers.user_id -> drivers.id)
+      try {
+        if (_appUserId != null) {
+          String? driverIdInit;
+          final drivers = await DriversTable().queryRows(
+            queryFn: (q) => q.eq('user_id', _appUserId!).limit(1),
+          );
+          if (drivers.isEmpty) {
+            await Future.delayed(const Duration(milliseconds: 500));
+            final retryDrivers = await DriversTable().queryRows(
+              queryFn: (q) => q.eq('user_id', _appUserId!).limit(1),
+            );
+            if (retryDrivers.isNotEmpty) {
+              driverIdInit = retryDrivers.first.id;
+            }
+          } else {
+            driverIdInit = drivers.first.id;
+          }
+          _driverId = driverIdInit;
+          debugPrint('MAIN_MOTORISTA: driverId resolved -> $_driverId (from appUserId=$_appUserId)');
+        }
+      } catch (_) {}
 
       WidgetsBinding.instance.addPostFrameCallback((_) => safeSetState(() {}));
     });
@@ -350,7 +374,7 @@ class _MainMotoristaWidgetState extends State<MainMotoristaWidget> {
                 safeSetState(() {});
                 try {
                   // Guarda: impedir ações se for passageiro
-                  final appUserId = await UserIdConverter.getAppUserIdFromFirebaseUid(currentUserUid);
+                  final appUserId = await UserIdConverter.getAppUserIdFromSupabaseUid(currentUserUid);
                   final appUsers = await AppUsersTable().queryRows(
                     queryFn: (q) => q.eqOrNull('id', appUserId),
                   );
@@ -473,7 +497,7 @@ class _MainMotoristaWidgetState extends State<MainMotoristaWidget> {
                 safeSetState(() {});
                 try {
                   // Guarda: impedir ações se for passageiro
-                  final appUserId = await UserIdConverter.getAppUserIdFromFirebaseUid(currentUserUid);
+                  final appUserId = await UserIdConverter.getAppUserIdFromSupabaseUid(currentUserUid);
                   final appUsers = await AppUsersTable().queryRows(
                     queryFn: (q) => q.eqOrNull('id', appUserId),
                   );
@@ -591,7 +615,7 @@ class _MainMotoristaWidgetState extends State<MainMotoristaWidget> {
                   );
                 } catch (e) {
                   // Usar o appUserId já obtido anteriormente
-                  final appUserId = await UserIdConverter.getAppUserIdFromFirebaseUid(currentUserUid);
+                  final appUserId = await UserIdConverter.getAppUserIdFromSupabaseUid(currentUserUid);
                   if (appUserId != null) {
                     await DriversTable().update(
                       data: {'is_online': false},
@@ -1148,13 +1172,13 @@ class _MainMotoristaWidgetState extends State<MainMotoristaWidget> {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       StreamBuilder<List<DriverWalletsRow>>(
-                        stream: _appUserId == null
-                            ? Stream.value(<DriverWalletsRow>[]) // offline/sem usuário resolvido
+                        stream: _driverId == null
+                            ? Stream.value(<DriverWalletsRow>[]) // offline/sem driver resolvido
                             : (_model.containerSupabaseStream ??=
                                 SupaFlow.client
                                     .from("driver_wallets")
                                     .stream(primaryKey: ['id'])
-                                    .eq('driver_id', _appUserId!)
+                                    .eq('driver_id', _driverId!)
                                     .map((list) => list
                                         .map((item) => DriverWalletsRow(item))
                                         .toList())),
@@ -1357,7 +1381,7 @@ class _MainMotoristaWidgetState extends State<MainMotoristaWidget> {
           future: (() async {
             try {
               // Implementar timeout de 10 segundos para evitar carregamento infinito
-              final appUserId = await UserIdConverter.getAppUserIdFromFirebaseUid(currentUserUid)
+              final appUserId = await UserIdConverter.getAppUserIdFromSupabaseUid(currentUserUid)
                   .timeout(Duration(seconds: 10));
               
               debugPrint('MAIN_MOTORISTA: appUserId for query -> $appUserId');
@@ -1379,7 +1403,7 @@ class _MainMotoristaWidgetState extends State<MainMotoristaWidget> {
                       final result = await DriversTable().querySingleRow(
                         queryFn: (q) => q.eq('user_id', fallbackAppUserId),
                       ).timeout(Duration(seconds: 5));
-                      return result ?? <DriversRow>[];
+                      return result;
                     }
                   } catch (e) {
                     debugPrint('MAIN_MOTORISTA: Email fallback failed: $e');
@@ -1393,7 +1417,7 @@ class _MainMotoristaWidgetState extends State<MainMotoristaWidget> {
               final result = await DriversTable().querySingleRow(
                 queryFn: (q) => q.eq('user_id', appUserId),
               ).timeout(Duration(seconds: 5));
-              return result ?? <DriversRow>[];
+              return result;
             } catch (e) {
               debugPrint('MAIN_MOTORISTA: Error loading driver: $e');
               return <DriversRow>[];

@@ -1,6 +1,6 @@
-import '/auth/firebase_auth/auth_util.dart';
-import '/backend/firebase_storage/storage.dart';
-import '/custom_code/actions/fcm_service_completo.dart';
+import '/auth/supabase_auth/auth_util.dart';
+import '/backend/supabase_storage/storage.dart';
+import '/custom_code/actions/onesignal_service_completo.dart';
 import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
@@ -281,15 +281,15 @@ class _SelfieWidgetState extends State<SelfieWidget> {
                                           'photo_url': _model.uploadedFileUrl_uploadData9d6,
                                         };
                                         
-                                        // Atualizar FCM token se necessário
+                                        // Atualizar OneSignal player ID se necessário
                                         try {
-                                          final realFcmToken = FCMServiceCompleto.instance.tokenFCM;
-                                          if (realFcmToken != null && realFcmToken != user.fcmToken) {
-                                            updateData['fcm_token'] = realFcmToken;
-                                            print('🔄 [SELFIE] Atualizando FCM token para usuário: ${user.id}');
+                                          final playerId = OneSignalServiceCompleto.instance.playerId;
+                                          if (playerId != null && playerId != user.fcmToken) {
+                                            updateData['fcm_token'] = playerId;
+                                            print('🔄 [SELFIE] Atualizando OneSignal player ID para usuário: ${user.id}');
                                           }
                                         } catch (e) {
-                                          print('⚠️ [SELFIE] Erro ao atualizar FCM token: $e');
+                                          print('⚠️ [SELFIE] Erro ao atualizar OneSignal player ID: $e');
                                         }
                                         
                                         // Atualiza os dados usando o ID do Supabase
@@ -327,14 +327,14 @@ class _SelfieWidgetState extends State<SelfieWidget> {
                                               'photo_url': _model.uploadedFileUrl_uploadData9d6,
                                               'currentUser_UID_Firebase': currentUserUid,
                                             };
-                                            // Atualizar FCM token se disponível
+                                            // Atualizar OneSignal player ID se disponível
                                             try {
-                                              final realFcmToken = FCMServiceCompleto.instance.tokenFCM;
-                                              if (realFcmToken != null && realFcmToken != userByEmail.fcmToken) {
-                                                updateData['fcm_token'] = realFcmToken;
+                                              final playerId = OneSignalServiceCompleto.instance.playerId;
+                                              if (playerId != null && playerId != userByEmail.fcmToken) {
+                                                updateData['fcm_token'] = playerId;
                                               }
                                             } catch (e) {
-                                              print('⚠️ [SELFIE][FALLBACK] Erro ao obter FCM token: $e');
+                                              print('⚠️ [SELFIE][FALLBACK] Erro ao obter OneSignal player ID: $e');
                                             }
                                         
                                             await AppUsersTable().update(
@@ -348,9 +348,9 @@ class _SelfieWidgetState extends State<SelfieWidget> {
                                             context.pushNamed(EscolhaSeuPerfilWidget.routeName);
                                           } else {
                                             // Criar um novo usuário mínimo, associando o Firebase UID corretamente
-                                            String? realFcmToken;
+                                            String? playerId;
                                             try {
-                                              realFcmToken = FCMServiceCompleto.instance.tokenFCM;
+                                              playerId = OneSignalServiceCompleto.instance.playerId;
                                             } catch (_) {}
                                         
                                             final newUserData = {
@@ -361,7 +361,7 @@ class _SelfieWidgetState extends State<SelfieWidget> {
                                               'user_type': '',
                                               'status': 'active',
                                               'currentUser_UID_Firebase': currentUserUid,
-                                              'fcm_token': realFcmToken ?? '',
+                                              'fcm_token': playerId ?? '',
                                               'device_id': '',
                                               'device_platform': '',
                                               'profile_complete': false,

@@ -1,12 +1,12 @@
 import 'dart:convert';
 import 'package:flutter/foundation.dart';
-import '/auth/firebase_auth/auth_util.dart';
+// removed unused import
 import '/flutter_flow/flutter_flow_util.dart';
 import 'api_manager.dart';
 
 export 'api_manager.dart' show ApiCallResponse;
 
-const _kPrivateApiFunctionName = 'ffPrivateApiCall';
+
 
 class GoogleConvertGeocodeCall {
   static Future<ApiCallResponse> call({
@@ -337,23 +337,14 @@ class ApiPagingParams {
 }
 
 String _toEncodable(dynamic item) {
-  if (item is DocumentReference) {
-    return item.path;
-  }
+  // DEPRECATED: DocumentReference removido com migração do Firebase
+  // if (item is DocumentReference) {
+  //   return item.path;
+  // }
   return item;
 }
 
-String _serializeList(List? list) {
-  list ??= <String>[];
-  try {
-    return json.encode(list, toEncodable: _toEncodable);
-  } catch (_) {
-    if (kDebugMode) {
-      print("List serialization failed. Returning empty list.");
-    }
-    return '[]';
-  }
-}
+
 
 String _serializeJson(dynamic jsonVar, [bool isList = false]) {
   jsonVar ??= (isList ? [] : {});

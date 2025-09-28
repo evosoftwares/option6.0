@@ -1,5 +1,5 @@
 import '/backend/supabase/supabase.dart';
-import '/auth/firebase_auth/auth_util.dart';
+import '/auth/supabase_auth/auth_util.dart';
 import 'package:flutter/material.dart';
 
 /// Dashboard e Monitoramento do Sistema Inteligente de Viagens

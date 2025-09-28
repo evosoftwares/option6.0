@@ -1,4 +1,4 @@
-import '/auth/firebase_auth/auth_util.dart';
+import '/auth/supabase_auth/auth_util.dart';
 import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
@@ -949,18 +949,68 @@ class _CadastrarWidgetState extends State<CadastrarWidget> {
                         print('   - Email para Firebase: "$email"');
                         print('   - Senha para Firebase: [${password.length} caracteres]');
 
-                        // Criar conta no Firebase
-                        final user = await authManager.createAccountWithEmail(
-                          context,
-                          _model.textController2.text,
-                          _model.textController4.text,
-                        );
+                        // Criar conta no Firebase com retry em caso de erro de rede
+                        BaseAuthUser? user;
+                        int retryCount = 0;
+                        const maxRetries = 3;
+                        
+                        while (user == null && retryCount < maxRetries) {
+                          try {
+                            print('Tentativa ${retryCount + 1} de $maxRetries para criar conta Firebase...');
+                            
+                            final authResult = await authManager.createAccountWithEmail(
+                              context,
+                              _model.textController2.text,
+                              _model.textController4.text,
+                            );
+                            
+                            user = authResult;
+                            
+                          } catch (e) {
+                            retryCount++;
+                            print('Erro na tentativa $retryCount: $e');
+                            
+                            if (retryCount < maxRetries) {
+                              print('Aguardando 2 segundos antes da próxima tentativa...');
+                              await Future.delayed(Duration(seconds: 2));
+                            } else {
+                              print('Máximo de tentativas atingido. Exibindo erro para o usuário.');
+                              Navigator.of(context).pop(); // Fechar loading
+                              
+                              // Mostrar erro específico baseado no tipo
+                              String errorMessage = 'Erro ao criar conta. ';
+                              if (e.toString().contains('network-request-failed')) {
+                                errorMessage += 'Verifique sua conexão com a internet e tente novamente.';
+                              } else if (e.toString().contains('email-already-in-use')) {
+                                errorMessage += 'Este email já está em uso. Tente fazer login ou use outro email.';
+                              } else {
+                                errorMessage += 'Tente novamente em alguns minutos.';
+                              }
+                              
+                              ScaffoldMessenger.of(context).showSnackBar(
+                                SnackBar(
+                                  content: Text(errorMessage),
+                                  backgroundColor: Colors.red,
+                                  duration: Duration(seconds: 5),
+                                ),
+                              );
+                              return;
+                            }
+                          }
+                        }
 
                         print('7. RESULTADO DA CRIAÇÃO NO FIREBASE:');
                         if (user == null) {
-                          print('   ERRO: user é null - Firebase retornou null');
-                          print('   - Possíveis causas: email já existe, senha inválida, erro de rede');
+                          print('   ERRO: user é null após $maxRetries tentativas');
                           Navigator.of(context).pop(); // Fechar loading
+                          
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Não foi possível criar a conta. Verifique sua conexão e tente novamente.'),
+                              backgroundColor: Colors.red,
+                              duration: Duration(seconds: 5),
+                            ),
+                          );
                           return;
                         }
                         print('   ✓ Usuário Firebase criado com sucesso');
@@ -968,6 +1018,11 @@ class _CadastrarWidgetState extends State<CadastrarWidget> {
                         print('   - Email: ${user.email}');
                         print('   - DisplayName: ${user.displayName}');
                         print('   - EmailVerified: ${user.emailVerified}');
+
+                        // Armazenar currentUser_UID_Firebase no app state persistente
+                        print('7.1. ARMAZENANDO UID NO APP STATE...');
+                        FFAppState().currentUserUIDSupabase = user.uid ?? '';
+                        print('   ✓ currentUser_UID_Firebase armazenado: ${user.uid}');
 
                         print('8. PREPARANDO DADOS PARA SUPABASE...');
                         print('   - currentUserUid: $currentUserUid');

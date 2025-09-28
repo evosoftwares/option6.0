@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'dart:developer' as developer;
 import 'package:flutter/foundation.dart';
 import '/backend/supabase/supabase.dart';
-import '/auth/firebase_auth/auth_util.dart';
+import '/auth/supabase_auth/auth_util.dart';
 
 class ZonaExclusaoLoggingService {
   static const String _logTag = 'ZONA_EXCLUSAO';

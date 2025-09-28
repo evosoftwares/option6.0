@@ -1,5 +1,4 @@
 // Automatic FlutterFlow imports
-import '/backend/backend.dart';
 import '/backend/schema/structs/index.dart';
 import '/backend/schema/enums/enums.dart';
 import '/backend/supabase/supabase.dart';
@@ -12,20 +11,25 @@ import 'package:flutter/material.dart';
 // Begin custom action code
 // DO NOT REMOVE OR MODIFY THE CODE ABOVE!
 
-Future<List<AreaAtuacaoStruct>> removerAreaAtuacao(
+/*
+// DEPRECATED: Legacy Firebase area management system
+// This file has been deprecated as part of the Firebase to Supabase migration.
+// The area management functionality should be reimplemented using Supabase tables.
+// 
+// Original functionality: Remove area from driver's operation areas
+// Replacement: Use Supabase driver_operational_cities table with proper CRUD operations
+//
+// TODO: Implement new area management system with Supabase
+// - Use driver_operational_cities table in Supabase
+// - Implement proper CRUD operations for area management
+// - Add real-time updates for driver availability
+*/
+
+// Placeholder function to maintain compatibility during migration
+Future<List<dynamic>> removerAreaAtuacao(
+  List<dynamic> listaOriginal,
   String cidadeParaRemover,
-  List<AreaAtuacaoStruct> listaOriginal,
 ) async {
-  // Retorna uma lista vazia se a lista de entrada for nula ou vazia.
-  if (listaOriginal == null || listaOriginal.isEmpty) {
-    return [];
-  }
-
-  // Cria uma cópia da lista para poder modificá-la.
-  List<AreaAtuacaoStruct> novaLista = List.from(listaOriginal);
-
-  novaLista.removeWhere((item) => item.areaAtuacaoCidade == cidadeParaRemover);
-
-  // Retorna a nova lista já sem o item removido.
-  return novaLista;
+  // Return empty list - functionality deprecated
+  return [];
 }

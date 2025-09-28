@@ -62,7 +62,7 @@ class LocationService {
         final lastKnown = await Geolocator.getLastKnownPosition();
         if (lastKnown != null) {
           final now = DateTime.now();
-          final lastTime = lastKnown.timestamp ?? now;
+          final lastTime = lastKnown.timestamp;
           if (now.difference(lastTime).inMinutes <= 5) {
             final lastLocation = LatLng(lastKnown.latitude, lastKnown.longitude);
             await _cacheLocation(lastLocation);

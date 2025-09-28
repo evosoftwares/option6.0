@@ -3,13 +3,9 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
-import 'auth/firebase_auth/firebase_user_provider.dart';
-import 'auth/firebase_auth/auth_util.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'auth/supabase_auth/auth_util.dart';
 
-import 'backend/push_notifications/push_notifications_util.dart';
 import '/backend/supabase/supabase.dart';
-import 'backend/firebase/firebase_config.dart';
 import 'flutter_flow/flutter_flow_util.dart';
 import 'flutter_flow/internationalization.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
@@ -28,8 +24,6 @@ void main() async {
     // Fallback if .env is missing; do not crash the app
     debugPrint('Warn: .env not found or failed to load: $e');
   }
-
-  await initFirebase();
 
   await SupaFlow.initialize();
 
@@ -74,10 +68,10 @@ class _MyAppState extends State<MyApp> {
       _router.routerDelegate.currentConfiguration.matches
           .map((e) => getRoute(e))
           .toList();
-  late Stream<BaseAuthUser> userStream;
+  late Stream<BaseAuthUser?> userStream;
 
   final authUserSub = authenticatedUserStream.listen((_) {});
-  final fcmTokenSub = fcmTokenUserStream.listen((_) {});
+  // Removido fcmTokenSub pois não usamos mais Firebase FCM
 
   @override
   void initState() {
@@ -86,12 +80,17 @@ class _MyAppState extends State<MyApp> {
     _appStateNotifier = AppStateNotifier.instance;
     _router = createRouter(_appStateNotifier);
     
+    // Inicializar OneSignal - TODO: Adicionar APP_ID do OneSignal
+    // OneSignalService.instance.initialize('YOUR_ONESIGNAL_APP_ID');
+    
     // Inicializar o usuário imediatamente para evitar travamento na splash screen
     _initializeUser();
     
-    userStream = optionFirebaseUserStream()
+    userStream = authManager.userStream
       ..listen((user) {
-        _appStateNotifier.update(user);
+        if (user != null) {
+          _appStateNotifier.update(user);
+        }
       });
     jwtTokenStream.listen((_) {});
     
@@ -104,25 +103,22 @@ class _MyAppState extends State<MyApp> {
 
   void _initializeUser() async {
     try {
-      // Verificar se já existe um usuário logado
-      final currentUser = FirebaseAuth.instance.currentUser;
+      // Verificar se já existe um usuário logado no Supabase
+      final currentUser = authManager.currentUser;
       if (currentUser != null) {
-        _appStateNotifier.update(OptionFirebaseUser(currentUser));
-      } else {
-        // Se não há usuário logado, criar um usuário "vazio" para permitir navegação
-        _appStateNotifier.update(OptionFirebaseUser(null));
+        _appStateNotifier.update(currentUser);
       }
+      // Se não há usuário logado, não fazemos nada - o AppStateNotifier já trata user como null
     } catch (e) {
-      // Em caso de erro, criar usuário vazio para não travar na splash
+      // Em caso de erro, apenas logar - não precisamos atualizar com null
       debugPrint('Erro na inicialização do usuário: $e');
-      _appStateNotifier.update(OptionFirebaseUser(null));
     }
   }
 
   @override
   void dispose() {
     authUserSub.cancel();
-    fcmTokenSub.cancel();
+    // fcmTokenSub removido - não usamos mais Firebase FCM
     super.dispose();
   }
 

@@ -32,6 +32,21 @@ class FFAppState extends ChangeNotifier {
       _supabaseUrl =
           await secureStorage.getString('ff_supabaseUrl') ?? _supabaseUrl;
     });
+    await _safeInitAsync(() async {
+      _currentUserUIDSupabase =
+          await secureStorage.getString('ff_currentUserUIDSupabase') ??
+              _currentUserUIDSupabase;
+    });
+    await _safeInitAsync(() async {
+      _currentUserEmail =
+          await secureStorage.getString('ff_currentUserEmail') ??
+              _currentUserEmail;
+    });
+    await _safeInitAsync(() async {
+      _supabaseAccessToken =
+          await secureStorage.getString('ff_supabaseAccessToken') ??
+              _supabaseAccessToken;
+    });
   }
 
   void update(VoidCallback callback) {
@@ -79,6 +94,39 @@ class FFAppState extends ChangeNotifier {
 
   void deleteSupabaseUrl() {
     secureStorage.delete(key: 'ff_supabaseUrl');
+  }
+
+  String _currentUserUIDSupabase = '';
+  String get currentUserUIDSupabase => _currentUserUIDSupabase;
+  set currentUserUIDSupabase(String value) {
+    _currentUserUIDSupabase = value;
+    secureStorage.setString('ff_currentUserUIDSupabase', value);
+  }
+
+  void deleteCurrentUserUIDSupabase() {
+    secureStorage.delete(key: 'ff_currentUserUIDSupabase');
+  }
+
+  String _currentUserEmail = '';
+  String get currentUserEmail => _currentUserEmail;
+  set currentUserEmail(String value) {
+    _currentUserEmail = value;
+    secureStorage.setString('ff_currentUserEmail', value);
+  }
+
+  void deleteCurrentUserEmail() {
+    secureStorage.delete(key: 'ff_currentUserEmail');
+  }
+
+  String _supabaseAccessToken = '';
+  String get supabaseAccessToken => _supabaseAccessToken;
+  set supabaseAccessToken(String value) {
+    _supabaseAccessToken = value;
+    secureStorage.setString('ff_supabaseAccessToken', value);
+  }
+
+  void deleteSupabaseAccessToken() {
+    secureStorage.delete(key: 'ff_supabaseAccessToken');
   }
 }
 

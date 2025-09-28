@@ -1,3 +1,8 @@
+// DEPRECATED: Legacy Firebase functions documentation
+// This file has been commented out during Firebase to Supabase migration
+// This was already marked as deprecated and is now fully commented out
+
+/*
 // =====================================================
 // FUNÇÕES FIREBASE FIRESTORE DEPRECIADAS
 // =====================================================
@@ -9,8 +14,6 @@
 // ✅ USAR as novas funções Supabase
 //
 // =====================================================
-
-/*
 
 ❌ DEPRECIADAS - Substituídas pelo Sistema Inteligente:
 
@@ -147,3 +150,9 @@ Sistema híbrido otimizado:
 ❌ Zero dependência do Firestore
 
 */
+
+// Placeholder to maintain file structure
+void deprecatedFirebaseFunctions() {
+  // This file has been deprecated and replaced by Supabase-based systems
+  print('DEPRECATED_firebase_functions: All functions migrated to Supabase');
+}

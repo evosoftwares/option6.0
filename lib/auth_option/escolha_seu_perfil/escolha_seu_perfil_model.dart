@@ -1,6 +1,6 @@
 import '/flutter_flow/flutter_flow_util.dart';
 import '/index.dart';
-import '/auth/firebase_auth/auth_util.dart';
+import '/auth/supabase_auth/auth_util.dart';
 import '/backend/supabase/supabase.dart';
 import 'escolha_seu_perfil_widget.dart' show EscolhaSeuPerfilWidget;
 import 'package:flutter/material.dart';

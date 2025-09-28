@@ -1,6 +1,6 @@
-import '/auth/firebase_auth/auth_util.dart';
-import '/backend/supabase/supabase.dart';
-import '/custom_code/actions/fcm_service_completo.dart';
+import '/auth/supabase_auth/auth_util.dart';
+import '/backend/supabase/supabase.dart' hide loggedIn;
+import '/custom_code/actions/onesignal_service_completo.dart';
 import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
@@ -242,19 +242,62 @@ class _EscolhaSeuPerfilWidgetState extends State<EscolhaSeuPerfilWidget> {
             '📊 [GET_OR_CREATE_USER][TXN:$transactionId] EMAIL_RESULTS_COUNT: ${byEmailPrim.length}');
 
         if (byEmailPrim.isNotEmpty) {
+          final existingUser = byEmailPrim.first;
+          // Garantir que user_type seja atualizado de acordo com a seleção atual
+          final currentType = (existingUser.userType ?? '').trim();
+          final desiredType = userType.trim();
+          if (currentType != desiredType) {
+            print(
+                '🔄 [GET_OR_CREATE_USER][TXN:$transactionId] Atualizando user_type de "$currentType" para "$desiredType" para usuário: ${existingUser.id}');
+            await AppUsersTable().update(
+              data: {'user_type': desiredType},
+              matchingRows: (rows) => rows.eq('id', existingUser.id),
+            );
+            print(
+                '✅ [GET_OR_CREATE_USER][TXN:$transactionId] user_type atualizado com sucesso!');
+          }
+
+          // HÍBRIDO: tentar atualizar mapeamentos de identidade
+          try {
+            final supabaseUserId = SupaFlow.client.auth.currentUser?.id;
+            final updates = <String, dynamic>{};
+            if ((existingUser.email ?? '').isNotEmpty && (existingUser.userType ?? '').isNotEmpty) {
+              // Garantir que Firebase UID esteja persistido
+              if ((existingUser.currentUserUidFirebase ?? '').isEmpty && currentUserUid.trim().isNotEmpty) {
+                updates['currentUser_UID_Firebase'] = currentUserUid.trim();
+              }
+            }
+            if (supabaseUserId != null && supabaseUserId.isNotEmpty) {
+              // Atualiza coluna híbrida se existir no esquema
+              updates['auth_user_id'] = supabaseUserId;
+            }
+            if (updates.isNotEmpty) {
+              print('🧭 [GET_OR_CREATE_USER][TXN:$transactionId] Atualizando mapeamentos híbridos: ${updates.keys.join(', ')}');
+              await AppUsersTable().update(
+                data: updates,
+                matchingRows: (rows) => rows.eq('id', existingUser.id),
+              );
+              print('✅ [GET_OR_CREATE_USER][TXN:$transactionId] Mapeamentos híbridos atualizados com sucesso.');
+            } else {
+              print('ℹ️ [GET_OR_CREATE_USER][TXN:$transactionId] Nenhum mapeamento híbrido necessário para este usuário.');
+            }
+          } catch (e) {
+            print('⚠️ [GET_OR_CREATE_USER][TXN:$transactionId] Falha ao atualizar mapeamentos híbridos (tabela sem coluna auth_user_id? sessão supabase ausente?): $e');
+          }
+
           final phase1End = DateTime.now();
           final phase1Duration = phase1End.difference(phase1Start);
           print(
               '✅ [GET_OR_CREATE_USER][TXN:$transactionId] SUCESSO: Usuário encontrado por EMAIL!');
           print(
-              '🆔 [GET_OR_CREATE_USER][TXN:$transactionId] USER_ID_FOUND: ${byEmailPrim.first.id}');
+              '🆔 [GET_OR_CREATE_USER][TXN:$transactionId] USER_ID_FOUND: ${existingUser.id}');
           print(
               '⏰ [GET_OR_CREATE_USER][TXN:$transactionId] PHASE1_END: ${phase1End.toIso8601String()}');
           print(
               '⚡ [GET_OR_CREATE_USER][TXN:$transactionId] PHASE1_DURATION: ${phase1Duration.inMilliseconds}ms');
           print(
               '🏁 [GET_OR_CREATE_USER][TXN:$transactionId] RETORNANDO USER POR EMAIL');
-          return byEmailPrim.first;
+          return existingUser;
         } else {
           print(
               '⚠️ [GET_OR_CREATE_USER][TXN:$transactionId] Nenhum usuário encontrado por EMAIL: "$currentUserEmail"');
@@ -311,29 +354,68 @@ class _EscolhaSeuPerfilWidgetState extends State<EscolhaSeuPerfilWidget> {
           '🔍 [GET_OR_CREATE_USER][TXN:$transactionId] FIREBASE_UID_RESULT_TYPE: ${byFirebaseUid.runtimeType}');
 
       if (byFirebaseUid.isNotEmpty) {
+        final existingUser = byFirebaseUid.first;
+        // Garantir que user_type seja atualizado de acordo com a seleção atual
+        final currentType = (existingUser.userType ?? '').trim();
+        final desiredType = userType.trim();
+        if (currentType != desiredType) {
+          print(
+              '🔄 [GET_OR_CREATE_USER][TXN:$transactionId] Atualizando user_type de "$currentType" para "$desiredType" para usuário: ${existingUser.id}');
+          await AppUsersTable().update(
+            data: {'user_type': desiredType},
+            matchingRows: (rows) => rows.eq('id', existingUser.id),
+          );
+          print(
+              '✅ [GET_OR_CREATE_USER][TXN:$transactionId] user_type atualizado com sucesso!');
+        }
+
+        // HÍBRIDO: tentar atualizar mapeamentos de identidade
+        try {
+          final supabaseUserId = SupaFlow.client.auth.currentUser?.id;
+          final updates = <String, dynamic>{};
+          if ((existingUser.currentUserUidFirebase ?? '').isEmpty && currentUserUid.trim().isNotEmpty) {
+            updates['currentUser_UID_Firebase'] = currentUserUid.trim();
+          }
+          if (supabaseUserId != null && supabaseUserId.isNotEmpty) {
+            updates['auth_user_id'] = supabaseUserId;
+          }
+          if (updates.isNotEmpty) {
+            print('🧭 [GET_OR_CREATE_USER][TXN:$transactionId] Atualizando mapeamentos híbridos: ${updates.keys.join(', ')}');
+            await AppUsersTable().update(
+              data: updates,
+              matchingRows: (rows) => rows.eq('id', existingUser.id),
+            );
+            print('✅ [GET_OR_CREATE_USER][TXN:$transactionId] Mapeamentos híbridos atualizados com sucesso.');
+          } else {
+            print('ℹ️ [GET_OR_CREATE_USER][TXN:$transactionId] Nenhum mapeamento híbrido necessário para este usuário.');
+          }
+        } catch (e) {
+          print('⚠️ [GET_OR_CREATE_USER][TXN:$transactionId] Falha ao atualizar mapeamentos híbridos (tabela sem coluna auth_user_id? sessão supabase ausente?): $e');
+        }
+
         final phase2End = DateTime.now();
         final phase2Duration = phase2End.difference(phase2Start);
         print(
             '✅ [GET_OR_CREATE_USER][TXN:$transactionId] SUCESSO: Usuário encontrado por Firebase UID!');
         print(
-            '🆔 [GET_OR_CREATE_USER][TXN:$transactionId] USER_ID_FOUND: ${byFirebaseUid.first.id}');
+            '🆔 [GET_OR_CREATE_USER][TXN:$transactionId] USER_ID_FOUND: ${existingUser.id}');
         print(
-            '📧 [GET_OR_CREATE_USER][TXN:$transactionId] USER_EMAIL: ${byFirebaseUid.first.email}');
+            '📧 [GET_OR_CREATE_USER][TXN:$transactionId] USER_EMAIL: ${existingUser.email}');
         print(
-            '👥 [GET_OR_CREATE_USER][TXN:$transactionId] USER_TYPE: ${byFirebaseUid.first.userType}');
+            '👥 [GET_OR_CREATE_USER][TXN:$transactionId] USER_TYPE: ${existingUser.userType}');
         print(
-            '✅ [GET_OR_CREATE_USER][TXN:$transactionId] USER_STATUS: ${byFirebaseUid.first.status}');
+            '✅ [GET_OR_CREATE_USER][TXN:$transactionId] USER_STATUS: ${existingUser.status}');
         print(
-            '⏰ [GET_OR_CREATE_USER][TXN:$transactionId] USER_CREATED_AT: ${byFirebaseUid.first.createdAt}');
+            '⏰ [GET_OR_CREATE_USER][TXN:$transactionId] USER_CREATED_AT: ${existingUser.createdAt}');
         print(
-            '🔄 [GET_OR_CREATE_USER][TXN:$transactionId] USER_UPDATED_AT: ${byFirebaseUid.first.updatedAt}');
+            '🔄 [GET_OR_CREATE_USER][TXN:$transactionId] USER_UPDATED_AT: ${existingUser.updatedAt}');
         print(
             '⏰ [GET_OR_CREATE_USER][TXN:$transactionId] PHASE2_END: ${phase2End.toIso8601String()}');
         print(
             '⚡ [GET_OR_CREATE_USER][TXN:$transactionId] PHASE2_DURATION: ${phase2Duration.inMilliseconds}ms');
         print(
             '🏁 [GET_OR_CREATE_USER][TXN:$transactionId] RETORNANDO USER POR FIREBASE UID');
-        return byFirebaseUid.first;
+        return existingUser;
       } else {
         print(
             '⚠️ [GET_OR_CREATE_USER][TXN:$transactionId] Firebase UID query retornou lista vazia');
@@ -365,7 +447,7 @@ class _EscolhaSeuPerfilWidgetState extends State<EscolhaSeuPerfilWidget> {
       // Obter o FCM token real do serviço
       String? realFcmToken;
       try {
-        realFcmToken = FCMServiceCompleto.instance.tokenFCM;
+        realFcmToken = OneSignalServiceCompleto.instance.playerId;
         print(
             '📱 [GET_OR_CREATE_USER][TXN:$transactionId] FCM Token obtido: ${realFcmToken?.substring(0, 20)}...');
       } catch (e) {
@@ -460,47 +542,15 @@ class _EscolhaSeuPerfilWidgetState extends State<EscolhaSeuPerfilWidget> {
           '🏁 [GET_OR_CREATE_USER][TXN:$transactionId] ====== TRANSAÇÃO FINALIZADA COM SUCESSO ======');
 
       return newUser;
-    } catch (e, stackTrace) {
-      final errorTimestamp = DateTime.now();
-      final totalDuration = errorTimestamp.difference(startTimestamp);
-
-      print(
-          '💥 [GET_OR_CREATE_USER][TXN:$transactionId] ====== EXCEÇÃO CAPTURADA ======');
-      print(
-          '⏰ [GET_OR_CREATE_USER][TXN:$transactionId] ERROR_TIME: ${errorTimestamp.toIso8601String()}');
-      print(
-          '⚡ [GET_OR_CREATE_USER][TXN:$transactionId] TIME_TO_ERROR: ${totalDuration.inMilliseconds}ms');
-      print(
-          '❌ [GET_OR_CREATE_USER][TXN:$transactionId] ERROR_TYPE: ${e.runtimeType}');
-      print('❌ [GET_OR_CREATE_USER][TXN:$transactionId] ERROR_MESSAGE: $e');
-      print(
-          '🔌 [GET_OR_CREATE_USER][TXN:$transactionId] Connection Hash at Error: ${SupaFlow.client.hashCode}');
-      print(
-          '📍 [GET_OR_CREATE_USER][TXN:$transactionId] STACK_TRACE: $stackTrace');
-      print(
-          '🔑 [GET_OR_CREATE_USER][TXN:$transactionId] currentUserUid no momento do erro: $currentUserUid');
-      print(
-          '📧 [GET_OR_CREATE_USER][TXN:$transactionId] currentUserEmail no momento do erro: $currentUserEmail');
-      print(
-          '⏰ [GET_OR_CREATE_USER][TXN:$transactionId] Timestamp do erro: ${DateTime.now()}');
-      print(
-          '💥 [GET_OR_CREATE_USER][TXN:$transactionId] ===== FIM DA EXCEÇÃO =====');
-
-      _showErrorSnackBar('Erro inesperado: $e');
-      throw Exception('Falha ao buscar/criar app_user: $e');
-    } finally {
-      // ===== LIMPEZA DO ESTADO (SEMPRE EXECUTADO) =====
-      print('🧹 [MOTORISTA] LIMPANDO ESTADO - Liberando lock do processo...');
-      safeSetState(() {
-        _model.isDriverCreationInProgress = false;
-      });
-      print(
-          '✅ [MOTORISTA] Estado limpo: isDriverCreationInProgress=${_model.isDriverCreationInProgress}');
+    } catch (e, st) {
+      print('❌ [GET_OR_CREATE_USER][TXN:$transactionId] ERRO: $e');
+      print('🧵 [GET_OR_CREATE_USER][TXN:$transactionId] STACK: $st');
+      rethrow;
     }
   }
 
   /// Cria perfil de passageiro no Supabase
-  Future<bool> _createPassengerProfile(String appUserId) async {
+  Future<String?> _createPassengerProfile(String appUserId) async {
     final transactionId =
         DateTime.now().millisecondsSinceEpoch.toString().substring(7);
     print(
@@ -521,7 +571,7 @@ class _EscolhaSeuPerfilWidgetState extends State<EscolhaSeuPerfilWidget> {
       if (appUserQuery.isEmpty) {
         print(
             '❌ [CREATE_PASSENGER][TXN:$transactionId] app_user não encontrado com id: $appUserId');
-        return false;
+        return null;
       }
 
       final appUser = appUserQuery.first;
@@ -538,7 +588,7 @@ class _EscolhaSeuPerfilWidgetState extends State<EscolhaSeuPerfilWidget> {
       if (existingPassenger.isNotEmpty) {
         print(
             '✅ [CREATE_PASSENGER][TXN:$transactionId] Passenger já existe: ${existingPassenger.first.id}');
-        return true;
+        return existingPassenger.first.id;
       }
 
       // Criar novo passenger
@@ -607,7 +657,7 @@ class _EscolhaSeuPerfilWidgetState extends State<EscolhaSeuPerfilWidget> {
       print(
           '🏁 [CREATE_PASSENGER][TXN:$transactionId] ====== CRIAÇÃO FINALIZADA COM SUCESSO ======');
 
-      return true;
+      return newPassenger.id;
     } catch (e, stackTrace) {
       print(
           '💥 [CREATE_PASSENGER][TXN:$transactionId] ====== ERRO NA CRIAÇÃO ======');
@@ -617,7 +667,7 @@ class _EscolhaSeuPerfilWidgetState extends State<EscolhaSeuPerfilWidget> {
       print(
           '🏁 [CREATE_PASSENGER][TXN:$transactionId] ====== CRIAÇÃO FINALIZADA COM ERRO ======');
 
-      return false;
+      return null;
     }
   }
 
@@ -759,16 +809,42 @@ class _EscolhaSeuPerfilWidgetState extends State<EscolhaSeuPerfilWidget> {
                                   // 3. Cria a carteira digital INTERNA do motorista
                                   print(
                                       '💰 [MOTORISTA] Criando carteira digital do motorista (driver_wallets)...');
-                                  await DriverWalletsTable().insert({
-                                    'user_id': appUser.id,
-                                    'available_balance': 0,
-                                    'pending_balance': 0,
-                                    'total_earned': 0,
-                                    'total_withdrawn': 0,
-                                  });
-                                  print(
-                                      '✅ [MOTORISTA] Carteira digital do motorista criada!');
+                                  // Buscar o driver_id a partir do user_id (trigger pode demorar um pouco)
+                                  String driverId;
+                                  final drivers = await DriversTable().queryRows(
+                                    queryFn: (q) => q.eq('user_id', appUser.id).limit(1),
+                                  );
+                                  if (drivers.isEmpty) {
+                                    await Future.delayed(const Duration(milliseconds: 500));
+                                    final retryDrivers = await DriversTable().queryRows(
+                                      queryFn: (q) => q.eq('user_id', appUser.id).limit(1),
+                                    );
+                                    if (retryDrivers.isEmpty) {
+                                      throw Exception('Driver não encontrado para user_id: ${appUser.id}');
+                                    }
+                                    driverId = retryDrivers.first.id;
+                                  } else {
+                                    driverId = drivers.first.id;
+                                  }
 
+                                  // Verificar existência de carteira antes de inserir
+                                  print('🔎 [MOTORISTA] Verificando existência de driver_wallet para driver_id=$driverId');
+                                  final existingDriverWallet = await DriverWalletsTable().queryRows(
+                                    queryFn: (q) => q.eq('driver_id', driverId).limit(1),
+                                  );
+                                  if (existingDriverWallet.isNotEmpty) {
+                                    print('ℹ️ [MOTORISTA] Carteira já existe para driver_id=$driverId. Pulando criação.');
+                                  } else {
+                                    await DriverWalletsTable().insert({
+                                      'driver_id': driverId,
+                                      'email': appUser.email,
+                                      'available_balance': 0,
+                                      'pending_balance': 0,
+                                      'total_earned': 0,
+                                      'total_withdrawn': 0,
+                                    });
+                                    print('✅ [MOTORISTA] Carteira digital do motorista criada!');
+                                  }
                                   // 4. Finaliza o fluxo e navega para a próxima tela
                                   _model.stopValidation();
                                   _model.hasValidAppUser = true;
@@ -969,9 +1045,9 @@ class _EscolhaSeuPerfilWidgetState extends State<EscolhaSeuPerfilWidget> {
                                       await _getOrCreateAppUser('passenger');
 
                                   // 2. Cria o perfil específico de passageiro em 'passengers'
-                                  final passengerCreated =
+                                  final passengerId =
                                       await _createPassengerProfile(appUser.id);
-                                  if (!passengerCreated) {
+                                  if (passengerId == null) {
                                     throw Exception(
                                         'Falha ao criar o registro na tabela passengers.');
                                   }
@@ -979,13 +1055,25 @@ class _EscolhaSeuPerfilWidgetState extends State<EscolhaSeuPerfilWidget> {
                                   // 3. Cria a carteira digital INTERNA do passageiro
                                   print(
                                       '💳 [PASSAGEIRO] Criando registro em passenger_wallets...');
-                                  await PassengerWalletsTable().insert({
-                                    'user_id': appUser.id,
-                                    'available_balance': 0,
-                                    'pending_balance': 0,
-                                  });
-                                  print(
-                                      '✅ [PASSAGEIRO] Perfil e carteira interna criados com sucesso!');
+
+                                  // Verificar existência de carteira antes de inserir
+                                  print('🔎 [PASSAGEIRO] Verificando existência de passenger_wallet para passenger_id=$passengerId');
+                                  final existingPassengerWallet = await PassengerWalletsTable().queryRows(
+                                    queryFn: (q) => q.eq('passenger_id', passengerId).limit(1),
+                                  );
+                                  if (existingPassengerWallet.isNotEmpty) {
+                                    print('ℹ️ [PASSAGEIRO] Carteira já existe para passenger_id=$passengerId. Pulando criação.');
+                                  } else {
+                                    await PassengerWalletsTable().insert({
+                                      'passenger_id': passengerId,
+                                      'user_id': appUser.id,
+                                      'email': appUser.email,
+                                      'available_balance': 0,
+                                      'pending_balance': 0,
+                                    });
+                                    print(
+                                        '✅ [PASSAGEIRO] Carteira interna criada com sucesso!');
+                                  }
 
                                   // 4. Finaliza o fluxo e navega para a próxima tela
                                   _model.stopValidation();

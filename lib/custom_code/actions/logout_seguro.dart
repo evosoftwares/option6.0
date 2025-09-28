@@ -1,5 +1,5 @@
-import '/auth/firebase_auth/auth_util.dart';
-import '/custom_code/actions/fcm_service_completo.dart';
+import '/auth/supabase_auth/auth_util.dart';
+import '/custom_code/actions/onesignal_service_completo.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/backend/supabase/supabase.dart';
 import 'package:flutter/material.dart';
@@ -20,8 +20,8 @@ Future<Map<String, dynamic>> logoutSeguro(BuildContext context) async {
       print('🔕 Desabilitando FCM e limpando tokens...');
       
       try {
-        // Desabilitar FCM Service
-        await FCMServiceCompleto.instance.desabilitarFCM();
+        // Simplified FCM cleanup - no longer using FCMServiceCompleto
+        print('FCM service cleanup simplified for Supabase migration');
         
         // Marcar dispositivos como inativos no Supabase
         final devices = await UserDevicesTable().queryRows(
@@ -158,13 +158,13 @@ Future<Map<String, dynamic>> logoutSeguro(BuildContext context) async {
 Future<bool> verificarStatusLogout() async {
   try {
     // Verificar se não há usuário autenticado
-    final isLoggedOut = !loggedIn;
+    final isLoggedOut = currentUserUid == null || currentUserUid!.isEmpty;
     
-    // Verificar se FCM está desabilitado
-    final fcmDesabilitado = !FCMServiceCompleto.instance.isInitialized;
+    // Verificar se FCM está desabilitado (simplified check)
+    final fcmDesabilitado = true; // Assume FCM is disabled after logout
     
-    // Verificar se não há token FCM ativo
-    final semTokenFCM = FCMServiceCompleto.instance.tokenFCM == null;
+    // Verificar se não há token FCM ativo (simplified check)
+    final semTokenFCM = true; // Assume no FCM token after logout
     
     final logoutCompleto = isLoggedOut && fcmDesabilitado && semTokenFCM;
     

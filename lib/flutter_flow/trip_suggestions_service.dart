@@ -2,7 +2,7 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import '/backend/supabase/supabase.dart';
 import '/backend/supabase/database/database.dart';
-import '/auth/firebase_auth/auth_util.dart';
+import '/auth/supabase_auth/auth_util.dart';
 import 'place.dart';
 
 // Tipos de sugestões

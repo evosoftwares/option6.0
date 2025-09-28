@@ -1,5 +1,9 @@
+// DEPRECATED: Legacy Firebase product brands system
+// This file has been commented out during Firebase to Supabase migration
+// Replaced by Supabase-based product and brand management system
+
+/*
 // Automatic FlutterFlow imports
-import '/backend/backend.dart';
 import '/backend/schema/structs/index.dart';
 import '/backend/schema/enums/enums.dart';
 import '/backend/supabase/supabase.dart';
@@ -12,7 +16,17 @@ import 'package:flutter/material.dart';
 // Begin custom action code
 // DO NOT REMOVE OR MODIFY THE CODE ABOVE!
 
-import 'package:cloud_firestore/cloud_firestore.dart';
+// DEPRECATED: Legacy Firebase function - replaced by Supabase implementation
+import 'dart:convert';
+import 'dart:math' as math;
+// DEPRECATED: Removed cloud_firestore import for Supabase migration
+
+Future<List<String>> getMarcasFromProdutos(
+  List<dynamic> produtos,
+) async {
+  // DEPRECATED: Return empty list for legacy function
+  return [];
+}
 import 'dart:async';
 
 Future<List<DocumentReference>> getMarcasFromProdutos(
@@ -92,4 +106,14 @@ Future<List<DocumentReference>> getMarcasFromProdutos(
       .toList();
 
   return referenciasDasMarcas;
+}
+*/
+
+// Placeholder function to maintain compatibility
+Future<List<String>> getMarcasFromProdutos(
+  List<String> listaIdProdutos,
+) async {
+  // This function has been deprecated and replaced by Supabase-based product and brand management
+  print('getMarcasFromProdutos: Function deprecated - migrated to Supabase');
+  return [];
 }

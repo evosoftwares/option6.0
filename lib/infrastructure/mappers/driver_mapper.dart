@@ -49,7 +49,7 @@ class DriverMapper {
       devicePlatform: row.devicePlatform ?? '',
       approvalStatus: row.approvalStatus?.toString() ?? '',
       onesignalPlayerId: row.onesignalPlayerId,
-      email: Email(row.email ?? 'placeholder@example.com'),
+      email: Email(row.email),
       currentLocation: row.currentLatitude != null && row.currentLongitude != null
           ? Location.fromCoordinates(
               _toDouble(row.currentLatitude),

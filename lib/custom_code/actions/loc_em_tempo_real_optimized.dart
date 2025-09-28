@@ -1,6 +1,7 @@
 // Automatic FlutterFlow imports
 import '/backend/supabase/supabase.dart';
 import '/flutter_flow/flutter_flow_util.dart';
+import '/auth/supabase_auth/auth_util.dart';
 import 'package:flutter/material.dart';
 // Begin custom action code
 // DO NOT REMOVE OR MODIFY THE CODE ABOVE!
@@ -9,7 +10,6 @@ import 'package:geolocator/geolocator.dart';
 import 'package:flutter_background_service/flutter_background_service.dart';
 import 'dart:async';
 import 'package:supabase_flutter/supabase_flutter.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:permission_handler/permission_handler.dart';
 import 'package:battery_plus/battery_plus.dart';
 import 'dart:math' as math;
@@ -495,8 +495,8 @@ Future<bool> iniciarRastreamentoViagemOtimizado(
   // Inicializar serviço otimizado (Android-only)
   await initializeOptimizedService();
 
-  final currentUser = FirebaseAuth.instance.currentUser;
-  if (currentUser == null) {
+  final currentUserId = currentUserUid;
+  if (currentUserId == null || currentUserId.isEmpty) {
     ScaffoldMessenger.of(context).showSnackBar(
       const SnackBar(content: Text('Usuário não autenticado')),
     );
@@ -507,7 +507,7 @@ Future<bool> iniciarRastreamentoViagemOtimizado(
   service.invoke('startParams', {
     'supabaseUrl': FFAppState().supabaseUrl,
     'supabaseAnonKey': FFAppState().supabaseAnnonkey,
-    'userId': currentUser.uid,
+    'userId': currentUserId,
     'tripId': tripId,
     'intervalSeconds': 30, // Base, será adaptado dinamicamente
   });

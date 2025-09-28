@@ -1,5 +1,9 @@
+// DEPRECATED: Legacy Firebase product system widget
+// This file has been commented out during Firebase to Supabase migration
+// Replaced by Supabase-based product management system
+
+/*
 // Automatic FlutterFlow imports
-import '/backend/backend.dart';
 // import '/backend/schema/structs/index.dart';
 // import '/backend/schema/enums/enums.dart';
 // import '/backend/supabase/supabase.dart';
@@ -223,3 +227,35 @@ class _LocalizacaoProdutosAgrupadosState
 }
 // Set your widget name, define your parameter, and then add the
 // boilerplate code using the green button on the right!
+*/
+
+import '/flutter_flow/flutter_flow_theme.dart';
+import 'package:flutter/material.dart';
+
+// Placeholder widget to maintain compatibility
+class LocalizacaoProdutosAgrupados extends StatelessWidget {
+  const LocalizacaoProdutosAgrupados({
+    Key? key,
+    this.width,
+    this.height,
+    this.relatorioId,
+  }) : super(key: key);
+
+  final double? width;
+  final double? height;
+  final String? relatorioId;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      width: width,
+      height: height,
+      child: Center(
+        child: Text(
+          'Widget descontinuado - migrado para Supabase',
+          style: FlutterFlowTheme.of(context).bodyMedium,
+        ),
+      ),
+    );
+  }
+}

@@ -1,5 +1,4 @@
 // Automatic FlutterFlow imports
-import '/backend/backend.dart';
 import '/backend/schema/structs/index.dart';
 import '/backend/schema/enums/enums.dart';
 import '/backend/supabase/supabase.dart';
@@ -12,49 +11,15 @@ import 'package:flutter/material.dart';
 // Begin custom action code
 // DO NOT REMOVE OR MODIFY THE CODE ABOVE!
 
-import 'package:cloud_firestore/cloud_firestore.dart';
+// DEPRECATED: Arquivo legado do Firebase - funcionalidade de prestadores não implementada no Supabase
+// TODO: Remover este arquivo após confirmação de que não é mais usado
 
-Future<List<String>> buscarPrestadores(
-  String tituloCategoriaDesejada,
-  String cidadeDesejada,
-  String uidSolicitante,
+/*
+Future<List<String>?> buscarPrestadores(
+  LatLng? localizacaoUsuario,
+  String? nomeCategoria,
 ) async {
-  final firestore = FirebaseFirestore.instance;
-
-  final categoriaSnapshot = await firestore
-      .collection('categoria')
-      .where('titulo', isEqualTo: tituloCategoriaDesejada)
-      .limit(1)
-      .get();
-
-  if (categoriaSnapshot.docs.isEmpty) {
-    return [];
-  }
-
-  final DocumentReference categoriaRef = categoriaSnapshot.docs.first.reference;
-
-  final prestadoresQuerySnapshot = await firestore
-      .collection('perfisPrestador')
-      .where('categorias', arrayContains: categoriaRef)
-      .where('online', isEqualTo: true)
-      .get();
-
-  List<String> uidsEncontrados = [];
-  for (var doc in prestadoresQuerySnapshot.docs) {
-    final data = doc.data() as Map<String, dynamic>;
-
-    if (data['areasCidades'] is List &&
-        data['idUsuario'] is DocumentReference) {
-      final List<String> cidadesDoPrestador = List.from(data['areasCidades']);
-      final String uidPrestador = data['idUsuario'].id;
-
-      if (cidadesDoPrestador.contains(cidadeDesejada)) {
-        if (uidSolicitante == null || uidSolicitante != uidPrestador) {
-          uidsEncontrados.add(uidPrestador);
-        }
-      }
-    }
-  }
-
-  return uidsEncontrados;
+  // Implementação legada comentada - funcionalidade de prestadores não implementada
+  return null;
 }
+*/

@@ -1,7 +1,7 @@
 import 'dart:developer' as developer;
 import 'package:flutter/foundation.dart';
 import '/backend/supabase/supabase.dart';
-import '/auth/firebase_auth/auth_util.dart';
+import '/auth/supabase_auth/auth_util.dart';
 
 /// Logger focado no código - logs diretos e técnicos
 class ZonaExclusaoCodeLogger {

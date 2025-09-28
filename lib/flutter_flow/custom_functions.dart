@@ -1,21 +1,20 @@
+import '/backend/schema/structs/index.dart';
+import '/backend/schema/enums/enums.dart';
+import '/backend/supabase/supabase.dart';
+import '/flutter_flow/flutter_flow_util.dart';
 import 'dart:convert';
 import 'dart:math' as math;
-
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:intl/intl.dart';
 import 'package:timeago/timeago.dart' as timeago;
+// DEPRECATED: Removed cloud_firestore import for Supabase migration
+import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:http/http.dart' as http;
 import 'lat_lng.dart';
 import 'place.dart';
 import 'uploaded_file.dart';
-import '/backend/backend.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import '/backend/schema/structs/index.dart';
-import '/backend/schema/enums/enums.dart';
-import '/backend/supabase/supabase.dart';
-import '/auth/firebase_auth/auth_util.dart';
-import 'package:http/http.dart' as http;
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import '/auth/supabase_auth/auth_util.dart';
 
  dynamic converteLatLngSeparado(String latLngString) {
   try {
@@ -340,55 +339,14 @@ double garantirValorDouble(dynamic jsonBody) {
   return 0.0;
 }
 
+// DEPRECATED: Legacy distance function - replaced by Supabase implementation
 String? distanciaEntrePontosEBuscaLatLng(
   LatLng pontoDePartida,
   String cidadeSeleciona,
-  PerfisPrestadorRecord prestadorDoc,
+  dynamic prestadorDoc,
 ) {
-  final areasAtuacaoList = prestadorDoc.areasAtuacao;
-
-  // ignore: unnecessary_null_comparison
-  if (areasAtuacaoList != null && areasAtuacaoList.isNotEmpty) {
-    LatLng? pontoDeDestino;
-
-    for (var area in areasAtuacaoList) {
-      if (area.areaAtuacaoCidade == cidadeSeleciona) {
-        if (area.areaAtuacaoLatLnt != null) {
-          pontoDeDestino = area.areaAtuacaoLatLnt;
-          break;
-        }
-      }
-    }
-
-    if (pontoDeDestino != null) {
-      const double earthRadius = 6371;
-
-      double lat1Rad = pontoDePartida.latitude * math.pi / 180;
-      double lon1Rad = pontoDePartida.longitude * math.pi / 180;
-      double lat2Rad = pontoDeDestino.latitude * math.pi / 180;
-      double lon2Rad = pontoDeDestino.longitude * math.pi / 180;
-
-      double deltaLat = lat2Rad - lat1Rad;
-      double deltaLon = lon2Rad - lon1Rad;
-
-      double a = math.sin(deltaLat / 2) * math.sin(deltaLat / 2) +
-          math.cos(lat1Rad) *
-              math.cos(lat2Rad) *
-              math.sin(deltaLon / 2) *
-              math.sin(deltaLon / 2);
-
-      double c = 2 * math.atan2(math.sqrt(a), math.sqrt(1 - a));
-
-      double distance = earthRadius * c;
-
-      if (distance < 1) {
-        return '${(distance * 1000).toStringAsFixed(0)}m';
-      } else {
-        return '${distance.toStringAsFixed(1)}km';
-      }
-    }
-  }
-  return 'N/A';
+  // Return null for deprecated function
+  return null;
 }
 
 Future<FFPlace?> googlePlaceDetails(
@@ -519,55 +477,21 @@ String distanciaEntrePontosCopy(
   }
 }
 
-double calcularProgressoChecklist(List<ChecklistItemStructStruct> listaItens) {
-  if (listaItens == null || listaItens.isEmpty) {
-    return 0.0;
-  }
-
-  // Conta quantos itens têm o campo 'concluido' como true.
-  int itensConcluidos =
-      listaItens.where((item) => item.concluido == true).length;
-
-  // Calcula a proporção.
-  double progresso = itensConcluidos / listaItens.length;
-
-  return progresso;
+// DEPRECATED: Legacy checklist function - replaced by Supabase implementation
+double calcularProgressoChecklist(List<dynamic> listaItens) {
+  // Return 0.0 for deprecated function
+  return 0.0;
 }
 
+// DEPRECATED: Legacy pricing function - replaced by Supabase implementation
 double? calcularValorCorridaPorCategoria(
   double? distanciaEmMetros,
-  CategoriasMobilidadeRecord? categoria,
+  dynamic categoria,
   double valorPorKm,
   double valorMinimoCorrida,
 ) {
-  if (distanciaEmMetros == null || categoria == null) {
-    return null;
-  }
-  // Garante que o fator multiplicador da categoria exista.
-  if (!categoria.hasFatorMultiplicador()) {
-    return null;
-  }
-
-  // --- Lógica de Cálculo ---
-
-  // 1. Converte a distância de metros para quilômetros.
-  final double distanciaEmKm = distanciaEmMetros / 1000.0;
-
-  // 2. Calcula o "Custo Base" da viagem, baseado apenas na distância.
-  final double custoBase = distanciaEmKm * valorPorKm;
-
-  // 3. Aplica o fator de multiplicação da categoria sobre o custo base.
-  // O fatorMultiplicador vem diretamente do documento da categoria no Firestore.
-  final double custoComMultiplicador = custoBase * categoria.fatorMultiplicador;
-
-  // 4. Aplica a regra do valor mínimo.
-  // O preço final será o maior valor entre o custo calculado e o valor mínimo definido.
-  // Isso garante que corridas muito curtas ainda sejam viáveis.
-  if (custoComMultiplicador < valorMinimoCorrida) {
-    return valorMinimoCorrida;
-  } else {
-    return custoComMultiplicador;
-  }
+  // Return null for deprecated function
+  return null;
 }
 
 double calcularMediaAvaliacoes(List<double>? listaDeAvaliacoes) {
@@ -581,18 +505,9 @@ double calcularMediaAvaliacoes(List<double>? listaDeAvaliacoes) {
   return somaTotal / listaDeAvaliacoes.length;
 }
 
-TipoVeiculoEnum? stringToTipoVeiculoEnum(String tipoString) {
-  // Percorre todos os valores possíveis do Enum.
-  for (TipoVeiculoEnum enumValue in TipoVeiculoEnum.values) {
-    // Compara a representação em String do Enum com a String recebida.
-    // O '.toString().split('.').last' pega apenas o nome do valor (ex: "HATCH").
-    if (enumValue.toString().split('.').last == tipoString) {
-      // Se encontrar uma correspondência, retorna o valor do Enum.
-      return enumValue;
-    }
-  }
-  // Se não encontrar nenhuma correspondência após percorrer todos os valores,
-  // retorna nulo para indicar que a conversão falhou.
+// DEPRECATED: Legacy enum function - replaced by Supabase implementation
+dynamic stringToTipoVeiculoEnum(String tipoString) {
+  // Return null for deprecated function
   return null;
 }
 

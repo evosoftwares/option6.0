@@ -1,4 +1,4 @@
-import '/auth/firebase_auth/auth_util.dart';
+import '/auth/supabase_auth/auth_util.dart';
 import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
@@ -44,7 +44,7 @@ class _MainPassageiroWidgetState extends State<MainPassageiroWidget> {
   Future<List<TripsRow>> _getPassengerTrips(String firebaseUserId) async {
     try {
       // Convert Firebase UID to app_users.id (UUID)
-      final appUserId = await UserIdConverter.getAppUserIdFromFirebaseUid(firebaseUserId);
+      final appUserId = await UserIdConverter.getAppUserIdFromSupabaseUid(firebaseUserId);
       
       if (appUserId == null) {
         debugPrint('Usuário não encontrado para Firebase UID: $firebaseUserId');

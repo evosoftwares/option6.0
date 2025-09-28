@@ -1,4 +1,4 @@
-import '/auth/firebase_auth/auth_util.dart';
+import '/auth/supabase_auth/auth_util.dart';
 import '/backend/supabase/supabase.dart';
 import '/flutter_flow/flutter_flow_drop_down.dart';
 import '/flutter_flow/flutter_flow_icon_button.dart';
@@ -850,7 +850,7 @@ class _MeuVeiculoWidgetState extends State<MeuVeiculoWidget> {
                           debugPrint('SEU VEÍCULO: enviando payload para Supabase...');
                           try {
                             // Garantir que usamos o UUID do app_user (não o Firebase UID)
-                            final appUserId = await UserIdConverter.getAppUserIdFromFirebaseUid(currentUserUid);
+                            final appUserId = await UserIdConverter.getAppUserIdFromSupabaseUid(currentUserUid);
                             debugPrint('SEU VEÍCULO: appUserId resolvido -> $appUserId (a partir de currentUserUid=$currentUserUid)');
                             if (appUserId == null) {
                               throw Exception('Não foi possível resolver appUserId a partir do Firebase UID');
