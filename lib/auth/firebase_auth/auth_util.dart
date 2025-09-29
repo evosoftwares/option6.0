@@ -1,27 +1,77 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
+import 'package:firebase_auth/firebase_auth.dart' as fb_auth;
+import 'package:rxdart/rxdart.dart';
+
 import '../auth_manager.dart' as base;
 import '../base_auth_user_provider.dart' as auth_base;
 import '../../backend/supabase/supabase.dart';
 
-// Exporta tipos básicos utilizados no app
+// --- Exports for compatibility ---
 export '../base_auth_user_provider.dart' show loggedIn, BaseAuthUser;
 
-// UID e e-mail do usuário atual (Supabase)
-String get currentUserUid => SupaFlow.client.auth.currentUser?.id ?? '';
-String get currentUserEmail => SupaFlow.client.auth.currentUser?.email ?? '';
+// --- User Wrapper and Stream (Firebase based) ---
 
-// Mantém compatibilidade com backend.dart que ainda referencia currentUserDocument
-Object? currentUserDocument;
+auth_base.BaseAuthUser? currentUser;
+bool get loggedIn => currentUser?.loggedIn ?? false;
 
-/// Implementação de AuthManager baseada em Supabase.
-class _SupabaseAuthManager implements base.AuthManager, base.EmailSignInManager {
+class OptionAuthUser extends auth_base.BaseAuthUser {
+  OptionAuthUser(this.user);
+  final fb_auth.User? user;
+
   @override
-  Future signOut() async {
-    await SupaFlow.client.auth.signOut();
-    auth_base.currentUser = _SupaAuthUser(null);
-  }
+  bool get loggedIn => user != null;
 
+  @override
+  String get uid => user?.uid ?? '';
+
+  @override
+  String get email => user?.email ?? '';
+
+  @override
+  bool get emailVerified => user?.emailVerified ?? false;
+  
+  @override
+  auth_base.AuthUserInfo get authUserInfo => auth_base.AuthUserInfo(
+        uid: user?.uid,
+        email: user?.email,
+        displayName: user?.displayName,
+        photoUrl: user?.photoURL,
+        phoneNumber: user?.phoneNumber,
+      );
+
+  @override
+  Future? delete() => user?.delete();
+
+  @override
+  Future? updateEmail(String email) => user?.updateEmail(email);
+
+  @override
+  Future? updatePassword(String newPassword) => user?.updatePassword(newPassword);
+
+  @override
+  Future? sendEmailVerification() => user?.sendEmailVerification();
+
+  @override
+  Future refreshUser() async => await user?.reload();
+}
+
+Stream<auth_base.BaseAuthUser> optionFirebaseUserStream() {
+  final userStream = fb_auth.FirebaseAuth.instance
+      .authStateChanges()
+      .debounce((user) => user == null && !loggedIn
+          ? TimerStream(true, const Duration(seconds: 1))
+          : Stream.value(user))
+      .map<auth_base.BaseAuthUser>((user) {
+    currentUser = OptionAuthUser(user);
+    return currentUser!;
+  });
+  return userStream;
+}
+
+// --- Auth Manager for Login (and other base methods) ---
+
+class FirebaseAuthManager implements base.AuthManager, base.EmailSignInManager {
   @override
   Future<auth_base.BaseAuthUser?> signInWithEmail(
     BuildContext context,
@@ -29,14 +79,16 @@ class _SupabaseAuthManager implements base.AuthManager, base.EmailSignInManager 
     String password,
   ) async {
     try {
-      final res = await SupaFlow.client.auth.signInWithPassword(
+      final userCredential =
+          await fb_auth.FirebaseAuth.instance.signInWithEmailAndPassword(
         email: email,
         password: password,
       );
-      final wrapped = _SupaAuthUser(res.user);
-      auth_base.currentUser = wrapped;
-      return res.user != null ? wrapped : null;
-    } catch (_) {
+      return OptionAuthUser(userCredential.user);
+    } on fb_auth.FirebaseAuthException catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.message ?? 'Ocorreu um erro.')),
+      );
       return null;
     }
   }
@@ -46,104 +98,113 @@ class _SupabaseAuthManager implements base.AuthManager, base.EmailSignInManager 
     BuildContext context,
     String email,
     String password,
-  ) async {
-    try {
-      final res = await SupaFlow.client.auth.signUp(
-        email: email,
-        password: password,
-      );
+  ) {
+    // This is part of the mixin, but we use the standalone function below
+    // for registration because we need to pass `fullName`.
+    throw UnimplementedError(
+        'Use the standalone createAccountWithEmail function for registration.');
+  }
 
-      // Cria/atualiza o registro correspondente em app_users, garantindo consistência
-      // Campos obrigatórios: id (não nulo). Mantemos email igual ao da autenticação.
-      if (res.user != null) {
-        try {
-          await SupaFlow.client
-              .from('app_users')
-              .upsert({
-                'id': res.user!.id,
-                'email': res.user!.email,
-              },
-                  // Evita conflito em reenvio; usa id como chave de conflito
-                  onConflict: 'id');
-        } catch (e) {
-          debugPrint('⚠️ Falha ao criar app_users para novo usuário: $e');
-        }
+  @override
+  Future signOut() async {
+    await fb_auth.FirebaseAuth.instance.signOut();
+  }
+
+  @override
+  Future deleteUser(BuildContext context) async {
+    try {
+      await currentUser?.delete();
+    } on fb_auth.FirebaseAuthException catch (e) {
+      if (e.code == 'requires-recent-login') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+              content: Text(
+                  'Sessão expirada. Faça login novamente antes de deletar a conta.')),
+        );
       }
-      final wrapped = _SupaAuthUser(res.user);
-      auth_base.currentUser = wrapped;
-      return res.user != null ? wrapped : null;
-    } catch (_) {
-      return null;
     }
   }
 
-  // Métodos não utilizados neste fluxo podem permanecer não implementados
   @override
-  Future deleteUser(BuildContext context) async {}
-  @override
-  Future updateEmail({required String email, required BuildContext context}) async {}
-  @override
-  Future resetPassword({required String email, required BuildContext context}) async {}
-  @override
-  Future refreshUser() async => auth_base.currentUser?.refreshUser();
-  @override
-  Future sendEmailVerification() async => auth_base.currentUser?.sendEmailVerification();
-}
-
-final _SupabaseAuthManager _authManager = _SupabaseAuthManager();
-base.EmailSignInManager get authManager => _authManager;
-
-// Wrapper de usuário Supabase para o contrato BaseAuthUser
-class _SupaAuthUser extends auth_base.BaseAuthUser {
-  _SupaAuthUser(this.user);
-  final User? user;
-
-  @override
-  bool get loggedIn => user != null;
-
-  @override
-  bool get emailVerified => false;
-
-  @override
-  auth_base.AuthUserInfo get authUserInfo => auth_base.AuthUserInfo(
-        uid: user?.id,
-        email: user?.email,
-        displayName: null,
-        photoUrl: null,
-        phoneNumber: null,
+  Future resetPassword(
+      {required String email, required BuildContext context}) async {
+    try {
+      await fb_auth.FirebaseAuth.instance.sendPasswordResetEmail(email: email);
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('E-mail de redefinição de senha enviado.')),
       );
+    } on fb_auth.FirebaseAuthException catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(e.message ?? 'Ocorreu um erro.')),
+      );
+    }
+  }
 
   @override
-  Future? delete() => null;
+  Future sendEmailVerification() => currentUser?.sendEmailVerification() ?? Future.value();
 
   @override
-  Future? updateEmail(String email) => null;
+  Future updateEmail({required String email, required BuildContext context}) async {
+    await currentUser?.updateEmail(email);
+  }
 
   @override
-  Future? updatePassword(String newPassword) => null;
-
-  @override
-  Future? sendEmailVerification() => null;
-
-  @override
-  Future refreshUser() async {}
+  Future refreshUser() async => await currentUser?.refreshUser();
 }
 
-// Streams baseadas em Supabase (mantendo nomes esperados pelo app)
-Stream<auth_base.BaseAuthUser> optionFirebaseUserStream() {
-  return SupaFlow.client.auth.onAuthStateChange.map((event) {
-    final wrapped = _SupaAuthUser(event.session?.user);
-    auth_base.currentUser = wrapped;
-    return wrapped;
-  });
+final FirebaseAuthManager authManager = FirebaseAuthManager();
+
+// --- Standalone Registration Function ---
+
+Future<auth_base.BaseAuthUser?> createAccountWithEmail(
+  BuildContext context, {
+  required String email,
+  required String password,
+  required String fullName,
+}) async {
+  fb_auth.UserCredential userCredential;
+  try {
+    userCredential =
+        await fb_auth.FirebaseAuth.instance.createUserWithEmailAndPassword(
+      email: email,
+      password: password,
+    );
+  } on fb_auth.FirebaseAuthException catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      SnackBar(content: Text(e.message ?? 'Ocorreu um erro no cadastro.')),
+    );
+    return null;
+  }
+
+  final firebaseUser = userCredential.user;
+  if (firebaseUser == null) {
+    return null;
+  }
+
+  try {
+    await SupaFlow.client.from('app_users').insert({
+      'currentUser_UID_Firebase': firebaseUser.uid,
+      'email': email,
+      'full_name': fullName,
+      'status': 'active',
+      'profile_complete': false,
+    });
+  } catch (e) {
+    debugPrint('CRITICAL: Failed to create Supabase app_user record. Rolling back Firebase user. Error: $e');
+    await firebaseUser.delete();
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Erro ao criar perfil de usuário. Tente novamente.')),
+    );
+    return null;
+  }
+
+  if (fullName.isNotEmpty) {
+    await firebaseUser.updateDisplayName(fullName);
+  }
+
+  return OptionAuthUser(firebaseUser);
 }
 
-Stream<auth_base.BaseAuthUser> authenticatedUserStream =
-    optionFirebaseUserStream();
-
-Stream<String?> jwtTokenStream = SupaFlow.client.auth.onAuthStateChange
-    .map((event) => event.session?.accessToken);
-
-// Função auxiliar pública para obter o usuário atual como BaseAuthUser
-auth_base.BaseAuthUser supabaseCurrentAuthUser() =>
-    _SupaAuthUser(SupaFlow.client.auth.currentUser);
+// --- Global Helper Properties ---
+String get currentUserUid => currentUser?.uid ?? '';
+String get currentUserEmail => currentUser?.email ?? '';
