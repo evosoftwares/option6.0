@@ -1,7 +1,6 @@
 import '/auth/firebase_auth/auth_util.dart';
 import '/backend/supabase/supabase.dart';
 import '/flutter_flow/flutter_flow_util.dart';
-import '/flutter_flow/flutter_flow_widgets.dart';
 import '/index.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -92,59 +91,155 @@ class _SelecaoPerfilWidgetState extends State<SelecaoPerfilWidget> {
       appBar: AppBar(
         backgroundColor: Colors.white,
         foregroundColor: Colors.black,
-        title: const Text('Seleção de Perfil'),
+        title: null,
         elevation: 0,
       ),
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(16.0),
+        child: Container(
+          width: double.infinity,
+          height: double.infinity,
+          decoration: const BoxDecoration(
+            color: Colors.white,
+          ),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.max,
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              Text(
-                'Escolha seu perfil',
-                style: GoogleFonts.inter(
-                  fontSize: 28,
-                  fontWeight: FontWeight.w700,
+              Padding(
+                padding: const EdgeInsets.only(top: 40.0),
+                child: Icon(
+                  Icons.person_pin_circle,
                   color: Colors.black,
+                  size: 100.0,
                 ),
               ),
-              const SizedBox(height: 24),
-              FFButtonWidget(
-                onPressed: _isUpdating ? null : () => _selecionarPerfil('passenger'),
-                text: _isUpdating ? 'Processando...' : 'Sou passageiro',
-                options: FFButtonOptions(
-                  width: double.infinity,
-                  height: 56,
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  color: Colors.black,
-                  textStyle: GoogleFonts.inter(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
-                    color: Colors.white,
-                  ),
-                  elevation: 0,
-                  borderSide: const BorderSide(color: Colors.black, width: 1),
-                  borderRadius: BorderRadius.circular(12),
-                ),
-              ),
-              const SizedBox(height: 12),
-              FFButtonWidget(
-                onPressed: _isUpdating ? null : () => _selecionarPerfil('driver'),
-                text: _isUpdating ? 'Processando...' : 'Sou motorista',
-                options: FFButtonOptions(
-                  width: double.infinity,
-                  height: 56,
-                  padding: const EdgeInsets.symmetric(horizontal: 24),
-                  color: Colors.white,
-                  textStyle: GoogleFonts.inter(
-                    fontSize: 16,
-                    fontWeight: FontWeight.w600,
+              Padding(
+                padding: const EdgeInsets.all(24.0),
+                child: Text(
+                  'Como você deseja usar a plataforma?',
+                  textAlign: TextAlign.center,
+                  style: GoogleFonts.inter(
+                    fontSize: 24,
+                    fontWeight: FontWeight.w700,
                     color: Colors.black,
                   ),
-                  elevation: 0,
-                  borderSide: const BorderSide(color: Colors.black, width: 1),
-                  borderRadius: BorderRadius.circular(12),
+                ),
+              ),
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 32.0, vertical: 20.0),
+                child: Column(
+                  mainAxisSize: MainAxisSize.min,
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Container(
+                      width: double.infinity,
+                      height: 120,
+                      decoration: BoxDecoration(
+                        color: Colors.black,
+                        borderRadius: BorderRadius.circular(16.0),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.1),
+                            blurRadius: 8.0,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(16.0),
+                          onTap: _isUpdating ? null : () => _selecionarPerfil('passenger'),
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.max,
+                              children: [
+                                Icon(
+                                  Icons.person,
+                                  color: Colors.white,
+                                  size: 32.0,
+                                ),
+                                const SizedBox(width: 16.0),
+                                Expanded(
+                                  child: Text(
+                                    'Sou passageiro',
+                                    style: GoogleFonts.inter(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ),
+                                Icon(
+                                  Icons.chevron_right,
+                                  color: Colors.white,
+                                  size: 24.0,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                    const SizedBox(height: 20.0),
+                    Container(
+                      width: double.infinity,
+                      height: 120,
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(16.0),
+                        border: Border.all(
+                          color: Colors.black,
+                          width: 1.0,
+                        ),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withValues(alpha: 0.1),
+                            blurRadius: 8.0,
+                            offset: const Offset(0, 4),
+                          ),
+                        ],
+                      ),
+                      child: Material(
+                        color: Colors.transparent,
+                        child: InkWell(
+                          borderRadius: BorderRadius.circular(16.0),
+                          onTap: _isUpdating ? null : () => _selecionarPerfil('driver'),
+                          child: Padding(
+                            padding: const EdgeInsets.all(16.0),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.max,
+                              children: [
+                                Icon(
+                                  Icons.drive_eta,
+                                  color: Colors.black,
+                                  size: 32.0,
+                                ),
+                                const SizedBox(width: 16.0),
+                                Expanded(
+                                  child: Text(
+                                    'Sou motorista',
+                                    style: GoogleFonts.inter(
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.black,
+                                    ),
+                                  ),
+                                ),
+                                Icon(
+                                  Icons.chevron_right,
+                                  color: Colors.black,
+                                  size: 24.0,
+                                ),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    ),
+                  ],
                 ),
               ),
             ],
