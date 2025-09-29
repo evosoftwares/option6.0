@@ -1,6 +1,5 @@
 import '/auth/firebase_auth/auth_util.dart';
 import '/backend/supabase/supabase.dart';
-import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import '/index.dart';
@@ -21,17 +20,36 @@ class _SelecaoPerfilWidgetState extends State<SelecaoPerfilWidget> {
   bool _isUpdating = false;
 
   Future<void> _selecionarPerfil(String tipo) async {
-    if (_isUpdating) return;
+    // Comprehensive logging for profile selection event
+    debugPrint('🔄 [PERFIL_SEL] Button Clicked: ${tipo == 'driver' ? 'Sou motorista' : 'Sou passageiro'}');
+    debugPrint('👤 [PERFIL_SEL] Current User UID: $currentUserUid');
+    debugPrint('⏰ [PERFIL_SEL] Timestamp: ${DateTime.now()}');
+    debugPrint('⚙️ [PERFIL_SEL] Is Updating Status: $_isUpdating');
+    
+    if (_isUpdating) {
+      debugPrint('❌ [PERFIL_SEL] Action blocked: Already updating profile');
+      return;
+    }
+    
     setState(() => _isUpdating = true);
+    debugPrint('🔄 [PERFIL_SEL] Updating state to: $_isUpdating');
+    
     try {
       final uid = currentUserUid;
+      debugPrint('👤 [PERFIL_SEL] Retrieved UID from currentUserUid: $uid');
+      
       if (uid.isEmpty) {
+        debugPrint('❌ [PERFIL_SEL] ERROR: User is not authenticated');
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Usuário não autenticado.')),
         );
         return;
       }
 
+      debugPrint('💾 [PERFIL_SEL] Starting database update for user: $uid');
+      debugPrint('📋 [PERFIL_SEL] Setting user_type to: $tipo');
+      debugPrint('📅 [PERFIL_SEL] Update timestamp: ${DateTime.now().toUtc()}');
+      
       await AppUsersTable().update(
         data: {
           'user_type': tipo,
@@ -39,6 +57,10 @@ class _SelecaoPerfilWidgetState extends State<SelecaoPerfilWidget> {
         },
         matchingRows: (rows) => rows.eq('id', uid),
       );
+      
+      debugPrint('✅ [PERFIL_SEL] Database update successful for user: $uid');
+      debugPrint('📋 [PERFIL_SEL] User type updated to: $tipo');
+      debugPrint('➡️ [PERFIL_SEL] Redirecting to UploadFotoWidget');
 
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
@@ -49,12 +71,17 @@ class _SelecaoPerfilWidgetState extends State<SelecaoPerfilWidget> {
       );
 
       context.goNamed(UploadFotoWidget.routeName);
-    } catch (e) {
+      debugPrint('✅ [PERFIL_SEL] Navigation completed to UploadFotoWidget');
+    } catch (e, stack) {
+      debugPrint('❌ [PERFIL_SEL] ERROR during profile selection: $e');
+      debugPrint('📋 [PERFIL_SEL] Stack trace: $stack');
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Erro ao atualizar perfil. Tente novamente.')),
       );
     } finally {
+      debugPrint('🔄 [PERFIL_SEL] Final: Setting _isUpdating to false');
       if (mounted) setState(() => _isUpdating = false);
+      debugPrint('✅ [PERFIL_SEL] Final: State updated, _isUpdating is now: $_isUpdating');
     }
   }
 

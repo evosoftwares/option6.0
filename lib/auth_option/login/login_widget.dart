@@ -184,7 +184,7 @@ class _LoginWidgetState extends State<LoginWidget> {
                                   autofocus: false,
                                   obscureText: false,
                                   decoration: InputDecoration(
-                                    hintText: 'E-mail ou Telefone',
+                                    hintText: 'E-mail',
                                     hintStyle: FlutterFlowTheme.of(context)
                                         .bodyMedium
                                         .override(

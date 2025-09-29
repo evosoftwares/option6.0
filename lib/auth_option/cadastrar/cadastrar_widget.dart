@@ -220,7 +220,15 @@ class _CadastrarWidgetState extends State<CadastrarWidget> {
                             const SizedBox(height: 16),
                             TextButton(
                               onPressed: () => context.goNamed(LoginWidget.routeName),
-                              child: const Text('Já tenho conta'),
+                              child: Text(
+                                'Já tenho conta',
+                                style: FlutterFlowTheme.of(context).bodyMedium.override(
+                                      font: GoogleFonts.inter(
+                                        decoration: TextDecoration.underline,
+                                        color: Colors.black,
+                                      ),
+                                    ),
+                              ),
                             )
                           ],
                         ),
