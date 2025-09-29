@@ -1,6 +1,6 @@
 import 'dart:io' show Platform;
 import 'package:flutter/foundation.dart';
-import '../../../auth/firebase_auth/auth_util.dart';
+import '../../../auth/firebase_auth/auth_util.dart' as auth;
 import '../cloud_functions/cloud_functions.dart';
 
 import 'package:stream_transform/stream_transform.dart';
@@ -35,7 +35,7 @@ Stream<UserTokenInfo> getFcmTokenStream(String userPath) =>
         .where((playerId) => playerId != null && playerId.isNotEmpty)
         .map((playerId) => UserTokenInfo(userPath, playerId!));
 
-final fcmTokenUserStream = authenticatedUserStream
+final fcmTokenUserStream = auth.authenticatedUserStream
     .where((user) => user != null && (user!.uid ?? '').isNotEmpty)
     .map((user) => 'users/${user!.uid}')
     .distinct()

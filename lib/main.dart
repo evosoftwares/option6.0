@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
-import 'auth/firebase_auth/auth_util.dart';
+import 'auth/firebase_auth/auth_util.dart' as auth;
 
 import 'backend/push_notifications/push_notifications_util.dart';
 import 'backend/push_notifications/onesignal_service.dart';
@@ -73,9 +73,9 @@ class _MyAppState extends State<MyApp> {
       _router.routerDelegate.currentConfiguration.matches
           .map((e) => getRoute(e))
           .toList();
-  late Stream<BaseAuthUser> userStream;
+  late Stream<auth.BaseAuthUser> userStream;
 
-  final authUserSub = authenticatedUserStream.listen((_) {});
+  final authUserSub = auth.authenticatedUserStream.listen((_) {});
   final fcmTokenSub = fcmTokenUserStream.listen((_) {});
 
   @override
@@ -92,11 +92,11 @@ class _MyAppState extends State<MyApp> {
     // Ignora em Web automaticamente no serviço
     OneSignalService.init();
     
-    userStream = optionFirebaseUserStream()
+    userStream = auth.optionFirebaseUserStream()
       ..listen((user) {
         _appStateNotifier.update(user);
       });
-    jwtTokenStream.listen((_) {});
+    // Removido: jwtTokenStream (Supabase). Em Firebase não há stream equivalente necessária aqui.
     
     // Timer para remover a splash screen
     Future.delayed(
@@ -107,12 +107,12 @@ class _MyAppState extends State<MyApp> {
 
   void _initializeUser() async {
     try {
-      // Atualiza estado inicial com o usuário atual do Supabase
-      _appStateNotifier.update(supabaseCurrentAuthUser());
+      // Atualiza estado inicial com o usuário atual do Firebase
+      _appStateNotifier.update(auth.currentUser ?? auth.OptionAuthUser(null));
     } catch (e) {
       // Em caso de erro, criar usuário vazio para não travar na splash
       debugPrint('Erro na inicialização do usuário: $e');
-      _appStateNotifier.update(supabaseCurrentAuthUser());
+      _appStateNotifier.update(auth.currentUser ?? auth.OptionAuthUser(null));
     }
   }
 

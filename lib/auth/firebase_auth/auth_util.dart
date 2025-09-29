@@ -69,6 +69,9 @@ Stream<auth_base.BaseAuthUser> optionFirebaseUserStream() {
   return userStream;
 }
 
+// Compat: mantém o nome esperado em partes do app que escutam mudanças de usuário
+Stream<auth_base.BaseAuthUser> authenticatedUserStream = optionFirebaseUserStream();
+
 // --- Auth Manager for Login (and other base methods) ---
 
 class FirebaseAuthManager implements base.AuthManager, base.EmailSignInManager {
