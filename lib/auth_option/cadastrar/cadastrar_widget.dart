@@ -1,13 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '/auth/firebase_auth/auth_util.dart' as auth;
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import '/index.dart';
-import '/auth/auth_manager.dart';
-import '/backend/supabase/supabase.dart';
 import '/flutter_flow/nav/nav.dart';
 
 class CadastrarWidget extends StatefulWidget {
@@ -40,51 +38,39 @@ class _CadastrarWidgetState extends State<CadastrarWidget> {
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isSubmitting = true);
+
     try {
       // Evitar refresh automático por mudança de auth para não quebrar navegação.
       AppStateNotifier.instance.updateNotifyOnAuthChange(false);
 
-      final res = await SupabaseAuthManager.instance.registerUser(
+      final user = await auth.createAccountWithEmail(
+        context,
         email: _emailController.text.trim(),
-        fullName: _nameController.text.trim(),
         password: _passwordController.text,
-        confirmPassword: _confirmController.text,
+        fullName: _nameController.text.trim(),
       );
 
       if (!mounted) return;
-      final email = _emailController.text.trim();
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(
-          res.user == null
-            ? 'Cadastro iniciado. Verifique seu e-mail ($email) para confirmar.'
-            : 'Cadastro concluído com sucesso!',
-        )),
-      );
 
-      // Garantir sessão ativa pós-cadastro quando possível
-      if (res.user != null) {
-        try {
-          await SupaFlow.client.auth.signInWithPassword(
-            email: _emailController.text.trim(),
-            password: _passwordController.text,
-          );
-        } catch (_) {}
+      if (user != null) {
+        // A função createAccountWithEmail já loga o usuário.
+        // Redirecionar para seleção de perfil após cadastro.
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Cadastro concluído com sucesso!')),
+        );
+        context.goNamed(SelecaoPerfilWidget.routeName);
       }
-
-      // Redirecionar para seleção de perfil após cadastro
-      context.goNamed(SelecaoPerfilWidget.routeName);
-    } on AuthException catch (e) {
-      if (!mounted) return;
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text(e.message)),
-      );
+      // Se user for nulo, a função createAccountWithEmail já exibiu um SnackBar com o erro.
     } catch (e) {
+      // O catch genérico é mantido para qualquer erro inesperado.
       if (!mounted) return;
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Erro ao cadastrar. Tente novamente.')),
+        const SnackBar(content: Text('Ocorreu um erro inesperado. Tente novamente.')),
       );
     } finally {
-      if (mounted) setState(() => _isSubmitting = false);
+      if (mounted) {
+        setState(() => _isSubmitting = false);
+      }
     }
   }
 
