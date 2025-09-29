@@ -134,7 +134,7 @@ class _SelecaoPerfilWidgetState extends State<SelecaoPerfilWidget> {
                   children: [
                     Container(
                       width: double.infinity,
-                      height: 120,
+                      height: 80,
                       decoration: BoxDecoration(
                         color: Colors.black,
                         borderRadius: BorderRadius.circular(16.0),
@@ -152,21 +152,21 @@ class _SelecaoPerfilWidgetState extends State<SelecaoPerfilWidget> {
                           borderRadius: BorderRadius.circular(16.0),
                           onTap: _isUpdating ? null : () => _selecionarPerfil('passenger'),
                           child: Padding(
-                            padding: const EdgeInsets.all(16.0),
+                            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
                             child: Row(
                               mainAxisSize: MainAxisSize.max,
                               children: [
                                 Icon(
                                   Icons.person,
                                   color: Colors.white,
-                                  size: 32.0,
+                                  size: 24.0,
                                 ),
                                 const SizedBox(width: 16.0),
                                 Expanded(
                                   child: Text(
                                     'Sou passageiro',
                                     style: GoogleFonts.inter(
-                                      fontSize: 18,
+                                      fontSize: 16,
                                       fontWeight: FontWeight.w600,
                                       color: Colors.white,
                                     ),
@@ -175,7 +175,7 @@ class _SelecaoPerfilWidgetState extends State<SelecaoPerfilWidget> {
                                 Icon(
                                   Icons.chevron_right,
                                   color: Colors.white,
-                                  size: 24.0,
+                                  size: 20.0,
                                 ),
                               ],
                             ),
@@ -186,7 +186,7 @@ class _SelecaoPerfilWidgetState extends State<SelecaoPerfilWidget> {
                     const SizedBox(height: 20.0),
                     Container(
                       width: double.infinity,
-                      height: 120,
+                      height: 80,
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(16.0),
@@ -208,21 +208,21 @@ class _SelecaoPerfilWidgetState extends State<SelecaoPerfilWidget> {
                           borderRadius: BorderRadius.circular(16.0),
                           onTap: _isUpdating ? null : () => _selecionarPerfil('driver'),
                           child: Padding(
-                            padding: const EdgeInsets.all(16.0),
+                            padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
                             child: Row(
                               mainAxisSize: MainAxisSize.max,
                               children: [
                                 Icon(
                                   Icons.drive_eta,
                                   color: Colors.black,
-                                  size: 32.0,
+                                  size: 24.0,
                                 ),
                                 const SizedBox(width: 16.0),
                                 Expanded(
                                   child: Text(
                                     'Sou motorista',
                                     style: GoogleFonts.inter(
-                                      fontSize: 18,
+                                      fontSize: 16,
                                       fontWeight: FontWeight.w600,
                                       color: Colors.black,
                                     ),
@@ -231,7 +231,7 @@ class _SelecaoPerfilWidgetState extends State<SelecaoPerfilWidget> {
                                 Icon(
                                   Icons.chevron_right,
                                   color: Colors.black,
-                                  size: 24.0,
+                                  size: 20.0,
                                 ),
                               ],
                             ),
