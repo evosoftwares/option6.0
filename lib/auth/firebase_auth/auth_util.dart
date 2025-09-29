@@ -1,83 +1,149 @@
-import 'dart:async';
-
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:supabase_flutter/supabase_flutter.dart';
+import '../auth_manager.dart' as base;
+import '../base_auth_user_provider.dart' as auth_base;
+import '../../backend/supabase/supabase.dart';
 
-import '/backend/backend.dart';
-import 'package:stream_transform/stream_transform.dart';
-import 'firebase_auth_manager.dart';
+// Exporta tipos básicos utilizados no app
+export '../base_auth_user_provider.dart' show loggedIn, BaseAuthUser;
 
-export 'firebase_auth_manager.dart';
+// UID e e-mail do usuário atual (Supabase)
+String get currentUserUid => SupaFlow.client.auth.currentUser?.id ?? '';
+String get currentUserEmail => SupaFlow.client.auth.currentUser?.email ?? '';
 
-final _authManager = FirebaseAuthManager();
-FirebaseAuthManager get authManager => _authManager;
+// Mantém compatibilidade com backend.dart que ainda referencia currentUserDocument
+Object? currentUserDocument;
 
-String get currentUserEmail =>
-    currentUserDocument?.email ?? currentUser?.email ?? '';
-
-String get currentUserUid => currentUser?.uid ?? '';
-
-String get currentUserDisplayName =>
-    currentUserDocument?.displayName ?? currentUser?.displayName ?? '';
-
-String get currentUserPhoto =>
-    currentUserDocument?.photoUrl ?? currentUser?.photoUrl ?? '';
-
-String get currentPhoneNumber =>
-    currentUserDocument?.phoneNumber ?? currentUser?.phoneNumber ?? '';
-
-String get currentJwtToken => _currentJwtToken ?? '';
-
-bool get currentUserEmailVerified => currentUser?.emailVerified ?? false;
-
-/// Create a Stream that listens to the current user's JWT Token, since Firebase
-/// generates a new token every hour.
-String? _currentJwtToken;
-final jwtTokenStream = FirebaseAuth.instance
-    .idTokenChanges()
-    .asyncMap((user) async {
-      try {
-        _currentJwtToken = await user?.getIdToken();
-      } catch (e) {
-        // Network errors can happen (offline, DNS, etc.). Keep last known token.
-        debugPrint('⚠️ [AUTH] Falha ao obter JWT: $e');
-      }
-      return _currentJwtToken;
-    })
-    .handleError((e, __) {
-      // Ensure no unhandled errors propagate from this stream
-      debugPrint('⚠️ [AUTH] Erro no stream de JWT: $e');
-    })
-    .asBroadcastStream();
-
-DocumentReference? get currentUserReference =>
-    loggedIn ? UsersRecord.collection.doc(currentUser!.uid) : null;
-
-UsersRecord? currentUserDocument;
-final authenticatedUserStream = FirebaseAuth.instance
-    .authStateChanges()
-    .map<String>((user) => user?.uid ?? '')
-    .switchMap(
-      (uid) => uid.isEmpty
-          ? Stream.value(null)
-          : UsersRecord.getDocument(UsersRecord.collection.doc(uid))
-              .handleError((_) {}),
-    )
-    .map((user) {
-  currentUserDocument = user;
-
-  return currentUserDocument;
-}).asBroadcastStream();
-
-class AuthUserStreamWidget extends StatelessWidget {
-  const AuthUserStreamWidget({Key? key, required this.builder})
-      : super(key: key);
-
-  final WidgetBuilder builder;
+/// Implementação de AuthManager baseada em Supabase.
+class _SupabaseAuthManager implements base.AuthManager, base.EmailSignInManager {
+  @override
+  Future signOut() async {
+    await SupaFlow.client.auth.signOut();
+    auth_base.currentUser = _SupaAuthUser(null);
+  }
 
   @override
-  Widget build(BuildContext context) => StreamBuilder(
-        stream: authenticatedUserStream,
-        builder: (context, _) => builder(context),
+  Future<auth_base.BaseAuthUser?> signInWithEmail(
+    BuildContext context,
+    String email,
+    String password,
+  ) async {
+    try {
+      final res = await SupaFlow.client.auth.signInWithPassword(
+        email: email,
+        password: password,
       );
+      final wrapped = _SupaAuthUser(res.user);
+      auth_base.currentUser = wrapped;
+      return res.user != null ? wrapped : null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  @override
+  Future<auth_base.BaseAuthUser?> createAccountWithEmail(
+    BuildContext context,
+    String email,
+    String password,
+  ) async {
+    try {
+      final res = await SupaFlow.client.auth.signUp(
+        email: email,
+        password: password,
+      );
+
+      // Cria/atualiza o registro correspondente em app_users, garantindo consistência
+      // Campos obrigatórios: id (não nulo). Mantemos email igual ao da autenticação.
+      if (res.user != null) {
+        try {
+          await SupaFlow.client
+              .from('app_users')
+              .upsert({
+                'id': res.user!.id,
+                'email': res.user!.email,
+              },
+                  // Evita conflito em reenvio; usa id como chave de conflito
+                  onConflict: 'id');
+        } catch (e) {
+          debugPrint('⚠️ Falha ao criar app_users para novo usuário: $e');
+        }
+      }
+      final wrapped = _SupaAuthUser(res.user);
+      auth_base.currentUser = wrapped;
+      return res.user != null ? wrapped : null;
+    } catch (_) {
+      return null;
+    }
+  }
+
+  // Métodos não utilizados neste fluxo podem permanecer não implementados
+  @override
+  Future deleteUser(BuildContext context) async {}
+  @override
+  Future updateEmail({required String email, required BuildContext context}) async {}
+  @override
+  Future resetPassword({required String email, required BuildContext context}) async {}
+  @override
+  Future refreshUser() async => auth_base.currentUser?.refreshUser();
+  @override
+  Future sendEmailVerification() async => auth_base.currentUser?.sendEmailVerification();
 }
+
+final _SupabaseAuthManager _authManager = _SupabaseAuthManager();
+base.EmailSignInManager get authManager => _authManager;
+
+// Wrapper de usuário Supabase para o contrato BaseAuthUser
+class _SupaAuthUser extends auth_base.BaseAuthUser {
+  _SupaAuthUser(this.user);
+  final User? user;
+
+  @override
+  bool get loggedIn => user != null;
+
+  @override
+  bool get emailVerified => false;
+
+  @override
+  auth_base.AuthUserInfo get authUserInfo => auth_base.AuthUserInfo(
+        uid: user?.id,
+        email: user?.email,
+        displayName: null,
+        photoUrl: null,
+        phoneNumber: null,
+      );
+
+  @override
+  Future? delete() => null;
+
+  @override
+  Future? updateEmail(String email) => null;
+
+  @override
+  Future? updatePassword(String newPassword) => null;
+
+  @override
+  Future? sendEmailVerification() => null;
+
+  @override
+  Future refreshUser() async {}
+}
+
+// Streams baseadas em Supabase (mantendo nomes esperados pelo app)
+Stream<auth_base.BaseAuthUser> optionFirebaseUserStream() {
+  return SupaFlow.client.auth.onAuthStateChange.map((event) {
+    final wrapped = _SupaAuthUser(event.session?.user);
+    auth_base.currentUser = wrapped;
+    return wrapped;
+  });
+}
+
+Stream<auth_base.BaseAuthUser> authenticatedUserStream =
+    optionFirebaseUserStream();
+
+Stream<String?> jwtTokenStream = SupaFlow.client.auth.onAuthStateChange
+    .map((event) => event.session?.accessToken);
+
+// Função auxiliar pública para obter o usuário atual como BaseAuthUser
+auth_base.BaseAuthUser supabaseCurrentAuthUser() =>
+    _SupaAuthUser(SupaFlow.client.auth.currentUser);

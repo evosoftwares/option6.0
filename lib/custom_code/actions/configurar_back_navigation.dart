@@ -94,21 +94,6 @@ class BackNavigationConfig {
         _showExitConfirmation(context);
         return true;
 
-      case '/escolhaSeuPerfil':
-        // Na escolha de perfil, voltar para login
-        router.go('/login');
-        return true;
-
-      case '/cadastrar':
-        // No cadastro, voltar para login
-        router.go('/login');
-        return true;
-
-      case '/selfie':
-        // Na selfie, não permitir volta (processo obrigatório)
-        _showCannotGoBackDialog(context);
-        return true;
-
       default:
         // Comportamento padrão: tentar voltar na pilha
         try {

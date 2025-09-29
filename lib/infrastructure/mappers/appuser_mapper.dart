@@ -1,3 +1,4 @@
+import '/backend/supabase/supabase.dart';
 // lib/infrastructure/mappers/appuser_mapper.dart
 import '../../domain/entities/appuser.dart';
 import '../../backend/supabase/database/tables/app_users.dart';

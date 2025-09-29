@@ -1,0 +1,2961 @@
+{
+  "saved_places": [
+    {
+      "name": "id",
+      "type": "text",
+      "nullable": false
+    },
+    {
+      "name": "user_id",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "label",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "address",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "latitude",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "longitude",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "category",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    }
+  ],
+  "trip_stops": [
+    {
+      "name": "id",
+      "type": "text",
+      "nullable": false
+    },
+    {
+      "name": "trip_id",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "stop_order",
+      "type": "integer",
+      "nullable": true
+    },
+    {
+      "name": "address",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "latitude",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "longitude",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "arrived_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "departed_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    }
+  ],
+  "operational_cities": [
+    {
+      "name": "id",
+      "type": "text",
+      "nullable": false
+    },
+    {
+      "name": "name",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "state",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "country",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "is_active",
+      "type": "boolean",
+      "nullable": true
+    },
+    {
+      "name": "min_fare",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "launch_date",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "polygon_coordinates",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    }
+  ],
+  "location_updates": [
+    {
+      "name": "id",
+      "type": "text",
+      "nullable": false
+    },
+    {
+      "name": "sharing_id",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "latitude",
+      "type": "double precision",
+      "nullable": true
+    },
+    {
+      "name": "longitude",
+      "type": "double precision",
+      "nullable": true
+    },
+    {
+      "name": "timestamp",
+      "type": "timestamp with time zone",
+      "nullable": true
+    }
+  ],
+  "wallet_transactions": [
+    {
+      "name": "id",
+      "type": "text",
+      "nullable": false
+    },
+    {
+      "name": "wallet_id",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "type",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "amount",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "description",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "reference_type",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "reference_id",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "balance_after",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "status",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    }
+  ],
+  "security_logs": [
+    {
+      "name": "id",
+      "type": "text",
+      "nullable": false
+    },
+    {
+      "name": "event_type",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "severity",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "description",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "user_id",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "ip_address",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "user_agent",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "device_info",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "platform",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "app_version",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "session_id",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "metadata",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "timestamp",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    }
+  ],
+  "backup_passengers_before_fk_change": [
+    {
+      "name": "id",
+      "type": "text",
+      "nullable": false
+    },
+    {
+      "name": "consecutive_cancellations",
+      "type": "integer",
+      "nullable": true
+    },
+    {
+      "name": "total_trips",
+      "type": "integer",
+      "nullable": true
+    },
+    {
+      "name": "average_rating",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "payment_method_id",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "user_id",
+      "type": "text",
+      "nullable": true
+    }
+  ],
+  "driver_status": [
+    {
+      "name": "driver_id",
+      "type": "text",
+      "nullable": false
+    },
+    {
+      "name": "online_intent",
+      "type": "boolean",
+      "nullable": true
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    }
+  ],
+  "corrupted_users_backup": [
+    {
+      "name": "id",
+      "type": "text",
+      "nullable": false
+    },
+    {
+      "name": "original_user_id",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "original_full_name",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "original_phone",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "original_email",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "correction_timestamp",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "correction_reason",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "restored",
+      "type": "boolean",
+      "nullable": true
+    },
+    {
+      "name": "restored_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    }
+  ],
+  "available_drivers_view": [
+    {
+      "name": "id",
+      "type": "text",
+      "nullable": false
+    },
+    {
+      "name": "driver_id",
+      "type": "text",
+      "nullable": false
+    },
+    {
+      "name": "user_id",
+      "type": "text",
+      "nullable": false
+    },
+    {
+      "name": "vehicle_brand",
+      "type": "text",
+      "nullable": false
+    },
+    {
+      "name": "vehicle_model",
+      "type": "text",
+      "nullable": false
+    },
+    {
+      "name": "vehicle_year",
+      "type": "integer",
+      "nullable": false
+    },
+    {
+      "name": "vehicle_color",
+      "type": "text",
+      "nullable": false
+    },
+    {
+      "name": "vehicle_category",
+      "type": "text",
+      "nullable": false
+    },
+    {
+      "name": "vehicle_plate",
+      "type": "text",
+      "nullable": false
+    },
+    {
+      "name": "is_online",
+      "type": "boolean",
+      "nullable": false
+    },
+    {
+      "name": "accepts_pet",
+      "type": "boolean",
+      "nullable": false
+    },
+    {
+      "name": "accepts_grocery",
+      "type": "boolean",
+      "nullable": false
+    },
+    {
+      "name": "accepts_condo",
+      "type": "boolean",
+      "nullable": false
+    },
+    {
+      "name": "ac_policy",
+      "type": "text",
+      "nullable": false
+    },
+    {
+      "name": "custom_price_per_km",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "pet_fee",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "grocery_fee",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "condo_fee",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "stop_fee",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "total_trips",
+      "type": "integer",
+      "nullable": false
+    },
+    {
+      "name": "average_rating",
+      "type": "double precision",
+      "nullable": false
+    },
+    {
+      "name": "current_latitude",
+      "type": "double precision",
+      "nullable": true
+    },
+    {
+      "name": "current_longitude",
+      "type": "double precision",
+      "nullable": true
+    }
+  ],
+  "driver_documents": [
+    {
+      "name": "id",
+      "type": "text",
+      "nullable": false
+    },
+    {
+      "name": "driver_id",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "document_type",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "file_url",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "file_size",
+      "type": "integer",
+      "nullable": true
+    },
+    {
+      "name": "mime_type",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "expiry_date",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "rejection_reason",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "reviewed_by",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "reviewed_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "is_current",
+      "type": "boolean",
+      "nullable": true
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "status",
+      "type": "jsonb",
+      "nullable": true
+    }
+  ],
+  "security_alerts": [
+    {
+      "name": "id",
+      "type": "text",
+      "nullable": false
+    },
+    {
+      "name": "alert_type",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "severity",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "description",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "metadata",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "resolved",
+      "type": "boolean",
+      "nullable": true
+    },
+    {
+      "name": "resolved_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "resolved_by",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    }
+  ],
+  "driver_operational_cities": [
+    {
+      "name": "id",
+      "type": "text",
+      "nullable": false
+    },
+    {
+      "name": "driver_id",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "city_id",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "is_primary",
+      "type": "boolean",
+      "nullable": true
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    }
+  ],
+  "withdrawals": [
+    {
+      "name": "id",
+      "type": "text",
+      "nullable": false
+    },
+    {
+      "name": "driver_id",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "wallet_id",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "amount",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "withdrawal_method",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "asaas_transfer_id",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "status",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "failure_reason",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "requested_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "processed_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "completed_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    }
+  ],
+  "driver_approval_audit": [
+    {
+      "name": "id",
+      "type": "text",
+      "nullable": false
+    },
+    {
+      "name": "driver_id",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "old_status",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "new_status",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "reason",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    }
+  ],
+  "backup_conflict_409_removal": [
+    {
+      "name": "source_table",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "backup_timestamp",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "id",
+      "type": "text",
+      "nullable": false
+    },
+    {
+      "name": "email",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "full_name",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "phone",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "photo_url",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "user_type",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "status",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    }
+  ],
+  "user_devices": [
+    {
+      "name": "id",
+      "type": "text",
+      "nullable": false
+    },
+    {
+      "name": "user_id",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "device_token",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "platform",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "device_model",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "app_version",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "os_version",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "is_active",
+      "type": "boolean",
+      "nullable": true
+    },
+    {
+      "name": "last_used_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    }
+  ],
+  "platform_settings": [
+    {
+      "name": "id",
+      "type": "text",
+      "nullable": false
+    },
+    {
+      "name": "category",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "base_price_per_km",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "base_price_per_minute",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "platform_commission_percent",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "min_fare",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "min_cancellation_fee",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "cancellation_fee_percent",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "no_show_wait_minutes",
+      "type": "integer",
+      "nullable": true
+    },
+    {
+      "name": "driver_acceptance_timeout_seconds",
+      "type": "integer",
+      "nullable": true
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "search_radius_km",
+      "type": "integer",
+      "nullable": true
+    }
+  ],
+  "driver_operation_zones": [
+    {
+      "name": "id",
+      "type": "text",
+      "nullable": false
+    },
+    {
+      "name": "driver_id",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "zone_name",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "polygon_coordinates",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "price_multiplier",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "is_active",
+      "type": "boolean",
+      "nullable": true
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    }
+  ],
+  "promo_code_usage": [
+    {
+      "name": "id",
+      "type": "text",
+      "nullable": false
+    },
+    {
+      "name": "promo_code_id",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "passenger_id",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "trip_id",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "discount_applied",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "used_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    }
+  ],
+  "drivers": [
+    {
+      "name": "id",
+      "type": "text",
+      "nullable": false
+    },
+    {
+      "name": "user_id",
+      "type": "text",
+      "nullable": false
+    },
+    {
+      "name": "vehicle_brand",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "vehicle_model",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "vehicle_year",
+      "type": "integer",
+      "nullable": true
+    },
+    {
+      "name": "vehicle_color",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "vehicle_plate",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "vehicle_category",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "approved_by",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "approved_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "is_online",
+      "type": "boolean",
+      "nullable": true
+    },
+    {
+      "name": "accepts_pet",
+      "type": "boolean",
+      "nullable": true
+    },
+    {
+      "name": "pet_fee",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "accepts_grocery",
+      "type": "boolean",
+      "nullable": true
+    },
+    {
+      "name": "grocery_fee",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "accepts_condo",
+      "type": "boolean",
+      "nullable": true
+    },
+    {
+      "name": "condo_fee",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "stop_fee",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "ac_policy",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "custom_price_per_km",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "custom_price_per_minute",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "bank_account_type",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "bank_code",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "bank_agency",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "bank_account",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "pix_key",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "pix_key_type",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "consecutive_cancellations",
+      "type": "integer",
+      "nullable": true
+    },
+    {
+      "name": "total_trips",
+      "type": "integer",
+      "nullable": true
+    },
+    {
+      "name": "average_rating",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "current_latitude",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "current_longitude",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "last_location_update",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "fcm_token",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "device_platform",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "last_notification_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "approval_status",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "onesignal_player_id",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "email",
+      "type": "text",
+      "nullable": false
+    }
+  ],
+  "driver_preference_fees": [
+    {
+      "name": "id",
+      "type": "text",
+      "nullable": false
+    },
+    {
+      "name": "driver_id",
+      "type": "text",
+      "nullable": false
+    },
+    {
+      "name": "preference_key",
+      "type": "text",
+      "nullable": false
+    },
+    {
+      "name": "enabled",
+      "type": "boolean",
+      "nullable": true
+    },
+    {
+      "name": "fee",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    }
+  ],
+  "passenger_wallet_transactions": [
+    {
+      "name": "id",
+      "type": "text",
+      "nullable": false
+    },
+    {
+      "name": "wallet_id",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "passenger_id",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "type",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "amount",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "description",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "trip_id",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "payment_method_id",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "asaas_payment_id",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "status",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "metadata",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "processed_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    }
+  ],
+  "payment_methods": [
+    {
+      "name": "id",
+      "type": "text",
+      "nullable": false
+    },
+    {
+      "name": "user_id",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "type",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "is_default",
+      "type": "boolean",
+      "nullable": true
+    },
+    {
+      "name": "is_active",
+      "type": "boolean",
+      "nullable": true
+    },
+    {
+      "name": "card_data",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "pix_data",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "asaas_customer_id",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    }
+  ],
+  "backup_drivers_migration": [
+    {
+      "name": "id",
+      "type": "text",
+      "nullable": false
+    },
+    {
+      "name": "user_id",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "cnh_number",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "cnh_expiry_date",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "cnh_photo_url",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "vehicle_brand",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "vehicle_model",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "vehicle_year",
+      "type": "integer",
+      "nullable": true
+    },
+    {
+      "name": "vehicle_color",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "vehicle_plate",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "vehicle_category",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "crlv_photo_url",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "approval_status",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "approved_by",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "approved_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "is_online",
+      "type": "boolean",
+      "nullable": true
+    },
+    {
+      "name": "accepts_pet",
+      "type": "boolean",
+      "nullable": true
+    },
+    {
+      "name": "pet_fee",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "accepts_grocery",
+      "type": "boolean",
+      "nullable": true
+    },
+    {
+      "name": "grocery_fee",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "accepts_condo",
+      "type": "boolean",
+      "nullable": true
+    },
+    {
+      "name": "condo_fee",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "stop_fee",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "ac_policy",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "custom_price_per_km",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "custom_price_per_minute",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "bank_account_type",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "bank_code",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "bank_agency",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "bank_account",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "pix_key",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "pix_key_type",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "consecutive_cancellations",
+      "type": "integer",
+      "nullable": true
+    },
+    {
+      "name": "total_trips",
+      "type": "integer",
+      "nullable": true
+    },
+    {
+      "name": "average_rating",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "current_latitude",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "current_longitude",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "last_location_update",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    }
+  ],
+  "trip_status_history": [
+    {
+      "name": "id",
+      "type": "text",
+      "nullable": false
+    },
+    {
+      "name": "trip_id",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "old_status",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "new_status",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "changed_by",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "reason",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "metadata",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    }
+  ],
+  "zona_exclusao_code_logs": [
+    {
+      "name": "id",
+      "type": "integer",
+      "nullable": false
+    },
+    {
+      "name": "driver_id",
+      "type": "text",
+      "nullable": false
+    },
+    {
+      "name": "action",
+      "type": "text",
+      "nullable": false
+    },
+    {
+      "name": "timestamp",
+      "type": "timestamp with time zone",
+      "nullable": true
+    }
+  ],
+  "notifications": [
+    {
+      "name": "id",
+      "type": "text",
+      "nullable": false
+    },
+    {
+      "name": "user_id",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "title",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "body",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "type",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "priority",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "is_read",
+      "type": "boolean",
+      "nullable": true
+    },
+    {
+      "name": "sent_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "read_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    }
+  ],
+  "backup_passengers_migration": [
+    {
+      "name": "id",
+      "type": "text",
+      "nullable": false
+    },
+    {
+      "name": "user_id",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "consecutive_cancellations",
+      "type": "integer",
+      "nullable": true
+    },
+    {
+      "name": "total_trips",
+      "type": "integer",
+      "nullable": true
+    },
+    {
+      "name": "average_rating",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "payment_method_id",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    }
+  ],
+  "driver_schedule_overrides": [
+    {
+      "name": "id",
+      "type": "text",
+      "nullable": false
+    },
+    {
+      "name": "driver_id",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "override_start",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "override_end",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "is_active",
+      "type": "boolean",
+      "nullable": true
+    },
+    {
+      "name": "reason",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "created_by",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    }
+  ],
+  "trips": [
+    {
+      "name": "id",
+      "type": "text",
+      "nullable": false
+    },
+    {
+      "name": "trip_code",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "request_id",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "passenger_id",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "driver_id",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "status",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "origin_address",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "origin_latitude",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "origin_longitude",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "origin_neighborhood",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "destination_address",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "destination_latitude",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "destination_longitude",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "destination_neighborhood",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "vehicle_category",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "needs_pet",
+      "type": "boolean",
+      "nullable": true
+    },
+    {
+      "name": "needs_grocery_space",
+      "type": "boolean",
+      "nullable": true
+    },
+    {
+      "name": "is_condo_destination",
+      "type": "boolean",
+      "nullable": true
+    },
+    {
+      "name": "is_condo_origin",
+      "type": "boolean",
+      "nullable": true
+    },
+    {
+      "name": "needs_ac",
+      "type": "boolean",
+      "nullable": true
+    },
+    {
+      "name": "number_of_stops",
+      "type": "integer",
+      "nullable": true
+    },
+    {
+      "name": "route_polyline",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "estimated_distance_km",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "estimated_duration_minutes",
+      "type": "integer",
+      "nullable": true
+    },
+    {
+      "name": "driver_to_pickup_distance_km",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "driver_to_pickup_duration_minutes",
+      "type": "integer",
+      "nullable": true
+    },
+    {
+      "name": "actual_distance_km",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "actual_duration_minutes",
+      "type": "integer",
+      "nullable": true
+    },
+    {
+      "name": "waiting_time_minutes",
+      "type": "integer",
+      "nullable": true
+    },
+    {
+      "name": "driver_distance_traveled_km",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "base_fare",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "additional_fees",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "surge_multiplier",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "total_fare",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "platform_commission",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "driver_earnings",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "cancellation_reason",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "cancellation_fee",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "cancelled_by",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "driver_assigned_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "driver_arrived_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "trip_started_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "trip_completed_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "cancelled_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "payment_status",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "payment_id",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "payment_completed_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "promo_code_id",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "discount_applied",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "start_time",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "end_time",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "requested_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "completed_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "assigned_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "arrived_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    }
+  ],
+  "promo_codes": [
+    {
+      "name": "id",
+      "type": "text",
+      "nullable": false
+    },
+    {
+      "name": "code",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "description",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "discount_type",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "discount_value",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "max_discount",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "min_trip_value",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "max_uses_per_user",
+      "type": "integer",
+      "nullable": true
+    },
+    {
+      "name": "valid_from",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "valid_until",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "usage_limit",
+      "type": "integer",
+      "nullable": true
+    },
+    {
+      "name": "used_count",
+      "type": "integer",
+      "nullable": true
+    },
+    {
+      "name": "is_first_trip_only",
+      "type": "boolean",
+      "nullable": true
+    },
+    {
+      "name": "is_active",
+      "type": "boolean",
+      "nullable": true
+    },
+    {
+      "name": "created_by",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    }
+  ],
+  "backup_app_users_migration": [
+    {
+      "name": "id",
+      "type": "text",
+      "nullable": false
+    },
+    {
+      "name": "email",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "full_name",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "phone",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "photo_url",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "user_type",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "status",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "user_id",
+      "type": "text",
+      "nullable": true
+    }
+  ],
+  "passenger_promo_code_usage": [
+    {
+      "name": "id",
+      "type": "text",
+      "nullable": false
+    },
+    {
+      "name": "user_id",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "promo_code_id",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "trip_id",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "original_amount",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "discount_amount",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "final_amount",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "used_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    }
+  ],
+  "ratings": [
+    {
+      "name": "id",
+      "type": "text",
+      "nullable": false
+    },
+    {
+      "name": "trip_id",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "passenger_rating",
+      "type": "integer",
+      "nullable": true
+    },
+    {
+      "name": "passenger_rating_comment",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "passenger_rated_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "driver_rating",
+      "type": "integer",
+      "nullable": true
+    },
+    {
+      "name": "driver_rating_comment",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "driver_rated_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    }
+  ],
+  "passenger_wallets": [
+    {
+      "name": "id",
+      "type": "text",
+      "nullable": false
+    },
+    {
+      "name": "passenger_id",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "email",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "available_balance",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "pending_balance",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "total_spent",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "total_cashback",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "user_id",
+      "type": "text",
+      "nullable": false
+    }
+  ],
+  "trip_requests": [
+    {
+      "name": "id",
+      "type": "text",
+      "nullable": false
+    },
+    {
+      "name": "passenger_id",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "origin_address",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "origin_latitude",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "origin_longitude",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "origin_neighborhood",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "destination_address",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "destination_latitude",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "destination_longitude",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "destination_neighborhood",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "vehicle_category",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "needs_pet",
+      "type": "boolean",
+      "nullable": true
+    },
+    {
+      "name": "needs_grocery_space",
+      "type": "boolean",
+      "nullable": true
+    },
+    {
+      "name": "needs_ac",
+      "type": "boolean",
+      "nullable": true
+    },
+    {
+      "name": "is_condo_origin",
+      "type": "boolean",
+      "nullable": true
+    },
+    {
+      "name": "is_condo_destination",
+      "type": "boolean",
+      "nullable": true
+    },
+    {
+      "name": "number_of_stops",
+      "type": "integer",
+      "nullable": true
+    },
+    {
+      "name": "status",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "selected_offer_id",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "expires_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "target_driver_id",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "accepted_by_driver_id",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "accepted_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "current_fallback_index",
+      "type": "integer",
+      "nullable": true
+    },
+    {
+      "name": "timeout_count",
+      "type": "integer",
+      "nullable": true
+    },
+    {
+      "name": "estimated_distance_km",
+      "type": "double precision",
+      "nullable": true
+    },
+    {
+      "name": "estimated_duration_minutes",
+      "type": "integer",
+      "nullable": true
+    },
+    {
+      "name": "estimated_fare",
+      "type": "double precision",
+      "nullable": true
+    }
+  ],
+  "passengers": [
+    {
+      "name": "id",
+      "type": "text",
+      "nullable": false
+    },
+    {
+      "name": "consecutive_cancellations",
+      "type": "integer",
+      "nullable": true
+    },
+    {
+      "name": "total_trips",
+      "type": "integer",
+      "nullable": true
+    },
+    {
+      "name": "average_rating",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "payment_method_id",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "user_id",
+      "type": "text",
+      "nullable": false
+    },
+    {
+      "name": "email",
+      "type": "text",
+      "nullable": true
+    }
+  ],
+  "app_users": [
+    {
+      "name": "id",
+      "type": "text",
+      "nullable": false
+    },
+    {
+      "name": "email",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "full_name",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "phone",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "photo_url",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "user_type",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "status",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "fcm_token",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "device_id",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "device_platform",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "last_active_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "profile_complete",
+      "type": "boolean",
+      "nullable": true
+    },
+    {
+      "name": "onesignal_player_id",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "currentUser_UID_Firebase",
+      "type": "text",
+      "nullable": true
+    }
+  ],
+  "driver_excluded_zones": [
+    {
+      "name": "id",
+      "type": "text",
+      "nullable": false
+    },
+    {
+      "name": "driver_id",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "type",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "local_name",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    }
+  ],
+  "trip_location_history": [
+    {
+      "name": "id",
+      "type": "text",
+      "nullable": false
+    },
+    {
+      "name": "trip_id",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "latitude",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "longitude",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "speed_kmh",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "heading",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "accuracy_meters",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "recorded_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    }
+  ],
+  "activity_logs": [
+    {
+      "name": "id",
+      "type": "text",
+      "nullable": false
+    },
+    {
+      "name": "user_id",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "action",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "entity_type",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "entity_id",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "old_values",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "new_values",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "metadata",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "ip_address",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "user_agent",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    }
+  ],
+  "passenger_promo_codes": [
+    {
+      "name": "id",
+      "type": "text",
+      "nullable": false
+    },
+    {
+      "name": "code",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "type",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "value",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "min_amount",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "max_discount",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "is_active",
+      "type": "boolean",
+      "nullable": true
+    },
+    {
+      "name": "is_first_ride_only",
+      "type": "boolean",
+      "nullable": true
+    },
+    {
+      "name": "usage_limit",
+      "type": "integer",
+      "nullable": true
+    },
+    {
+      "name": "usage_count",
+      "type": "integer",
+      "nullable": true
+    },
+    {
+      "name": "valid_from",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "valid_until",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    }
+  ],
+  "trip_chats": [
+    {
+      "name": "id",
+      "type": "text",
+      "nullable": false
+    },
+    {
+      "name": "trip_id",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "sender_id",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "message",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "is_read",
+      "type": "boolean",
+      "nullable": true
+    },
+    {
+      "name": "read_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    }
+  ],
+  "location_sharing": [
+    {
+      "name": "id",
+      "type": "text",
+      "nullable": false
+    },
+    {
+      "name": "user_id",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "expires_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "is_active",
+      "type": "boolean",
+      "nullable": true
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "ended_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    }
+  ],
+  "driver_wallets": [
+    {
+      "name": "id",
+      "type": "text",
+      "nullable": false
+    },
+    {
+      "name": "driver_id",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "available_balance",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "pending_balance",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "total_earned",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "total_withdrawn",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "updated_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "email",
+      "type": "text",
+      "nullable": true
+    }
+  ],
+  "asaas_webhook_events": [
+    {
+      "name": "id",
+      "type": "text",
+      "nullable": false
+    },
+    {
+      "name": "asaas_event_id",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "event_type",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "payment_id",
+      "type": "text",
+      "nullable": true
+    },
+    {
+      "name": "payload",
+      "type": "jsonb",
+      "nullable": true
+    },
+    {
+      "name": "processed_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    },
+    {
+      "name": "created_at",
+      "type": "timestamp with time zone",
+      "nullable": true
+    }
+  ]
+}

@@ -138,15 +138,27 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
                   );
                 }
 
-                final userType = snapshot.data?.trim().toLowerCase();
+                final userTypeRaw = snapshot.data ?? '';
+                final userType = userTypeRaw.trim().toLowerCase();
+                if (userType.isEmpty) {
+                  return const SelecaoPerfilWidget();
+                }
                 if (userType == 'passenger' || userType == 'passageiro') {
                   return MainPassageiroWidget();
                 }
-
-                return MainMotoristaWidget();
+                if (userType == 'driver' || userType == 'motorista') {
+                  return MainMotoristaWidget();
+                }
+                // Qualquer valor inesperado cai para seleção de perfil
+                return const SelecaoPerfilWidget();
               },
             );
           },
+        ),
+        FFRoute(
+          name: CadastrarWidget.routeName,
+          path: CadastrarWidget.routePath,
+          builder: (context, params) => CadastrarWidget(),
         ),
         FFRoute(
           name: LoginWidget.routeName,
@@ -163,26 +175,18 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           path: EsqueceuSenhaWidget.routePath,
           builder: (context, params) => EsqueceuSenhaWidget(),
         ),
+
         FFRoute(
-          name: CadastrarWidget.routeName,
-          path: CadastrarWidget.routePath,
-          builder: (context, params) => CadastrarWidget(),
+          name: SelecaoPerfilWidget.routeName,
+          path: SelecaoPerfilWidget.routePath,
+          builder: (context, params) => const SelecaoPerfilWidget(),
         ),
         FFRoute(
-          name: SelfieWidget.routeName,
-          path: SelfieWidget.routePath,
-          builder: (context, params) => SelfieWidget(),
+          name: UploadFotoWidget.routeName,
+          path: UploadFotoWidget.routePath,
+          builder: (context, params) => const UploadFotoWidget(),
         ),
-        FFRoute(
-          name: CadastroSucessoWidget.routeName,
-          path: CadastroSucessoWidget.routePath,
-          builder: (context, params) => CadastroSucessoWidget(),
-        ),
-        FFRoute(
-          name: EscolhaSeuPerfilWidget.routeName,
-          path: EscolhaSeuPerfilWidget.routePath,
-          builder: (context, params) => EscolhaSeuPerfilWidget(),
-        ),
+
         FFRoute(
           name: MainMotoristaWidget.routeName,
           path: MainMotoristaWidget.routePath,
@@ -761,11 +765,9 @@ bool _isConfigurationRoute(String route) {
   final configurationRoutes = {
     '/login',
     '/cadastrar', 
+    '/selecao-perfil',
     '/esqueceuSenha',
     '/suporteRecuperacao',
-    '/selfie',
-    '/cadastroSucesso',
-    '/escolhaSeuPerfil',
     '/documentos_motorista',
     '/',
   };
@@ -775,12 +777,9 @@ bool _isConfigurationRoute(String route) {
 /// Rotas que não precisam de validação de user_type
 final Set<String> _routesWithoutAppUserValidation = {
   '/login',
-  '/cadastrar',
   '/esqueceuSenha',
   '/suporteRecuperacao',
-  '/selfie',
-  '/cadastroSucesso',
-  '/escolhaSeuPerfil',
+  '/selecao-perfil',
   '/',
 };
 

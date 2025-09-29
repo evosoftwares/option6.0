@@ -1,3 +1,4 @@
+import '/backend/supabase/supabase.dart';
 // lib/infrastructure/mappers/driver_mapper.dart
 import '../../domain/entities/driver.dart';
 import '../../backend/supabase/database/tables/drivers.dart';

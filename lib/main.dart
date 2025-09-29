@@ -3,11 +3,10 @@ import 'package:flutter/material.dart';
 
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:flutter_web_plugins/url_strategy.dart';
-import 'auth/firebase_auth/firebase_user_provider.dart';
 import 'auth/firebase_auth/auth_util.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 
 import 'backend/push_notifications/push_notifications_util.dart';
+import 'backend/push_notifications/onesignal_service.dart';
 import '/backend/supabase/supabase.dart';
 import 'backend/firebase/firebase_config.dart';
 import 'flutter_flow/flutter_flow_util.dart';
@@ -88,6 +87,10 @@ class _MyAppState extends State<MyApp> {
     
     // Inicializar o usuário imediatamente para evitar travamento na splash screen
     _initializeUser();
+
+    // Inicializa OneSignal (mobile) cedo no ciclo de vida
+    // Ignora em Web automaticamente no serviço
+    OneSignalService.init();
     
     userStream = optionFirebaseUserStream()
       ..listen((user) {
@@ -104,18 +107,12 @@ class _MyAppState extends State<MyApp> {
 
   void _initializeUser() async {
     try {
-      // Verificar se já existe um usuário logado
-      final currentUser = FirebaseAuth.instance.currentUser;
-      if (currentUser != null) {
-        _appStateNotifier.update(OptionFirebaseUser(currentUser));
-      } else {
-        // Se não há usuário logado, criar um usuário "vazio" para permitir navegação
-        _appStateNotifier.update(OptionFirebaseUser(null));
-      }
+      // Atualiza estado inicial com o usuário atual do Supabase
+      _appStateNotifier.update(supabaseCurrentAuthUser());
     } catch (e) {
       // Em caso de erro, criar usuário vazio para não travar na splash
       debugPrint('Erro na inicialização do usuário: $e');
-      _appStateNotifier.update(OptionFirebaseUser(null));
+      _appStateNotifier.update(supabaseCurrentAuthUser());
     }
   }
 

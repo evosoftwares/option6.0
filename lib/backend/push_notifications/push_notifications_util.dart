@@ -1,20 +1,19 @@
 import 'dart:io' show Platform;
-
-
+import 'package:flutter/foundation.dart';
 import '../../../auth/firebase_auth/auth_util.dart';
 import '../cloud_functions/cloud_functions.dart';
 
-import 'package:flutter/foundation.dart';
 import 'package:stream_transform/stream_transform.dart';
-import 'package:firebase_messaging/firebase_messaging.dart';
+import 'package:onesignal_flutter/onesignal_flutter.dart';
+import 'onesignal_service.dart';
 
 export 'push_notifications_handler.dart';
 export 'serialization_util.dart';
 
 class UserTokenInfo {
-  const UserTokenInfo(this.userPath, this.fcmToken);
+  const UserTokenInfo(this.userPath, this.pushToken);
   final String userPath;
-  final String fcmToken;
+  final String pushToken;
 }
 
 Stream<UserTokenInfo> getFcmTokenStream(String userPath) =>
@@ -22,27 +21,23 @@ Stream<UserTokenInfo> getFcmTokenStream(String userPath) =>
         .where((shouldGetToken) => shouldGetToken)
         .asyncMap<String?>((_) async {
           try {
-            final settings = await FirebaseMessaging.instance.requestPermission();
-            if (settings.authorizationStatus == AuthorizationStatus.authorized) {
-              return await FirebaseMessaging.instance.getToken();
-            }
+            await OneSignalService.init();
+            // Em OneSignal usamos o playerId como token
+            return OneSignal.User.pushSubscription.id;
           } catch (e) {
-            debugPrint('⚠️ [FCM] Falha ao obter token: $e');
+            debugPrint('⚠️ [OneSignal] Falha ao obter playerId: $e');
           }
           return null;
         })
-        .switchMap((fcmToken) =>
-            Stream.value(fcmToken).merge(FirebaseMessaging.instance.onTokenRefresh))
         .handleError((e) {
-          // Evita que erros de rede derrubem o stream de FCM
-          debugPrint('⚠️ [FCM] Erro no stream de token: $e');
+          debugPrint('⚠️ [OneSignal] Erro no stream de token: $e');
         })
-        .where((fcmToken) => fcmToken != null && fcmToken.isNotEmpty)
-        .map((token) => UserTokenInfo(userPath, token!));
+        .where((playerId) => playerId != null && playerId.isNotEmpty)
+        .map((playerId) => UserTokenInfo(userPath, playerId!));
 
 final fcmTokenUserStream = authenticatedUserStream
-    .where((user) => user != null)
-    .map((user) => user!.reference.path)
+    .where((user) => user != null && (user!.uid ?? '').isNotEmpty)
+    .map((user) => 'users/${user!.uid}')
     .distinct()
     .switchMap(getFcmTokenStream)
     .asyncMap((userTokenInfo) async {
@@ -51,8 +46,8 @@ final fcmTokenUserStream = authenticatedUserStream
           'addFcmToken',
           {
             'userDocPath': userTokenInfo.userPath,
-            'fcmToken': userTokenInfo.fcmToken,
-            'deviceType': Platform.isIOS ? 'iOS' : 'Android',
+            'fcmToken': userTokenInfo.pushToken,
+            'deviceType': kIsWeb ? 'Web' : (Platform.isIOS ? 'iOS' : 'Android'),
           },
           suppressErrors: true,
           timeout: const Duration(seconds: 8),

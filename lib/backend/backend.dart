@@ -1317,3 +1317,5 @@ Future updateUserDocument({String? email}) async {
   await currentUserDocument?.reference
       .update(createUsersRecordData(email: email));
 }
+// Compatibilidade: variável do documento de usuário atual (Firestore)
+UsersRecord? currentUserDocument;

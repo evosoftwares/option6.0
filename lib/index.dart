@@ -1,15 +1,14 @@
 // Export pages
 export '/auth_option/login/login_widget.dart' show LoginWidget;
+export '/auth_option/cadastrar/cadastrar_widget.dart' show CadastrarWidget;
 export '/auth_option/suporte_recuperacao/suporte_recuperacao_widget.dart'
     show SuporteRecuperacaoWidget;
 export '/auth_option/esqueceu_senha/esqueceu_senha_widget.dart'
     show EsqueceuSenhaWidget;
-export '/auth_option/cadastrar/cadastrar_widget.dart' show CadastrarWidget;
-export '/auth_option/selfie/selfie_widget.dart' show SelfieWidget;
-export '/auth_option/cadastro_sucesso/cadastro_sucesso_widget.dart'
-    show CadastroSucessoWidget;
-export '/auth_option/escolha_seu_perfil/escolha_seu_perfil_widget.dart'
-    show EscolhaSeuPerfilWidget;
+export '/auth_option/selecao_perfil/selecao_perfil_widget.dart'
+    show SelecaoPerfilWidget;
+export '/auth_option/upload_foto/upload_foto_widget.dart'
+    show UploadFotoWidget;
 export '/main_motorista_option/main_motorista/main_motorista_widget.dart'
     show MainMotoristaWidget;
 export '/main_motorista_option/a_caminho_do_passageiro/a_caminho_do_passageiro_widget.dart'

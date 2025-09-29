@@ -163,6 +163,7 @@ dependencies:
   cupertino_icons: ^1.0.0
   battery_plus: ^7.0.0
   flutter_dotenv: ^5.1.0
+  onesignal_flutter: ^5.0.4
 
 dependency_overrides:
   http: 1.4.0
