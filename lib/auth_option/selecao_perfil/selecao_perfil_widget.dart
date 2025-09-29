@@ -19,7 +19,7 @@ class _SelecaoPerfilWidgetState extends State<SelecaoPerfilWidget> {
   bool _isUpdating = false;
 
   Future<void> _selecionarPerfil(String tipo) async {
-    // Comprehensive logging for profile selection event
+    // Log completo pra quando o usuário escolhe o perfil
     debugPrint('🔄 [PERFIL_SEL] Button Clicked: ${tipo == 'driver' ? 'Sou motorista' : 'Sou passageiro'}');
     debugPrint('👤 [PERFIL_SEL] Current User UID: $currentUserUid');
     debugPrint('⏰ [PERFIL_SEL] Timestamp: ${DateTime.now()}');
@@ -52,9 +52,9 @@ class _SelecaoPerfilWidgetState extends State<SelecaoPerfilWidget> {
       await AppUsersTable().update(
         data: {
           'user_type': tipo,
-          'updated_at': DateTime.now().toUtc(),
+          'updated_at': DateTime.now().toUtc().toIso8601String(),
         },
-        matchingRows: (rows) => rows.eq('id', uid),
+        matchingRows: (rows) => rows.eq('currentUser_UID_Firebase', uid),
       );
       
       debugPrint('✅ [PERFIL_SEL] Database update successful for user: $uid');

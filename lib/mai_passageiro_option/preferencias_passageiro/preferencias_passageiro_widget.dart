@@ -758,10 +758,18 @@ class _PreferenciasPassageiroWidgetState
         Switch.adaptive(
           value: value,
           onChanged: onChanged,
-          activeThumbColor: FlutterFlowTheme.of(context).primary,
-          activeTrackColor: FlutterFlowTheme.of(context).primary.withValues(alpha: 0.3),
-          inactiveTrackColor: FlutterFlowTheme.of(context).alternate,
-          inactiveThumbColor: FlutterFlowTheme.of(context).secondaryText,
+          thumbColor: MaterialStateProperty.resolveWith((states) {
+            if (states.contains(MaterialState.selected)) {
+              return FlutterFlowTheme.of(context).primary;
+            }
+            return FlutterFlowTheme.of(context).secondaryText;
+          }),
+          trackColor: MaterialStateProperty.resolveWith((states) {
+            if (states.contains(MaterialState.selected)) {
+              return FlutterFlowTheme.of(context).primary.withAlpha(77);
+            }
+            return FlutterFlowTheme.of(context).alternate;
+          }),
         ),
       ],
     );
@@ -782,7 +790,7 @@ class _PreferenciasPassageiroWidgetState
         ),
       ),
       child: DropdownButtonFormField<String>(
-        initialValue: currentValue,
+        value: currentValue,
         decoration: InputDecoration(
           contentPadding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
           border: InputBorder.none,
