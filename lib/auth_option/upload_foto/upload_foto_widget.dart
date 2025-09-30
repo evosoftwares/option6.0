@@ -66,9 +66,9 @@ class _UploadFotoWidgetState extends State<UploadFotoWidget> {
       await AppUsersTable().update(
         data: {
           'photo_url': url,
-          'updated_at': DateTime.now().toUtc(),
+          'updated_at': DateTime.now().toUtc().toIso8601String(),
         },
-        matchingRows: (rows) => rows.eq('id', uid),
+        matchingRows: (rows) => rows.eq('currentUser_UID_Firebase', uid),
       );
 
       ScaffoldMessenger.of(context).showSnackBar(
@@ -77,7 +77,7 @@ class _UploadFotoWidgetState extends State<UploadFotoWidget> {
 
       // Direcionar para tela principal conforme perfil
       final userRows = await AppUsersTable().queryRows(
-        queryFn: (q) => q.eq('id', uid).limit(1),
+        queryFn: (q) => q.eq('currentUser_UID_Firebase', uid).limit(1),
       );
       final user = userRows.isNotEmpty ? userRows.first : null;
       final tipo = user?.userType ?? 'passenger';
