@@ -364,11 +364,18 @@ class _PreferenciasMotoristaWidgetState
                 Switch.adaptive(
                   value: switchValue,
                   onChanged: onSwitchChanged,
-                  activeThumbColor: Colors.white,
-                  activeTrackColor: FlutterFlowTheme.of(context).primary,
-                  inactiveTrackColor: FlutterFlowTheme.of(context).alternate,
-                  inactiveThumbColor:
-                      FlutterFlowTheme.of(context).secondaryText,
+                  thumbColor: MaterialStateProperty.resolveWith((states) {
+                    if (states.contains(MaterialState.selected)) {
+                      return Colors.white;
+                    }
+                    return FlutterFlowTheme.of(context).secondaryText;
+                  }),
+                  trackColor: MaterialStateProperty.resolveWith((states) {
+                    if (states.contains(MaterialState.selected)) {
+                      return FlutterFlowTheme.of(context).primary;
+                    }
+                    return FlutterFlowTheme.of(context).alternate;
+                  }),
                 ),
               ],
             ),
