@@ -36,8 +36,8 @@ Stream<UserTokenInfo> getFcmTokenStream(String userPath) =>
         .map((playerId) => UserTokenInfo(userPath, playerId!));
 
 final fcmTokenUserStream = auth.authenticatedUserStream
-    .where((user) => user != null && (user!.uid ?? '').isNotEmpty)
-    .map((user) => 'users/${user!.uid}')
+    .where((user) => (user.uid ?? '').isNotEmpty)
+    .map((user) => 'users/${user.uid}')
     .distinct()
     .switchMap(getFcmTokenStream)
     .asyncMap((userTokenInfo) async {
