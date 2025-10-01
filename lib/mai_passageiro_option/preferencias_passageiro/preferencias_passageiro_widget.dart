@@ -758,14 +758,14 @@ class _PreferenciasPassageiroWidgetState
         Switch.adaptive(
           value: value,
           onChanged: onChanged,
-          thumbColor: MaterialStateProperty.resolveWith((states) {
-            if (states.contains(MaterialState.selected)) {
+          thumbColor: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) {
               return FlutterFlowTheme.of(context).primary;
             }
             return FlutterFlowTheme.of(context).secondaryText;
           }),
-          trackColor: MaterialStateProperty.resolveWith((states) {
-            if (states.contains(MaterialState.selected)) {
+          trackColor: WidgetStateProperty.resolveWith((states) {
+            if (states.contains(WidgetState.selected)) {
               return FlutterFlowTheme.of(context).primary.withAlpha(77);
             }
             return FlutterFlowTheme.of(context).alternate;
@@ -790,7 +790,7 @@ class _PreferenciasPassageiroWidgetState
         ),
       ),
       child: DropdownButtonFormField<String>(
-        value: currentValue,
+        initialValue: currentValue,
         decoration: InputDecoration(
           contentPadding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
           border: InputBorder.none,
