@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:supabase_flutter/supabase_flutter.dart';
 import '../backend/supabase/supabase.dart';
-import '../backend/supabase/database/tables/app_users.dart';
 import 'base_auth_user_provider.dart' as auth_base;
 
 class SupabaseAuthManager {
