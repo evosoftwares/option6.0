@@ -4,6 +4,7 @@ import '/backend/supabase/supabase.dart';
 import '/backend/supabase/database/database.dart';
 import '/auth/firebase_auth/auth_util.dart';
 import 'place.dart';
+import '../utils/num_utils.dart';
 
 // Tipos de sugestões
 enum SuggestionType { recent, frequent, timePattern, nearby, favorite }
@@ -688,16 +689,22 @@ class TripSuggestionsService {
         }
 
         // Calcular distância aproximada
+        final poiLat = toDoubleOrNull(poi['latitude']);
+        final poiLng = toDoubleOrNull(poi['longitude']);
+        if (poiLat == null || poiLng == null) {
+          debugPrint('⚠️ POI sem coordenadas válidas: ${poi['name']}');
+          continue;
+        }
         final distance = _calculateDistance(
           userLocation.latitude,
           userLocation.longitude,
-          poi['latitude'] as double,
-          poi['longitude'] as double,
+          poiLat,
+          poiLng,
         );
 
         // Criar place
         final place = FFPlace(
-          latLng: LatLng(poi['latitude'] as double, poi['longitude'] as double),
+          latLng: LatLng(poiLat, poiLng),
           name: poi['name'] as String,
           address: poi['address'] as String,
           city: poi['city'] as String,
@@ -707,7 +714,7 @@ class TripSuggestionsService {
         );
 
         // Score baseado na distância e popularidade
-        final score = _calculatePOIScore(distance, poi['popularity'] as double);
+        final score = _calculatePOIScore(distance, toDoubleOrZero(poi['popularity']));
 
         final suggestionItem = SuggestionItem(
           place: place,

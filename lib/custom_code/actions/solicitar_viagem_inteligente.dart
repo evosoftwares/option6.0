@@ -1,5 +1,6 @@
 import '/backend/supabase/supabase.dart';
 import 'package:flutter/material.dart';
+import '../../utils/num_utils.dart';
 
 /// Sistema Inteligente de Solicitação de Viagem
 /// Substitui o sistema antigo Firebase por uma solução 100% Supabase
@@ -171,7 +172,7 @@ Future<List<Map<String, dynamic>>> _buscarMotoristasInteligentes({
 
     // Ordenar por score (maior para menor)
     motoristasComScore
-        .sort((a, b) => (b['score'] as double).compareTo(a['score'] as double));
+        .sort((a, b) => toDoubleOrZero(b['score']).compareTo(toDoubleOrZero(a['score'])));
 
     print('🧠 Motoristas encontrados com IA: ${motoristasComScore.length}');
     for (var motorista in motoristasComScore.take(3)) {

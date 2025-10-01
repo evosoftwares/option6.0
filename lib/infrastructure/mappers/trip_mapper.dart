@@ -4,6 +4,7 @@ import '../../domain/entities/trip.dart';
 import '../../backend/supabase/database/tables/trips.dart';
 import '../../domain/value_objects/location.dart';
 import '../../domain/value_objects/money.dart';
+import '../../utils/num_utils.dart';
 
 class TripMapper {
   Trip toDomain(TripsRow row) {
@@ -55,11 +56,17 @@ class TripMapper {
       completedAt: row.completedAt ?? DateTime.now(),
       assignedAt: row.assignedAt ?? DateTime.now(),
       arrivedAt: row.arrivedAt ?? DateTime.now(),
-      originLocation: row.originLatitude != null && row.originLongitude != null
-          ? Location.fromCoordinates(row.originLatitude!, row.originLongitude!)
+      originLocation: toDoubleOrNull(row.originLatitude) != null && toDoubleOrNull(row.originLongitude) != null
+          ? Location.fromCoordinates(
+              toDoubleOrNull(row.originLatitude)!,
+              toDoubleOrNull(row.originLongitude)!,
+            )
           : null,
-      destinationLocation: row.destinationLatitude != null && row.destinationLongitude != null
-          ? Location.fromCoordinates(row.destinationLatitude!, row.destinationLongitude!)
+      destinationLocation: toDoubleOrNull(row.destinationLatitude) != null && toDoubleOrNull(row.destinationLongitude) != null
+          ? Location.fromCoordinates(
+              toDoubleOrNull(row.destinationLatitude)!,
+              toDoubleOrNull(row.destinationLongitude)!,
+            )
           : null,
     );
   }

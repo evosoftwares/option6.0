@@ -1,6 +1,7 @@
 import '/backend/supabase/supabase.dart';
 import '/auth/firebase_auth/auth_util.dart';
 import 'package:flutter/material.dart';
+import '../../utils/num_utils.dart';
 import 'dart:math' show sin, cos, sqrt, atan2, pi;
 
 /// Conecta interface do passageiro com dados reais do Supabase
@@ -170,8 +171,12 @@ Future<List<Map<String, dynamic>>> buscarMotoristasDisponiveis({
 
     // Ordenar por melhor custo-benefício (rating + proximidade)
     motoristasFormatados.sort((a, b) {
-      final scoreA = (a['rating'] as double) * 0.7 + (10.0 - (a['distancia_km'] as double)) * 0.3;
-      final scoreB = (b['rating'] as double) * 0.7 + (10.0 - (b['distancia_km'] as double)) * 0.3;
+      final ratingA = toDoubleOrZero(a['rating']);
+      final ratingB = toDoubleOrZero(b['rating']);
+      final distA = toDoubleOrZero(a['distancia_km']);
+      final distB = toDoubleOrZero(b['distancia_km']);
+      final scoreA = ratingA * 0.7 + (10.0 - distA) * 0.3;
+      final scoreB = ratingB * 0.7 + (10.0 - distB) * 0.3;
       return scoreB.compareTo(scoreA);
     });
 
