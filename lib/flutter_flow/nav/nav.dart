@@ -241,6 +241,30 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
               'preco',
               ParamType.double,
             ),
+            vehicleCategory: params.getParam(
+              'vehicleCategory',
+              ParamType.String,
+            ),
+            paymentMethod: params.getParam(
+              'paymentMethod',
+              ParamType.String,
+            ),
+            needsPet: params.getParam(
+              'needsPet',
+              ParamType.bool,
+            ),
+            needsGrocerySpace: params.getParam(
+              'needsGrocerySpace',
+              ParamType.bool,
+            ),
+            needsAc: params.getParam(
+              'needsAc',
+              ParamType.bool,
+            ),
+            needsCondoAccess: params.getParam(
+              'needsCondoAccess',
+              ParamType.bool,
+            ),
           ),
         ),
         FFRoute(

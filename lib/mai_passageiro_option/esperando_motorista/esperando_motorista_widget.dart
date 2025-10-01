@@ -1,15 +1,20 @@
+import '/backend/supabase/supabase.dart';
 import '/flutter_flow/flutter_flow_google_map.dart';
-import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
+import '/utils/num_utils.dart';
 import 'esperando_motorista_model.dart';
 export 'esperando_motorista_model.dart';
 
 class EsperandoMotoristaWidget extends StatefulWidget {
-  const EsperandoMotoristaWidget({super.key});
+  const EsperandoMotoristaWidget({
+    super.key,
+    this.tripRequestId,
+  });
+
+  final String? tripRequestId;
 
   static String routeName = 'esperandoMotorista';
   static String routePath = '/esperandoMotorista';
@@ -33,7 +38,6 @@ class _EsperandoMotoristaWidgetState extends State<EsperandoMotoristaWidget> {
   @override
   void dispose() {
     _model.dispose();
-
     super.dispose();
   }
 
@@ -96,420 +100,190 @@ class _EsperandoMotoristaWidgetState extends State<EsperandoMotoristaWidget> {
             ),
           ),
         ),
-        body: Container(
-          decoration: BoxDecoration(),
-          child: Column(
-            mainAxisSize: MainAxisSize.max,
-            children: [
-              Expanded(
-                child: Container(
-                  width: double.infinity,
-                  height: 300.0,
-                  decoration: BoxDecoration(
-                    color: FlutterFlowTheme.of(context).primaryBackground,
-                  ),
-                  child: FlutterFlowGoogleMap(
-                    controller: _model.googleMapsController,
-                    onCameraIdle: (latLng) => _model.googleMapsCenter = latLng,
-                    initialLocation: _model.googleMapsCenter ??=
-                        LatLng(13.106061, -59.613158),
-                    markerColor: GoogleMarkerColor.violet,
-                    mapType: MapType.normal,
-                    style: GoogleMapStyle.standard,
-                    initialZoom: 14.0,
-                    allowInteraction: true,
-                    allowZoom: true,
-                    showZoomControls: true,
-                    showLocation: true,
-                    showCompass: false,
-                    showMapToolbar: false,
-                    showTraffic: false,
-                    centerMapOnMarkerTap: true,
-                    mapTakesGesturePreference: false,
-                  ),
-                ),
+        body: StreamBuilder<List<TripsRow>>(
+          stream: Supabase.instance.client
+              .from('trips')
+              .stream(primaryKey: ['id'])
+              .eq('request_id', widget.tripRequestId!)
+              .map((snapshot) {
+            final table = TripsTable();
+            return snapshot.map(table.createRow).toList();
+          }),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return _buildSearchingUI();
+            }
+            if (!snapshot.hasData || snapshot.data!.isEmpty) {
+              return _buildSearchingUI();
+            }
+
+            final trip = snapshot.data!.first;
+
+            if (trip.driverId == null) {
+              return _buildSearchingUI();
+            }
+
+            return FutureBuilder<List<DriversRow>>(
+              future: DriversTable().querySingleRow(
+                queryFn: (q) => q.eq('id', trip.driverId!),
               ),
-              Container(
-                width: double.infinity,
-                decoration: BoxDecoration(
-                  color: FlutterFlowTheme.of(context).secondaryBackground,
-                ),
-                child: Padding(
-                  padding:
-                      EdgeInsetsDirectional.fromSTEB(24.0, 24.0, 24.0, 24.0),
-                  child: Column(
-                    mainAxisSize: MainAxisSize.max,
-                    children: [
-                      Row(
-                        mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: Column(
-                              mainAxisSize: MainAxisSize.max,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Chega em',
-                                  style: FlutterFlowTheme.of(context)
-                                      .bodyMedium
-                                      .override(
-                                        font: GoogleFonts.inter(
-                                          fontWeight:
-                                              FlutterFlowTheme.of(context)
-                                                  .bodyMedium
-                                                  .fontWeight,
-                                          fontStyle:
-                                              FlutterFlowTheme.of(context)
-                                                  .bodyMedium
-                                                  .fontStyle,
-                                        ),
-                                        color: FlutterFlowTheme.of(context)
-                                            .secondaryText,
-                                        letterSpacing: 0.0,
-                                        fontWeight: FlutterFlowTheme.of(context)
-                                            .bodyMedium
-                                            .fontWeight,
-                                        fontStyle: FlutterFlowTheme.of(context)
-                                            .bodyMedium
-                                            .fontStyle,
-                                      ),
-                                ),
-                                Text(
-                                  '3 min',
-                                  style: FlutterFlowTheme.of(context)
-                                      .headlineMedium
-                                      .override(
-                                        font: GoogleFonts.roboto(
-                                          fontWeight: FontWeight.w600,
-                                          fontStyle:
-                                              FlutterFlowTheme.of(context)
-                                                  .headlineMedium
-                                                  .fontStyle,
-                                        ),
-                                        letterSpacing: 0.0,
-                                        fontWeight: FontWeight.w600,
-                                        fontStyle: FlutterFlowTheme.of(context)
-                                            .headlineMedium
-                                            .fontStyle,
-                                      ),
-                                ),
-                              ].divide(SizedBox(height: 4.0)),
-                            ),
-                          ),
-                          Column(
-                            mainAxisSize: MainAxisSize.max,
-                            crossAxisAlignment: CrossAxisAlignment.end,
-                            children: [
-                              Text(
-                                'Lucas Mendes',
-                                style: FlutterFlowTheme.of(context)
-                                    .titleMedium
-                                    .override(
-                                      font: GoogleFonts.roboto(
-                                        fontWeight: FontWeight.w600,
-                                        fontStyle: FlutterFlowTheme.of(context)
-                                            .titleMedium
-                                            .fontStyle,
-                                      ),
-                                      letterSpacing: 0.0,
-                                      fontWeight: FontWeight.w600,
-                                      fontStyle: FlutterFlowTheme.of(context)
-                                          .titleMedium
-                                          .fontStyle,
-                                    ),
-                              ),
-                              Row(
-                                mainAxisSize: MainAxisSize.max,
-                                children: [
-                                  Text(
-                                    '4.9',
-                                    style: FlutterFlowTheme.of(context)
-                                        .bodyMedium
-                                        .override(
-                                          font: GoogleFonts.inter(
-                                            fontWeight:
-                                                FlutterFlowTheme.of(context)
-                                                    .bodyMedium
-                                                    .fontWeight,
-                                            fontStyle:
-                                                FlutterFlowTheme.of(context)
-                                                    .bodyMedium
-                                                    .fontStyle,
-                                          ),
-                                          letterSpacing: 0.0,
-                                          fontWeight:
-                                              FlutterFlowTheme.of(context)
-                                                  .bodyMedium
-                                                  .fontWeight,
-                                          fontStyle:
-                                              FlutterFlowTheme.of(context)
-                                                  .bodyMedium
-                                                  .fontStyle,
-                                        ),
-                                  ),
-                                  Icon(
-                                    Icons.star,
-                                    color: Color(0xFFFFC107),
-                                    size: 16.0,
-                                  ),
-                                ].divide(SizedBox(width: 4.0)),
-                              ),
-                            ].divide(SizedBox(height: 4.0)),
-                          ),
-                          Container(
-                            width: 60.0,
-                            height: 60.0,
-                            decoration: BoxDecoration(
-                              color: Color(0xFF81C784),
-                              borderRadius: BorderRadius.circular(30.0),
-                            ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(30.0),
-                              child: Image.network(
-                                'https://images.unsplash.com/photo-1555626906-fcf10d6851b4?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHJhbmRvbXx8fHx8fHx8fDE3NTc5NDY0MTl8&ixlib=rb-4.1.0&q=80&w=1080',
-                                width: double.infinity,
-                                height: double.infinity,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ),
-                        ].divide(SizedBox(width: 12.0)),
-                      ),
-                      Divider(
-                        thickness: 1.0,
-                        color: FlutterFlowTheme.of(context).alternate,
-                      ),
-                      Row(
-                        mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: Column(
-                              mainAxisSize: MainAxisSize.max,
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Corolla',
-                                  style: FlutterFlowTheme.of(context)
-                                      .bodyMedium
-                                      .override(
-                                        font: GoogleFonts.inter(
-                                          fontWeight:
-                                              FlutterFlowTheme.of(context)
-                                                  .bodyMedium
-                                                  .fontWeight,
-                                          fontStyle:
-                                              FlutterFlowTheme.of(context)
-                                                  .bodyMedium
-                                                  .fontStyle,
-                                        ),
-                                        color: FlutterFlowTheme.of(context)
-                                            .secondaryText,
-                                        letterSpacing: 0.0,
-                                        fontWeight: FlutterFlowTheme.of(context)
-                                            .bodyMedium
-                                            .fontWeight,
-                                        fontStyle: FlutterFlowTheme.of(context)
-                                            .bodyMedium
-                                            .fontStyle,
-                                      ),
-                                ),
-                                Text(
-                                  'BCR-1D34',
-                                  style: FlutterFlowTheme.of(context)
-                                      .titleMedium
-                                      .override(
-                                        font: GoogleFonts.roboto(
-                                          fontWeight: FontWeight.w600,
-                                          fontStyle:
-                                              FlutterFlowTheme.of(context)
-                                                  .titleMedium
-                                                  .fontStyle,
-                                        ),
-                                        letterSpacing: 0.0,
-                                        fontWeight: FontWeight.w600,
-                                        fontStyle: FlutterFlowTheme.of(context)
-                                            .titleMedium
-                                            .fontStyle,
-                                      ),
-                                ),
-                              ].divide(SizedBox(height: 4.0)),
-                            ),
-                          ),
-                          Container(
-                            width: 60.0,
-                            height: 40.0,
-                            decoration: BoxDecoration(
-                              color: Color(0xFFFFCC80),
-                              borderRadius: BorderRadius.circular(8.0),
-                            ),
-                            child: ClipRRect(
-                              borderRadius: BorderRadius.circular(8.0),
-                              child: Image.network(
-                                'https://images.unsplash.com/photo-1612593968469-d44a2e6ab5d2?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w0NTYyMDF8MHwxfHJhbmRvbXx8fHx8fHx8fDE3NTc5NDY0MTl8&ixlib=rb-4.1.0&q=80&w=1080',
-                                width: double.infinity,
-                                height: double.infinity,
-                                fit: BoxFit.cover,
-                              ),
-                            ),
-                          ),
-                        ].divide(SizedBox(width: 12.0)),
-                      ),
-                      Divider(
-                        thickness: 1.0,
-                        color: FlutterFlowTheme.of(context).alternate,
-                      ),
-                      Row(
-                        mainAxisSize: MainAxisSize.max,
-                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                        children: [
-                          Expanded(
-                            child: Container(
-                              width: 100.0,
-                              height: 100.0,
-                              decoration: BoxDecoration(
-                                color: FlutterFlowTheme.of(context)
-                                    .primaryBackground,
-                                borderRadius: BorderRadius.circular(10.0),
-                              ),
-                              child: Padding(
-                                padding: EdgeInsets.all(16.0),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.max,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Icon(
-                                      Icons.phone_enabled_outlined,
-                                      color: FlutterFlowTheme.of(context)
-                                          .primaryText,
-                                      size: 32.0,
-                                    ),
-                                    Text(
-                                      'Ligar',
-                                      style: FlutterFlowTheme.of(context)
-                                          .bodyMedium
-                                          .override(
-                                            font: GoogleFonts.inter(
-                                              fontWeight: FontWeight.w500,
-                                              fontStyle:
-                                                  FlutterFlowTheme.of(context)
-                                                      .bodyMedium
-                                                      .fontStyle,
-                                            ),
-                                            letterSpacing: 0.0,
-                                            fontWeight: FontWeight.w500,
-                                            fontStyle:
-                                                FlutterFlowTheme.of(context)
-                                                    .bodyMedium
-                                                    .fontStyle,
-                                          ),
-                                    ),
-                                  ].divide(SizedBox(height: 8.0)),
-                                ),
-                              ),
-                            ),
-                          ),
-                          Expanded(
-                            child: Container(
-                              width: 100.0,
-                              height: 100.0,
-                              decoration: BoxDecoration(
-                                color: FlutterFlowTheme.of(context)
-                                    .primaryBackground,
-                                borderRadius: BorderRadius.circular(10.0),
-                              ),
-                              child: Padding(
-                                padding: EdgeInsets.all(16.0),
-                                child: Column(
-                                  mainAxisSize: MainAxisSize.max,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    Column(
-                                      mainAxisSize: MainAxisSize.max,
-                                      crossAxisAlignment:
-                                          CrossAxisAlignment.center,
-                                      children: [
-                                        Icon(
-                                          Icons.chat_bubble_outline,
-                                          color: FlutterFlowTheme.of(context)
-                                              .primaryText,
-                                          size: 32.0,
-                                        ),
-                                        Text(
-                                          'Chat',
-                                          style: FlutterFlowTheme.of(context)
-                                              .bodyMedium
-                                              .override(
-                                                font: GoogleFonts.inter(
-                                                  fontWeight: FontWeight.w500,
-                                                  fontStyle:
-                                                      FlutterFlowTheme.of(
-                                                              context)
-                                                          .bodyMedium
-                                                          .fontStyle,
-                                                ),
-                                                letterSpacing: 0.0,
-                                                fontWeight: FontWeight.w500,
-                                                fontStyle:
-                                                    FlutterFlowTheme.of(context)
-                                                        .bodyMedium
-                                                        .fontStyle,
-                                              ),
-                                        ),
-                                      ].divide(SizedBox(height: 8.0)),
-                                    ),
-                                  ].divide(SizedBox(height: 8.0)),
-                                ),
-                              ),
-                            ),
-                          ),
-                        ].divide(SizedBox(width: 16.0)),
-                      ),
-                      FFButtonWidget(
-                        onPressed: () {
-                          print('Button pressed ...');
-                        },
-                        text: 'Cancelar viagem',
-                        options: FFButtonOptions(
-                          width: double.infinity,
-                          height: 60.0,
-                          padding: EdgeInsets.all(8.0),
-                          iconPadding: EdgeInsetsDirectional.fromSTEB(
-                              0.0, 0.0, 0.0, 0.0),
-                          color: FlutterFlowTheme.of(context).error,
-                          textStyle:
-                              FlutterFlowTheme.of(context).titleMedium.override(
-                                    font: GoogleFonts.roboto(
-                                      fontWeight: FlutterFlowTheme.of(context)
-                                          .titleMedium
-                                          .fontWeight,
-                                      fontStyle: FlutterFlowTheme.of(context)
-                                          .titleMedium
-                                          .fontStyle,
-                                    ),
-                                    color: FlutterFlowTheme.of(context)
-                                        .secondaryBackground,
-                                    letterSpacing: 0.0,
-                                    fontWeight: FlutterFlowTheme.of(context)
-                                        .titleMedium
-                                        .fontWeight,
-                                    fontStyle: FlutterFlowTheme.of(context)
-                                        .titleMedium
-                                        .fontStyle,
-                                  ),
-                          elevation: 0.0,
-                          borderRadius: BorderRadius.circular(8.0),
-                        ),
-                      ),
-                    ].divide(SizedBox(height: 16.0)),
+              builder: (context, driverSnapshot) {
+                if (!driverSnapshot.hasData || driverSnapshot.data!.isEmpty) {
+                  return _buildSearchingUI();
+                }
+                final driver = driverSnapshot.data!.first;
+
+                return FutureBuilder<List<AppUsersRow>>(
+                  future: AppUsersTable().querySingleRow(
+                    queryFn: (q) => q.eq('id', driver.userId),
                   ),
-                ),
-              ),
-            ].divide(SizedBox(height: 0.0)),
-          ),
+                  builder: (context, appUserSnapshot) {
+                    if (!appUserSnapshot.hasData || appUserSnapshot.data!.isEmpty) {
+                      return _buildSearchingUI();
+                    }
+                    final appUser = appUserSnapshot.data!.first;
+                    return _buildDriverFoundUI(trip, driver, appUser);
+                  },
+                );
+              },
+            );
+          },
         ),
       ),
+    );
+  }
+
+  // Widget para mostrar enquanto procura por um motorista.
+  Widget _buildSearchingUI() {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircularProgressIndicator(),
+          SizedBox(height: 20),
+          Text(
+            'Aguarde enquanto encontramos o melhor motorista para você.',
+            textAlign: TextAlign.center,
+            style: FlutterFlowTheme.of(context).bodyLarge,
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Widget para mostrar quando um motorista foi encontrado.
+  Widget _buildDriverFoundUI(TripsRow trip, DriversRow driver, AppUsersRow appUser) {
+    final originLat = toDoubleOrNull(trip.originLatitude);
+    final originLng = toDoubleOrNull(trip.originLongitude);
+    final dLat = toDoubleOrNull(driver.currentLatitude);
+    final dLng = toDoubleOrNull(driver.currentLongitude);
+    final rating = toDoubleOrNull(driver.averageRating);
+
+    return Column(
+      mainAxisSize: MainAxisSize.max,
+      children: [
+        Expanded(
+          child: FlutterFlowGoogleMap(
+            controller: _model.googleMapsController,
+            onCameraIdle: (latLng) => _model.googleMapsCenter = latLng,
+            initialLocation: LatLng(
+              originLat ?? 13.106061,
+              originLng ?? -59.613158,
+            ),
+            markers: [
+              if (dLat != null && dLng != null)
+                FlutterFlowMarker(
+                  'driverLocation',
+                  LatLng(dLat, dLng),
+                ),
+            ],
+            markerColor: GoogleMarkerColor.red,
+            mapType: MapType.normal,
+            style: GoogleMapStyle.standard,
+            initialZoom: 15,
+            allowInteraction: true,
+            allowZoom: true,
+            showZoomControls: true,
+            showLocation: true,
+            showCompass: false,
+            showMapToolbar: false,
+            showTraffic: false,
+            centerMapOnMarkerTap: true,
+          ),
+        ),
+        Container(
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: FlutterFlowTheme.of(context).secondaryBackground,
+            boxShadow: [BoxShadow(blurRadius: 4, color: Color(0x33000000), offset: Offset(0, -2))],
+          ),
+          child: Padding(
+            padding: EdgeInsets.all(24.0),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Text('Chega em 3 min', style: FlutterFlowTheme.of(context).headlineMedium),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.end,
+                      children: [
+                        // Usa fullName do appUser.
+                        Text(appUser.fullName ?? 'Nome não disponível', style: FlutterFlowTheme.of(context).titleMedium),
+                        Row(
+                          children: [
+                            Text(rating != null ? rating.toStringAsFixed(1) : '--', style: FlutterFlowTheme.of(context).bodyMedium),
+                            Icon(Icons.star, color: Color(0xFFFFC107), size: 16),
+                          ],
+                        ),
+                      ],
+                    ),
+                    Container(
+                      width: 60, height: 60,
+                      decoration: BoxDecoration(shape: BoxShape.circle),
+                      child: ClipRRect(
+                        borderRadius: BorderRadius.circular(30),
+                        // Usa photoUrl do appUser.
+                        child: Image.network(appUser.photoUrl ?? '', fit: BoxFit.cover, errorBuilder: (c, o, s) => Icon(Icons.person, size: 30)),
+                      ),
+                    ),
+                  ],
+                ),
+                Divider(),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(driver.vehicleModel ?? 'Modelo', style: FlutterFlowTheme.of(context).bodyMedium),
+                        Text(driver.vehiclePlate ?? 'Placa', style: FlutterFlowTheme.of(context).titleMedium),
+                      ],
+                    ),
+                    Container(
+                      width: 60, height: 40,
+                      // Remove a foto do veículo que não existe e usa um ícone.
+                      child: Icon(Icons.directions_car, size: 30),
+                    ),
+                  ],
+                ),
+                Divider(),
+                FFButtonWidget(
+                  onPressed: () { /* TODO: Implementar cancelamento em português */ },
+                  text: 'Cancelar viagem',
+                  options: FFButtonOptions(
+                    width: double.infinity,
+                    height: 60,
+                    color: FlutterFlowTheme.of(context).error,
+                    textStyle: FlutterFlowTheme.of(context).titleMedium.copyWith(color: Colors.white),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 }
