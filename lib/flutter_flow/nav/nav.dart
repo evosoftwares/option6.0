@@ -370,6 +370,11 @@ GoRouter createRouter(AppStateNotifier appStateNotifier) => GoRouter(
           name: PreferenciasMotoristaWidget.routeName,
           path: PreferenciasMotoristaWidget.routePath,
           builder: (context, params) => PreferenciasMotoristaWidget(),
+        ),
+        FFRoute(
+          name: EditarPerfilWidget.routeName,
+          path: EditarPerfilWidget.routePath,
+          builder: (context, params) => const EditarPerfilWidget(),
         )
       ].map((r) => r.toRoute(appStateNotifier)).toList(),
     );

@@ -335,6 +335,54 @@ class _MenuMotoristaWidgetState extends State<MenuMotoristaWidget> {
                       ),
                       SizedBox(height: 16.0),
 
+                      // Editar Perfil
+                      InkWell(
+                        splashColor: Colors.transparent,
+                        focusColor: Colors.transparent,
+                        hoverColor: Colors.transparent,
+                        highlightColor: Colors.transparent,
+                        onTap: () async {
+                          print('🔍 [MENU_MOTORISTA] Navegando para Editar Perfil');
+                          context.pushNamed(EditarPerfilWidget.routeName);
+                        },
+                        child: Container(
+                          width: double.infinity,
+                          height: 60.0,
+                          decoration: BoxDecoration(
+                            color: FlutterFlowTheme.of(context).secondaryBackground,
+                            borderRadius: BorderRadius.circular(8.0),
+                            border: Border.all(
+                              color: FlutterFlowTheme.of(context).alternate,
+                              width: 1.0,
+                            ),
+                          ),
+                          child: Padding(
+                            padding: EdgeInsetsDirectional.fromSTEB(16.0, 16.0, 16.0, 16.0),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.max,
+                              children: [
+                                Icon(
+                                  Icons.person,
+                                  color: FlutterFlowTheme.of(context).primary,
+                                  size: 24.0,
+                                ),
+                                Text(
+                                  'Editar Perfil',
+                                  style: FlutterFlowTheme.of(context)
+                                      .bodyMedium
+                                      .override(
+                                        font: GoogleFonts.inter(),
+                                        letterSpacing: 0.0,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                ),
+                              ].divide(SizedBox(width: 12.0)),
+                            ),
+                          ),
+                        ),
+                      ),
+                      SizedBox(height: 16.0),
+
                       // Ajuda - JÁ CLICÁVEL
                       InkWell(
                         splashColor: Colors.transparent,

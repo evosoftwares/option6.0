@@ -46,6 +46,7 @@ export '/mai_passageiro_option/menu_passageiro/menu_passageiro_widget.dart'
 export '/mai_passageiro_option/minhas_viagens_pax/minhas_viagens_pax_widget.dart' show MinhasViagensPaxWidget;
 export '/mai_passageiro_option/carteira_passageiro/carteira_passageiro_widget.dart' show CarteiraPassageiroWidget;
 export '/mai_passageiro_option/preferencias_passageiro/preferencias_passageiro_widget.dart' show PreferenciasPassageiroWidget;
+export '/profile_option/editar_perfil/editar_perfil_widget.dart' show EditarPerfilWidget;
 
 // Export logout components
 export '/components/logout_button_widget.dart' show LogoutButtonWidget, SimpleLogoutWidget, AppBarLogoutWidget;
