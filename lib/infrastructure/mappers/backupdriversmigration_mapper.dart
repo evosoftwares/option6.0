@@ -3,6 +3,7 @@ import '../../domain/entities/backupdriversmigration.dart';
 import '../../backend/supabase/database/tables/backup_drivers_migration.dart';
 import '../../domain/value_objects/location.dart';
 import '../../domain/value_objects/money.dart';
+import '../../utils/num_utils.dart';
 
 class BackupDriversMigrationMapper {
   BackupDriversMigration toDomain(BackupDriversMigrationRow row) {
@@ -42,8 +43,11 @@ class BackupDriversMigrationMapper {
       averageRating: row.averageRating ?? 0.0,
       createdAt: row.createdAt ?? DateTime.now(),
       updatedAt: row.updatedAt ?? DateTime.now(),
-      currentLocation: row.currentLatitude != null && row.currentLongitude != null
-          ? Location.fromCoordinates(row.currentLatitude!, row.currentLongitude!)
+      currentLocation: toDoubleOrNull(row.currentLatitude) != null && toDoubleOrNull(row.currentLongitude) != null
+          ? Location.fromCoordinates(
+              toDoubleOrNull(row.currentLatitude)!,
+              toDoubleOrNull(row.currentLongitude)!,
+            )
           : null,
     );
   }
