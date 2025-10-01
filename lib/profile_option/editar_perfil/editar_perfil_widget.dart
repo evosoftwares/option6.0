@@ -31,11 +31,23 @@ class _EditarPerfilWidgetState extends State<EditarPerfilWidget> {
   bool _hasChanges = false;
   AppUsersRow? _appUser;
   String? _photoUrl;
+  Uint8List? _localPhotoBytes;
+  String? _initialNome;
+  String? _initialTelefone;
+  String? _initialPhotoUrl;
 
   @override
   void initState() {
     super.initState();
-    _carregarDadosUsuario();
+    print('\n🚀 ========== INIT STATE ==========');
+    
+    WidgetsBinding.instance.addPostFrameCallback((_) async {
+      print('🔄 InitState - PostFrameCallback executado');
+      await _carregarDadosUsuario();
+      print('✅ Carregamento inicial concluído');
+    });
+    
+    print('========== FIM INIT STATE ==========\n');
 
     // Detectar mudanças nos campos
     _nomeController.addListener(_onFieldChanged);
@@ -44,18 +56,55 @@ class _EditarPerfilWidgetState extends State<EditarPerfilWidget> {
 
   @override
   void dispose() {
+    _nomeController.removeListener(_onFieldChanged);
+    _telefoneController.removeListener(_onFieldChanged);
     _nomeController.dispose();
     _telefoneController.dispose();
     super.dispose();
   }
 
+  String _formatarTelefoneParaMascara(String telefone) {
+    // Remove all non-digit characters
+    String digits = telefone.replaceAll(RegExp(r'\D'), '');
+    
+    // If starts with 55 (Brazilian country code), remove it
+    if (digits.startsWith('55') && digits.length >= 12) {
+      digits = digits.substring(2);
+    }
+    // If starts with +55, remove it
+    else if (telefone.startsWith('+55') && digits.length >= 12) {
+      digits = digits.substring(3);
+    }
+    
+    // If we have exactly 11 digits (Brazilian format 2 digits area code + 9 digits), format with mask
+    if (digits.length == 11) {
+      return '(${digits.substring(0, 2)}) ${digits.substring(2, 7)}-${digits.substring(7, 11)}';
+    } 
+    // If we have 10 digits (without leading '9' in mobile numbers), format with mask
+    else if (digits.length == 10) {
+      return '(${digits.substring(0, 2)}) ${digits.substring(2, 6)}-${digits.substring(6, 10)}';
+    }
+    // Otherwise, return as is
+    else {
+      return telefone;
+    }
+  }
+
   void _onFieldChanged() {
-    if (!_hasChanges) {
-      setState(() => _hasChanges = true);
+    final hasNomeChanged = _nomeController.text != _initialNome;
+    final hasTelefoneChanged = _telefoneController.text != _initialTelefone;
+    final hasPhotoChanged = _photoUrl != _initialPhotoUrl;
+
+    final hasChanges = hasNomeChanged || hasTelefoneChanged || hasPhotoChanged;
+
+    if (_hasChanges != hasChanges) {
+      setState(() => _hasChanges = hasChanges);
     }
   }
 
   Future<void> _carregarDadosUsuario() async {
+    print('\n🔄 ========== INICIANDO CARREGAMENTO DE DADOS ==========');
+    
     setState(() => _carregando = true);
     try {
       final rows = await AppUsersTable().queryRows(
@@ -65,21 +114,54 @@ class _EditarPerfilWidgetState extends State<EditarPerfilWidget> {
 
       if (rows.isNotEmpty) {
         _appUser = rows.first;
-        _nomeController.text = _appUser?.fullName ?? '';
-        _telefoneController.text = _appUser?.phone ?? '';
-        _photoUrl = _appUser?.photoUrl;
+
+        // Usar os nomes corretos das colunas do banco
+        final nome = _appUser?.fullName ?? '';
+        final telefone = _appUser?.phone ?? '';
+        final foto = _appUser?.photoUrl ?? '';
+        
+        print('📸 Dados do usuário:');
+        print('   - ID: ${_appUser?.id}');
+        print('   - Nome: "$nome"');
+        print('   - Telefone: "$telefone"');
+        print('📸 Photo URL do banco: "$foto"');
+        print('📸 Foto vazia? ${foto.isEmpty}');
+        print('📸 Foto null? ${_appUser?.photoUrl == null}');
+        print('📸 Comprimento da URL: ${foto.length}');
+
+        setState(() {
+          _nomeController.text = nome;
+          _telefoneController.text = _formatarTelefoneParaMascara(telefone);
+          
+          _photoUrl = foto.isEmpty ? null : foto;
+          _initialPhotoUrl = _photoUrl;
+          
+          print('📸 _photoUrl setado para: "$_photoUrl"');
+          print('📸 _initialPhotoUrl setado para: "$_initialPhotoUrl"');
+          
+          // Salvar valores iniciais
+          _initialNome = _nomeController.text;
+          _initialTelefone = _telefoneController.text;
+        });
+        
+        print('✅ setState() chamado com sucesso');
+        
+        // Forçar rebuild e verificar
+        WidgetsBinding.instance.addPostFrameCallback((_) {
+          print('🔄 PostFrameCallback - Widget reconstruído');
+          print('📸 _photoUrl após rebuild: "$_photoUrl"');
+        });
+      } else {
+        print('❌ Usuário não encontrado no banco');
       }
-    } catch (e) {
-      debugPrint('Erro ao carregar app_user: $e');
-      if (mounted) {
-        _mostrarMensagem(
-          'Não foi possível carregar seus dados. Tente novamente.',
-          isError: true,
-        );
-      }
+    } catch (e, stackTrace) {
+      print('❌ ERRO ao carregar dados do usuário: $e');
+      print('📚 StackTrace: $stackTrace');
     } finally {
       if (mounted) setState(() => _carregando = false);
     }
+    
+    print('========== FIM DO CARREGAMENTO DE DADOS ==========\n');
   }
 
   Future<void> _salvarAlteracoes() async {
@@ -97,6 +179,7 @@ class _EditarPerfilWidgetState extends State<EditarPerfilWidget> {
       final phoneDigits = _extractDigits(_telefoneController.text);
       final e164Phone = phoneDigits.length == 11 ? '+55$phoneDigits' : null;
 
+      // Usar os nomes corretos das colunas conforme o banco
       final data = {
         'full_name': _nomeController.text.trim(),
         'phone': e164Phone ?? _telefoneController.text.trim(),
@@ -176,122 +259,162 @@ class _EditarPerfilWidgetState extends State<EditarPerfilWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return PopScope(
-      canPop: !_hasChanges,
-      onPopInvokedWithResult: (didPop, result) async {
-        if (!didPop && _hasChanges) {
-          final shouldPop = await _mostrarDialogoConfirmacao();
-          if (shouldPop == true && context.mounted) {
-            Navigator.of(context).pop();
-          }
-        }
-      },
-      child: GestureDetector(
-        onTap: () => FocusScope.of(context).unfocus(),
-        child: Scaffold(
-          backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
-          appBar: AppBar(
-            backgroundColor: Colors.white,
-            automaticallyImplyLeading: false,
-            leading: FlutterFlowIconButton(
-              buttonSize: 40.0,
-              icon: Icon(
-                Icons.arrow_back_rounded,
-                color: FlutterFlowTheme.of(context).primaryText,
-                size: 24.0,
-              ),
-              onPressed: () async {
-                if (_hasChanges) {
-                  final shouldPop = await _mostrarDialogoConfirmacao();
-                  if (shouldPop == true && context.mounted) {
-                    Navigator.of(context).pop();
-                  }
-                } else {
-                  context.safePop();
-                }
-              },
+    return GestureDetector(
+      onTap: () => FocusScope.of(context).unfocus(),
+      child: Scaffold(
+        backgroundColor: FlutterFlowTheme.of(context).primaryBackground,
+        appBar: AppBar(
+          backgroundColor: Colors.white,
+          automaticallyImplyLeading: false,
+          leading: FlutterFlowIconButton(
+            buttonSize: 40.0,
+            icon: Icon(
+              Icons.arrow_back_rounded,
+              color: FlutterFlowTheme.of(context).primaryText,
+              size: 24.0,
             ),
-            title: Text(
-              'Editar Perfil',
-              style: FlutterFlowTheme.of(context).headlineSmall.override(
-                    font: GoogleFonts.inter(
-                      fontWeight: FontWeight.w600,
-                    ),
-                    color: FlutterFlowTheme.of(context).primaryText,
-                    letterSpacing: 0.0,
+            onPressed: () {
+              context.safePop();
+            },
+          ),
+          title: Text(
+            'Editar Perfil',
+            style: FlutterFlowTheme.of(context).headlineSmall.override(
+                  font: GoogleFonts.inter(
+                    fontWeight: FontWeight.w600,
                   ),
-            ),
-            centerTitle: false,
-            elevation: 0,
-            bottom: PreferredSize(
-              preferredSize: const Size.fromHeight(1),
-              child: Container(
-                height: 1,
-                color: FlutterFlowTheme.of(context).alternate,
-              ),
+                  color: FlutterFlowTheme.of(context).primaryText,
+                  letterSpacing: 0.0,
+                ),
+          ),
+          centerTitle: false,
+          elevation: 0,
+          bottom: PreferredSize(
+            preferredSize: const Size.fromHeight(1),
+            child: Container(
+              height: 1,
+              color: FlutterFlowTheme.of(context).alternate,
             ),
           ),
-          body: SafeArea(
-            top: true,
-            child: _carregando
-                ? Center(
-                    child: Column(
-                      mainAxisSize: MainAxisSize.min,
-                      children: [
-                        CircularProgressIndicator(
-                          color: FlutterFlowTheme.of(context).primary,
-                        ),
-                        const SizedBox(height: 16),
-                        Text(
-                          'Carregando...',
-                          style: FlutterFlowTheme.of(context)
-                              .bodyMedium
-                              .override(
-                                font: GoogleFonts.inter(),
-                                color:
-                                    FlutterFlowTheme.of(context).secondaryText,
-                              ),
-                        ),
-                      ],
-                    ),
-                  )
-                : SingleChildScrollView(
-                    physics: const AlwaysScrollableScrollPhysics(),
-                    child: Padding(
-                      padding: const EdgeInsets.all(20.0),
-                      child: Form(
-                        key: _formKey,
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.center,
-                          children: [
-                            const SizedBox(height: 8),
+        ),
+        body: SafeArea(
+          top: true,
+          child: _carregando
+              ? Center(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    children: [
+                      CircularProgressIndicator(
+                        color: FlutterFlowTheme.of(context).primary,
+                      ),
+                      const SizedBox(height: 16),
+                      Text(
+                        'Carregando...',
+                        style: FlutterFlowTheme.of(context)
+                            .bodyMedium
+                            .override(
+                              font: GoogleFonts.inter(),
+                              color:
+                                  FlutterFlowTheme.of(context).secondaryText,
+                            ),
+                      ),
+                    ],
+                  ),
+                )
+              : SingleChildScrollView(
+                  physics: const AlwaysScrollableScrollPhysics(),
+                  child: Padding(
+                    padding: const EdgeInsets.all(20.0),
+                    child: Form(
+                      key: _formKey,
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.center,
+                        children: [
+                          const SizedBox(height: 8),
 
-                            // Foto do perfil
-                            _buildPhotoSection(),
+                          // Foto do perfil
+                          _buildPhotoSection(),
 
-                            const SizedBox(height: 32),
+                          const SizedBox(height: 32),
 
-                            // Campos do formulário
-                            _buildFormFields(),
+                          // Campos do formulário
+                          _buildFormFields(),
 
-                            const SizedBox(height: 32),
+                          const SizedBox(height: 32),
 
-                            // Botão salvar
-                            _buildSaveButton(),
+                          // Botão salvar
+                          _buildSaveButton(),
 
-                            const SizedBox(height: 16),
-                          ],
-                        ),
+                          const SizedBox(height: 16),
+                        ],
                       ),
                     ),
                   ),
-          ),
+                ),
         ),
       ),
     );
   }
 
   Widget _buildPhotoSection() {
+    print('\n🖼️  ========== RENDERIZANDO PHOTO SECTION ==========');
+    print('📸 Estado atual:');
+    print('   - _localPhotoBytes: ${_localPhotoBytes != null ? "SIM (${_localPhotoBytes!.length} bytes)" : "null"}');
+    print('   - _photoUrl: "$_photoUrl"');
+    print('   - _photoUrl é null? ${_photoUrl == null}');
+    print('   - _photoUrl está vazio? ${_photoUrl?.isEmpty ?? true}');
+    print('   - Condição trim().isNotEmpty: ${_photoUrl != null && _photoUrl!.trim().isNotEmpty}');
+    
+    // DIAGNÓSTICO AVANÇADO DA URL
+    if (_photoUrl != null && _photoUrl!.isNotEmpty) {
+      print('\n🔍 ===== ANÁLISE DETALHADA DA URL =====');
+      print('📏 Comprimento: ${_photoUrl!.length}');
+      print('🔗 URL completa:\n   $_photoUrl');
+      print('✂️  URL após trim: "${_photoUrl!.trim()}"');
+      print('🔍 Contém "firebase"? ${_photoUrl!.contains("firebase")}');
+      print('🔍 Contém "storage"? ${_photoUrl!.contains("storage")}');
+      print('🔍 Contém "/users/"? ${_photoUrl!.contains("/users/")}');
+      print('🔍 Começa com http? ${_photoUrl!.startsWith("http")}');
+      print('🔍 Tem espaços? ${_photoUrl!.contains(" ")}');
+      
+      // Verificar se é uma URL válida do Firebase Storage
+      if (_photoUrl!.contains('firebasestorage.googleapis.com')) {
+        print('✅ URL parece ser do Firebase Storage');
+        
+        // Extrair o path do arquivo
+        try {
+          final uri = Uri.parse(_photoUrl!);
+          final decodedPath = Uri.decodeComponent(uri.path);
+          print('📁 Path codificado: ${uri.path}');
+          print('📁 Path decodificado: $decodedPath');
+          print('🔑 Query params: ${uri.queryParameters}');
+          
+          // Verificar se o path está correto (buscando por /users/ em ambos codificado e decodificado)
+          if (uri.path.contains('/users/') || decodedPath.contains('/users/')) {
+            print('✅ Path contém /users/ (correto)');
+          } else {
+            print('⚠️ WARNING: Path NÃO contém /users/ - pode não bater com as rules!');
+          }
+        } catch (e) {
+          print('❌ ERRO ao fazer parse da URL: $e');
+        }
+      } else {
+        print('⚠️ WARNING: URL não parece ser do Firebase Storage!');
+      }
+      print('========================================\n');
+    }
+    
+    // Determinar qual branch será executado
+    if (_localPhotoBytes != null) {
+      print('✅ Vai mostrar: Image.memory (foto local)');
+    } else if (_photoUrl != null && _photoUrl!.trim().isNotEmpty) {
+      print('✅ Vai mostrar: Image.network');
+      print('   URL completa: $_photoUrl');
+    } else {
+      print('⚠️  Vai mostrar: Container placeholder (sem foto)');
+    }
+    print('========== FIM PHOTO SECTION ==========\n');
+    
     return Column(
       children: [
         Stack(
@@ -315,54 +438,112 @@ class _EditarPerfilWidgetState extends State<EditarPerfilWidget> {
               ),
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(60.0),
-                child: _photoUrl != null && _photoUrl!.isNotEmpty
-                    ? Image.network(
-                        _photoUrl!,
+                child: _localPhotoBytes != null
+                    ? Image.memory(
+                        _localPhotoBytes!,
                         width: 120,
                         height: 120,
                         fit: BoxFit.cover,
-                        loadingBuilder: (context, child, loadingProgress) {
-                          if (loadingProgress == null) return child;
-                          return Container(
+                      )
+                    : (_photoUrl != null && _photoUrl!.trim().isNotEmpty
+                        ? Image.network(
+                            _photoUrl!,
+                            key: ValueKey(_photoUrl),
+                            width: 120,
+                            height: 120,
+                            fit: BoxFit.cover,
+                            loadingBuilder:
+                                (context, child, loadingProgress) {
+                              if (loadingProgress == null) return child;
+                              return Container(
+                                width: 120,
+                                height: 120,
+                                color: FlutterFlowTheme.of(context)
+                                    .secondaryBackground,
+                                child: Center(
+                                  child: CircularProgressIndicator(
+                                    value:
+                                        loadingProgress.expectedTotalBytes !=
+                                                null
+                                            ? loadingProgress
+                                                    .cumulativeBytesLoaded /
+                                                loadingProgress
+                                                    .expectedTotalBytes!
+                                            : null,
+                                    strokeWidth: 2,
+                                    color: FlutterFlowTheme.of(context).primary,
+                                  ),
+                                ),
+                              );
+                            },
+                            errorBuilder:
+                                (context, error, stackTrace) {
+                              print('❌ ========== ERRO AO CARREGAR IMAGEM ==========');
+                              print('📸 URL que falhou: $_photoUrl');
+                              print('❌ Tipo do erro: ${error.runtimeType}');
+                              print('❌ Erro completo: $error');
+                              print('📚 StackTrace: $stackTrace');
+                              
+                              // Verificar se é erro de rede, permissão, etc
+                              String errorMessage = 'Erro';
+                              if (error.toString().contains('403')) {
+                                errorMessage = 'Sem permissão';
+                                print('⚠️  DIAGNÓSTICO: Erro 403 - Problema com Firebase Storage Rules!');
+                              } else if (error.toString().contains('404')) {
+                                errorMessage = 'Não encontrada';
+                                print('⚠️  DIAGNÓSTICO: Erro 404 - Arquivo não existe no Storage!');
+                              } else if (error.toString().contains('NetworkImage')) {
+                                errorMessage = 'Erro de rede';
+                                print('⚠️  DIAGNÓSTICO: Erro de conexão ou CORS!');
+                              }
+                              print('========================================\n');
+                              
+                              return Container(
+                                width: 120,
+                                height: 120,
+                                decoration: BoxDecoration(
+                                  color: FlutterFlowTheme.of(context).secondaryBackground,
+                                  shape: BoxShape.circle,
+                                  border: Border.all(
+                                    color: Colors.red, // Borda vermelha para indicar erro
+                                    width: 2,
+                                  ),
+                                ),
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.center,
+                                  children: [
+                                    Icon(
+                                      Icons.error_outline,
+                                      size: 40,
+                                      color: Colors.red,
+                                    ),
+                                    SizedBox(height: 4),
+                                    Text(
+                                      errorMessage,
+                                      textAlign: TextAlign.center,
+                                      style: TextStyle(
+                                        fontSize: 9,
+                                        color: Colors.red,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            },
+                          )
+                        : Container(
                             width: 120,
                             height: 120,
                             color: FlutterFlowTheme.of(context)
                                 .secondaryBackground,
-                            child: Center(
-                              child: CircularProgressIndicator(
-                                value: loadingProgress.expectedTotalBytes !=
-                                        null
-                                    ? loadingProgress.cumulativeBytesLoaded /
-                                        loadingProgress.expectedTotalBytes!
-                                    : null,
-                                strokeWidth: 2,
-                                color: FlutterFlowTheme.of(context).primary,
-                              ),
+                            child: Icon(
+                              Icons.person,
+                              size: 60,
+                              color:
+                                  FlutterFlowTheme.of(context).secondaryText,
                             ),
-                          );
-                        },
-                        errorBuilder: (context, error, stackTrace) => Container(
-                          width: 120,
-                          height: 120,
-                          color:
-                              FlutterFlowTheme.of(context).secondaryBackground,
-                          child: Icon(
-                            Icons.person,
-                            size: 60,
-                            color: FlutterFlowTheme.of(context).secondaryText,
-                          ),
-                        ),
-                      )
-                    : Container(
-                        width: 120,
-                        height: 120,
-                        color: FlutterFlowTheme.of(context).secondaryBackground,
-                        child: Icon(
-                          Icons.person,
-                          size: 60,
-                          color: FlutterFlowTheme.of(context).secondaryText,
-                        ),
-                      ),
+                          )),
               ),
             ),
 
@@ -623,6 +804,8 @@ class _EditarPerfilWidgetState extends State<EditarPerfilWidget> {
   }
 
   Future<void> _alterarFoto() async {
+    if (_uploadingPhoto) return;
+
     try {
       setState(() => _uploadingPhoto = true);
 
@@ -630,10 +813,8 @@ class _EditarPerfilWidgetState extends State<EditarPerfilWidget> {
         context: context,
         allowPhoto: true,
         allowVideo: false,
-        imageQuality: 85,
-        maxWidth: 1024,
-        maxHeight: 1024,
-        includeDimensions: true,
+        imageQuality: 80,
+        backgroundColor: FlutterFlowTheme.of(context).secondaryBackground,
       );
 
       if (media == null || media.isEmpty) {
@@ -641,71 +822,97 @@ class _EditarPerfilWidgetState extends State<EditarPerfilWidget> {
         return;
       }
 
-      final m = media.first;
-      if (!validateFileFormat(m.filePath ?? m.storagePath, context)) {
+      final selectedMedia = media.first;
+
+      // Validar se é uma imagem válida
+      if (selectedMedia.bytes.isEmpty) {
+        if (mounted) {
+          _mostrarMensagem('Arquivo inválido. Selecione uma imagem.', isError: true);
+        }
         setState(() => _uploadingPhoto = false);
         return;
       }
 
-      final downloadUrl = await uploadData(m.storagePath, m.bytes);
+      // Mostrar preview local imediatamente
+      setState(() {
+        _localPhotoBytes = selectedMedia.bytes;
+      });
 
-      if (downloadUrl != null) {
+      // Obter extensão do arquivo
+      String extensao = '.jpg'; // default
+      if (selectedMedia.storagePath.isNotEmpty) {
+        final path = selectedMedia.storagePath.toLowerCase();
+        if (path.endsWith('.png')) extensao = '.png';
+        else if (path.endsWith('.jpeg')) extensao = '.jpeg';
+        else if (path.endsWith('.gif')) extensao = '.gif';
+        else if (path.endsWith('.webp')) extensao = '.webp';
+      }
+
+      // Upload para Firebase Storage com path único
+      final timestamp = DateTime.now().millisecondsSinceEpoch;
+      final storagePath = 'users/$currentUserUid/profile_$timestamp$extensao';
+
+      final downloadUrl = await uploadData(
+        storagePath,
+        selectedMedia.bytes,
+      );
+
+      if (downloadUrl != null && downloadUrl.isNotEmpty) {
+        print('\n📤 ========== UPLOAD CONCLUÍDO ==========');
+        print('📸 Download URL recebida: "$downloadUrl"');
+        
         setState(() {
           _photoUrl = downloadUrl;
-          _hasChanges = true;
+          // Limpar preview local para usar a imagem do banco/URL
+          _localPhotoBytes = null;
+          print('📸 _photoUrl atualizada para: "$_photoUrl"');
+          print('📸 _localPhotoBytes limpa: ${_localPhotoBytes == null}');
         });
-        _mostrarMensagem('Foto atualizada! Não esqueça de salvar.');
+        
+        print('✅ setState() chamado após upload');
+        _onFieldChanged(); // Atualizar estado de mudanças
+
+        // Persistir imediatamente no banco apenas o photo_url
+        try {
+          if (_appUser != null) {
+            print('💾 Salvando no banco...');
+            await AppUsersTable().update(
+              data: {
+                'photo_url': _photoUrl,
+                'updated_at': DateTime.now().toIso8601String(),
+              },
+              matchingRows: (q) => q.eq('id', _appUser!.id),
+            );
+            print('✅ Salvo no banco com sucesso');
+            
+            // Recarregar dados
+            print('🔄 Recarregando dados do usuário...');
+            await _carregarDadosUsuario();
+          }
+        } catch (e) {
+          print('❌ Erro ao salvar no banco: $e');
+        }
+        print('========== FIM DO UPLOAD ==========\n');
+
+        if (mounted) {
+          _mostrarMensagem('Foto atualizada com sucesso!');
+        }
       } else {
-        _mostrarMensagem('Falha ao enviar a foto.', isError: true);
+        if (mounted) {
+          _mostrarMensagem('Erro ao fazer upload da foto.', isError: true);
+        }
       }
     } catch (e) {
-      _mostrarMensagem('Erro ao selecionar a imagem.', isError: true);
+      debugPrint('Erro ao alterar foto: $e');
+      if (mounted) {
+        _mostrarMensagem('Erro ao processar a imagem. Tente novamente.', isError: true);
+      }
     } finally {
       if (mounted) setState(() => _uploadingPhoto = false);
     }
   }
 
-  Future<bool?> _mostrarDialogoConfirmacao() {
-    return showDialog<bool>(
-      context: context,
-      builder: (context) => AlertDialog(
-        shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
-        title: Text(
-          'Descartar alterações?',
-          style: FlutterFlowTheme.of(context).titleMedium.override(
-                font: GoogleFonts.inter(fontWeight: FontWeight.w600),
-              ),
-        ),
-        content: Text(
-          'Você tem alterações não salvas. Deseja descartá-las?',
-          style: FlutterFlowTheme.of(context).bodyMedium.override(
-                font: GoogleFonts.inter(),
-              ),
-        ),
-        actions: [
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(false),
-            child: Text(
-              'Cancelar',
-              style: TextStyle(
-                color: FlutterFlowTheme.of(context).secondaryText,
-              ),
-            ),
-          ),
-          TextButton(
-            onPressed: () => Navigator.of(context).pop(true),
-            child: Text(
-              'Descartar',
-              style: TextStyle(
-                color: FlutterFlowTheme.of(context).error,
-                fontWeight: FontWeight.w600,
-              ),
-            ),
-          ),
-        ],
-      ),
-    );
-  }
+
 
   String _extractDigits(String s) => s.replaceAll(RegExp(r'\D'), '');
 }
