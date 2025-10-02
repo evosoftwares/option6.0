@@ -13,8 +13,6 @@ class PreferenciasPassageiroModel extends FlutterFlowModel {
   // Lista dinâmica de categorias vindas de platform_settings
   List<String> platformCategories = [];
 
-  // State field(s) for payment method
-  String paymentMethod = 'dinheiro';
 
   // State field(s) for preferences switches
   bool needsPet = false;

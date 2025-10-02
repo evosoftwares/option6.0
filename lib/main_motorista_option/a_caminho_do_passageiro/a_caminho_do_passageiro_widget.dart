@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'dart:math';
 import '/backend/supabase/supabase.dart';
 import '/flutter_flow/flutter_flow_google_map.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
@@ -26,11 +28,96 @@ class _ACaminhoDoPassageiroWidgetState
   late ACaminhoDoPassageiroModel _model;
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
+  Timer? _etaTimer;
+  String _etaMessage = 'Calculando ETA...';
 
   @override
   void initState() {
     super.initState();
     _model = createModel(context, () => ACaminhoDoPassageiroModel());
+
+    // Start the timer to update ETA every 30 seconds
+    if (widget.tripId != null) {
+      _etaTimer = Timer.periodic(const Duration(seconds: 30), (timer) {
+        _updateETA();
+      });
+      // Initial call
+      _updateETA();
+    }
+  }
+
+  @override
+  void dispose() {
+    _etaTimer?.cancel(); // Cancel the timer to prevent memory leaks
+    _model.dispose();
+    super.dispose();
+  }
+
+  // Function to calculate distance using Haversine formula
+  double _calculateDistanceInKm(
+      double lat1, double lon1, double lat2, double lon2) {
+    const p = 0.017453292519943295; // Pi / 180
+    final a = 0.5 -
+        cos((lat2 - lat1) * p) / 2 +
+        cos(lat1 * p) * cos(lat2 * p) * (1 - cos((lon2 - lon1) * p)) / 2;
+    return 12742 * asin(sqrt(a)); // 2 * R; R = 6371 km
+  }
+
+  Future<void> _updateETA() async {
+    if (widget.tripId == null) return;
+
+    try {
+      // Fetch the latest trip details
+      final tripList = await TripsTable().queryRows(
+        queryFn: (q) => q.eq('id', widget.tripId!).limit(1),
+      );
+      if (tripList.isEmpty) return;
+      final trip = tripList.first;
+
+      // Fetch the driver's current location
+      final driverList = await DriversTable().queryRows(
+        queryFn: (q) => q.eq('id', trip.driverId!).limit(1),
+      );
+      if (driverList.isEmpty) return;
+      final driver = driverList.first;
+
+      final driverLat = driver.currentLatitude;
+      final driverLon = driver.currentLongitude;
+
+      // Determine passenger location based on trip status
+      final passengerLat = trip.status == 'in_progress'
+          ? trip.destinationLatitude
+          : trip.originLatitude;
+      final passengerLon = trip.status == 'in_progress'
+          ? trip.destinationLongitude
+          : trip.originLongitude;
+
+      if (driverLat != null &&
+          driverLon != null &&
+          passengerLat != null &&
+          passengerLon != null) {
+        final distance = _calculateDistanceInKm(
+            driverLat, driverLon, passengerLat, passengerLon);
+
+        // Assume average speed of 30 km/h
+        const averageSpeedKmH = 30;
+        final timeHours = distance / averageSpeedKmH;
+        final timeMinutes = (timeHours * 60).ceil();
+
+        if (mounted) {
+          setState(() {
+            _etaMessage = 'Aprox. $timeMinutes min';
+          });
+        }
+      }
+    } catch (e) {
+      print('Error updating ETA: $e');
+      if (mounted) {
+        setState(() {
+          _etaMessage = 'Erro ao calcular';
+        });
+      }
+    }
   }
 
   Future<AppUsersRow?> _fetchPassengerUserDetails(String passengerId) async {
@@ -51,7 +138,8 @@ class _ACaminhoDoPassageiroWidgetState
     if (uri != null && await canLaunchUrl(uri)) {
       await launchUrl(uri);
     } else {
-      final webUri = Uri.tryParse('https://www.google.com/maps/dir/?api=1&destination=$lat,$lon');
+      final webUri = Uri.tryParse(
+          'https://www.google.com/maps/dir/?api=1&destination=$lat,$lon');
       if (webUri != null && await canLaunchUrl(webUri)) {
         await launchUrl(webUri);
       }
@@ -80,15 +168,177 @@ class _ACaminhoDoPassageiroWidgetState
     );
   }
 
-  Future<void> _handleFinishTrip() async {
-    // TODO: Implementar lógica de finalização da viagem, cálculo de preço e pagamento.
-    print('Finalizar corrida clicado');
+  Future<void> _handleFinishTrip(TripsRow trip) async {
+    try {
+      final settingsList = await PlatformSettingsTable().queryRows(
+        queryFn: (q) => q.eq('category', trip.vehicleCategory!).limit(1),
+      );
+      if (settingsList.isEmpty) {
+        throw Exception(
+            'Platform settings not found for category ${trip.vehicleCategory}');
+      }
+      final platformSettings = settingsList.first;
+
+      final driverList = await DriversTable().queryRows(
+        queryFn: (q) => q.eq('id', trip.driverId!).limit(1),
+      );
+      if (driverList.isEmpty) {
+        throw Exception('Driver details not found.');
+      }
+      final driver = driverList.first;
+
+      final distanceValue = (trip.actualDistanceKm ?? 0.0) *
+          (platformSettings.basePricePerKm ?? 0.0);
+      final timeValue = (trip.actualDurationMinutes ?? 0) *
+          (platformSettings.basePricePerMinute ?? 0.0);
+
+      double extraFees = 0;
+      if (trip.needsPet == true) extraFees += driver.petFee ?? 0;
+      if (trip.needsGrocerySpace == true) extraFees += driver.groceryFee ?? 0;
+      if (trip.isCondoOrigin == true || trip.isCondoDestination == true)
+        extraFees += driver.condoFee ?? 0;
+      extraFees += (trip.numberOfStops ?? 0) * (driver.stopFee ?? 0);
+
+      final calculatedFare = distanceValue + timeValue + extraFees;
+      final totalFare =
+          max<double>(calculatedFare, platformSettings.minFare ?? 0.0);
+
+      final platformCommission =
+          totalFare * (platformSettings.platformCommissionPercent ?? 0.0);
+      final driverEarnings = totalFare - platformCommission;
+
+      await TripsTable().update(
+        data: {
+          'status': 'completed',
+          'total_fare': totalFare,
+          'platform_commission': platformCommission,
+          'driver_earnings': driverEarnings,
+          'trip_completed_at': DateTime.now().toIso8601String(),
+        },
+        matchingRows: (q) => q.eq('id', trip.id),
+      );
+
+      final passengerWallets = await PassengerWalletsTable().queryRows(
+          queryFn: (q) => q.eq('passenger_id', trip.passengerId!).limit(1));
+      if (passengerWallets.isNotEmpty) {
+        final passengerWallet = passengerWallets.first;
+        final newPassengerBalance =
+            (passengerWallet.availableBalance ?? 0) - totalFare;
+        await PassengerWalletsTable().update(
+          data: {'available_balance': newPassengerBalance},
+          matchingRows: (q) => q.eq('id', passengerWallet.id),
+        );
+        await PassengerWalletTransactionsTable().insert({
+          'wallet_id': passengerWallet.id,
+          'passenger_id': trip.passengerId,
+          'type': 'trip_payment',
+          'amount': totalFare,
+          'description': 'Pagamento da corrida ${trip.tripCode ?? ''}',
+          'trip_id': trip.id,
+          'status': 'completed',
+        });
+      }
+
+      final driverWallets = await DriverWalletsTable().queryRows(
+          queryFn: (q) => q.eq('driver_id', trip.driverId!).limit(1));
+      if (driverWallets.isNotEmpty) {
+        final driverWallet = driverWallets.first;
+        final newDriverBalance =
+            (driverWallet.availableBalance ?? 0) + driverEarnings;
+        await DriverWalletsTable().update(
+          data: {'available_balance': newDriverBalance},
+          matchingRows: (q) => q.eq('id', driverWallet.id),
+        );
+        await WalletTransactionsTable().insert({
+          'wallet_id': driverWallet.id,
+          'type': 'earning',
+          'amount': driverEarnings,
+          'description': 'Ganhos da corrida ${trip.tripCode ?? ''}',
+          'reference_type': 'trip',
+          'reference_id': trip.id,
+          'status': 'completed',
+        });
+      }
+
+      if (mounted) {
+        context.goNamed('mainMotorista');
+      }
+    } catch (e) {
+      print('Error finishing trip: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erro ao finalizar a corrida: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
-  @override
-  void dispose() {
-    _model.dispose();
-    super.dispose();
+  Future<void> _handleCancellation(TripsRow trip) async {
+    try {
+      final settingsList = await PlatformSettingsTable().queryRows(
+        queryFn: (q) => q.eq('category', trip.vehicleCategory!).limit(1),
+      );
+      if (settingsList.isEmpty) {
+        throw Exception('Platform settings not found.');
+      }
+      final platformSettings = settingsList.first;
+
+      // snake_case para camelCase
+      final estimatedFare = trip.estimatedDistanceKm ?? 0.0;
+      final percentageValue =
+          estimatedFare * (platformSettings.cancellationFeePercent ?? 0.0);
+      final cancellationFee = max<double>(
+          platformSettings.minCancellationFee ?? 0.0, percentageValue);
+
+      final passengerWallets = await PassengerWalletsTable().queryRows(
+          queryFn: (q) => q.eq('passenger_id', trip.passengerId!).limit(1));
+      if (passengerWallets.isNotEmpty) {
+        final passengerWallet = passengerWallets.first;
+        final newPassengerBalance =
+            (passengerWallet.availableBalance ?? 0) - cancellationFee;
+        await PassengerWalletsTable().update(
+          data: {'available_balance': newPassengerBalance},
+          matchingRows: (q) => q.eq('id', passengerWallet.id),
+        );
+        await PassengerWalletTransactionsTable().insert({
+          'wallet_id': passengerWallet.id,
+          'passenger_id': trip.passengerId,
+          'type': 'cancellation_fee',
+          'amount': cancellationFee,
+          'description':
+              'Taxa de cancelamento da corrida ${trip.tripCode ?? ''}',
+          'trip_id': trip.id,
+          'status': 'completed',
+        });
+      }
+
+      await TripsTable().update(
+        data: {
+          'status': 'cancelled_by_driver',
+          'cancellation_fee': cancellationFee,
+          'cancelled_by': 'driver',
+          'cancelled_at': DateTime.now().toIso8601String(),
+        },
+        matchingRows: (q) => q.eq('id', trip.id),
+      );
+
+      if (mounted) {
+        context.goNamed('mainMotorista');
+      }
+    } catch (e) {
+      print('Error cancelling trip: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erro ao cancelar a corrida: ${e.toString()}'),
+            backgroundColor: Colors.red,
+          ),
+        );
+      }
+    }
   }
 
   @override
@@ -104,7 +354,9 @@ class _ACaminhoDoPassageiroWidgetState
             .eq('id', widget.tripId!)
             .map((data) => data.map((row) => TripsRow(row)).toList()),
         builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting || !snapshot.hasData || snapshot.data!.isEmpty) {
+          if (snapshot.connectionState == ConnectionState.waiting ||
+              !snapshot.hasData ||
+              snapshot.data!.isEmpty) {
             return Center(child: CircularProgressIndicator());
           }
           final trip = snapshot.data!.first;
@@ -112,7 +364,8 @@ class _ACaminhoDoPassageiroWidgetState
           return FutureBuilder<AppUsersRow?>(
             future: _fetchPassengerUserDetails(trip.passengerId.toString()),
             builder: (context, passengerSnapshot) {
-              if (passengerSnapshot.connectionState == ConnectionState.waiting) {
+              if (passengerSnapshot.connectionState ==
+                  ConnectionState.waiting) {
                 return Center(child: CircularProgressIndicator());
               }
               final appUser = passengerSnapshot.data;
@@ -123,12 +376,15 @@ class _ACaminhoDoPassageiroWidgetState
                   Expanded(
                     child: FlutterFlowGoogleMap(
                       controller: _model.googleMapsController,
-                      onCameraIdle: (latLng) => _model.googleMapsCenter = latLng,
-                      initialLocation: LatLng(trip.originLatitude! as double, trip.originLongitude! as double),
+                      onCameraIdle: (latLng) =>
+                          _model.googleMapsCenter = latLng,
+                      initialLocation: LatLng(trip.originLatitude! as double,
+                          trip.originLongitude! as double),
                       markers: [
                         FlutterFlowMarker(
                           'passengerLocation',
-                          LatLng(trip.originLatitude! as double, trip.originLongitude! as double),
+                          LatLng(trip.originLatitude! as double,
+                              trip.originLongitude! as double),
                         ),
                       ],
                       markerColor: GoogleMarkerColor.green,
@@ -164,21 +420,29 @@ class _ACaminhoDoPassageiroWidgetState
           children: [
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
-              children: [Text('Aprox. 3 min', style: FlutterFlowTheme.of(context).displayMedium)],
+              children: [
+                Text(_etaMessage,
+                    style: FlutterFlowTheme.of(context).displayMedium)
+              ],
             ),
             Divider(),
             Row(
               children: [
                 Container(
-                  width: 60, height: 60,
+                  width: 60,
+                  height: 60,
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(30),
-                    child: Image.network(appUser?.photoUrl ?? '', fit: BoxFit.cover, errorBuilder: (c,o,s) => Icon(Icons.person, size: 30)),
+                    child: Image.network(appUser?.photoUrl ?? '',
+                        fit: BoxFit.cover,
+                        errorBuilder: (c, o, s) =>
+                            Icon(Icons.person, size: 30)),
                   ),
                 ),
                 SizedBox(width: 16),
                 Expanded(
-                  child: Text(appUser?.fullName ?? 'Passageiro', style: FlutterFlowTheme.of(context).titleMedium),
+                  child: Text(appUser?.fullName ?? 'Passageiro',
+                      style: FlutterFlowTheme.of(context).titleMedium),
                 ),
               ],
             ),
@@ -188,19 +452,37 @@ class _ACaminhoDoPassageiroWidgetState
               children: [
                 Expanded(
                   child: FFButtonWidget(
-                    onPressed: () => _launchMaps(trip.originLatitude! as double, trip.originLongitude! as double),
+                    onPressed: () => _launchMaps(trip.originLatitude! as double,
+                        trip.originLongitude! as double),
                     text: 'Navegar',
                     icon: Icon(Icons.navigation_outlined),
-                    options: FFButtonOptions(height: 50, color: FlutterFlowTheme.of(context).primary, textStyle: FlutterFlowTheme.of(context).titleSmall.copyWith(color: Colors.white)),
+                    options: FFButtonOptions(
+                        height: 50,
+                        color: FlutterFlowTheme.of(context).primary,
+                        textStyle: FlutterFlowTheme.of(context)
+                            .titleSmall
+                            .copyWith(color: Colors.white)),
                   ),
                 ),
                 SizedBox(width: 16),
                 Expanded(
                   child: FFButtonWidget(
-                    onPressed: () { /* TODO: Navegar para o chat em português */ },
+                    onPressed: () {
+                      context.pushNamed(
+                        'tripChatPage',
+                        queryParameters: {
+                          'tripId': serializeParam(trip.id, ParamType.String),
+                        }.withoutNulls,
+                      );
+                    },
                     text: 'Chat',
                     icon: Icon(Icons.chat_bubble_outline),
-                    options: FFButtonOptions(height: 50, color: FlutterFlowTheme.of(context).secondary, textStyle: FlutterFlowTheme.of(context).titleSmall.copyWith(color: Colors.white)),
+                    options: FFButtonOptions(
+                        height: 50,
+                        color: FlutterFlowTheme.of(context).secondary,
+                        textStyle: FlutterFlowTheme.of(context)
+                            .titleSmall
+                            .copyWith(color: Colors.white)),
                   ),
                 ),
               ],
@@ -208,11 +490,17 @@ class _ACaminhoDoPassageiroWidgetState
             SizedBox(height: 16),
             _buildActionButton(trip),
             SizedBox(height: 16),
-            if (trip.status != 'in_progress') // Oculta o botão cancelar se a viagem já começou
+            if (trip.status != 'in_progress')
               FFButtonWidget(
-                onPressed: () { /* TODO: Implementar cancelamento em português */ },
+                onPressed: () => _handleCancellation(trip),
                 text: 'Cancelar Viagem',
-                options: FFButtonOptions(width: double.infinity, height: 50, color: FlutterFlowTheme.of(context).error, textStyle: FlutterFlowTheme.of(context).titleSmall.copyWith(color: Colors.white)),
+                options: FFButtonOptions(
+                    width: double.infinity,
+                    height: 50,
+                    color: FlutterFlowTheme.of(context).error,
+                    textStyle: FlutterFlowTheme.of(context)
+                        .titleSmall
+                        .copyWith(color: Colors.white)),
               ),
           ],
         ),
@@ -221,24 +509,41 @@ class _ACaminhoDoPassageiroWidgetState
   }
 
   Widget _buildActionButton(TripsRow trip) {
-    // O status inicial pode ser 'driver_assigned' ou 'driver_arriving'
     if (trip.status == 'driver_assigned' || trip.status == 'driver_arriving') {
       return FFButtonWidget(
         onPressed: _handleArrival,
         text: 'Cheguei ao Local',
-        options: FFButtonOptions(width: double.infinity, height: 50, color: FlutterFlowTheme.of(context).success, textStyle: FlutterFlowTheme.of(context).titleSmall.copyWith(color: Colors.white)),
+        options: FFButtonOptions(
+            width: double.infinity,
+            height: 50,
+            color: FlutterFlowTheme.of(context).success,
+            textStyle: FlutterFlowTheme.of(context)
+                .titleSmall
+                .copyWith(color: Colors.white)),
       );
     } else if (trip.status == 'waiting_passenger') {
       return FFButtonWidget(
         onPressed: _handleStartTrip,
         text: 'Iniciar Corrida',
-        options: FFButtonOptions(width: double.infinity, height: 50, color: FlutterFlowTheme.of(context).primary, textStyle: FlutterFlowTheme.of(context).titleSmall.copyWith(color: Colors.white)),
+        options: FFButtonOptions(
+            width: double.infinity,
+            height: 50,
+            color: FlutterFlowTheme.of(context).primary,
+            textStyle: FlutterFlowTheme.of(context)
+                .titleSmall
+                .copyWith(color: Colors.white)),
       );
     } else if (trip.status == 'in_progress') {
       return FFButtonWidget(
-        onPressed: _handleFinishTrip,
+        onPressed: () => _handleFinishTrip(trip),
         text: 'Finalizar Corrida',
-        options: FFButtonOptions(width: double.infinity, height: 50, color: FlutterFlowTheme.of(context).tertiary, textStyle: FlutterFlowTheme.of(context).titleSmall.copyWith(color: Colors.white)),
+        options: FFButtonOptions(
+            width: double.infinity,
+            height: 50,
+            color: FlutterFlowTheme.of(context).tertiary,
+            textStyle: FlutterFlowTheme.of(context)
+                .titleSmall
+                .copyWith(color: Colors.white)),
       );
     } else {
       return SizedBox.shrink();
