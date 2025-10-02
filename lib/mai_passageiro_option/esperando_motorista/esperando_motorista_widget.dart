@@ -1,3 +1,5 @@
+import 'dart:async';
+import 'dart:math';
 import 'package:just_audio/just_audio.dart';
 import '/backend/supabase/supabase.dart';
 import '/flutter_flow/flutter_flow_google_map.dart';
@@ -33,18 +35,88 @@ class _EsperandoMotoristaWidgetState extends State<EsperandoMotoristaWidget> {
   bool _soundPlayed = false;
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
+  Timer? _etaTimer;
+  String _etaMessage = 'Calculando ETA...';
 
   @override
   void initState() {
     super.initState();
     _model = createModel(context, () => EsperandoMotoristaModel());
+
+    // Start the timer to update ETA every 30 seconds
+    if (widget.tripRequestId != null) {
+      _etaTimer = Timer.periodic(const Duration(seconds: 30), (timer) {
+        _updateETA();
+      });
+      // Initial call
+      _updateETA();
+    }
   }
 
   @override
   void dispose() {
+    _etaTimer?.cancel(); // Cancel the timer
     _model.dispose();
     _audioPlayer.dispose();
     super.dispose();
+  }
+
+  // Function to calculate distance using Haversine formula
+  double _calculateDistanceInKm(double lat1, double lon1, double lat2, double lon2) {
+    const p = 0.017453292519943295; // Pi / 180
+    final a = 0.5 -
+        cos((lat2 - lat1) * p) / 2 +
+        cos(lat1 * p) * cos(lat2 * p) * (1 - cos((lon2 - lon1) * p)) / 2;
+    return 12742 * asin(sqrt(a)); // 2 * R; R = 6371 km
+  }
+
+  Future<void> _updateETA() async {
+    if (widget.tripRequestId == null) return;
+
+    try {
+      // Fetch the latest trip details using the request_id
+      final tripList = await TripsTable().queryRows(
+        queryFn: (q) => q.eq('request_id', widget.tripRequestId!).limit(1),
+      );
+      if (tripList.isEmpty || tripList.first.driverId == null) return;
+      final trip = tripList.first;
+
+      // Fetch the driver's current location
+      final driverList = await DriversTable().queryRows(
+        queryFn: (q) => q.eq('id', trip.driverId!).limit(1),
+      );
+      if (driverList.isEmpty) return;
+      final driver = driverList.first;
+
+      final driverLat = driver.currentLatitude;
+      final driverLon = driver.currentLongitude;
+      
+      // In this screen, the passenger is always at the origin
+      final passengerLat = trip.originLatitude;
+      final passengerLon = trip.originLongitude;
+
+      if (driverLat != null && driverLon != null && passengerLat != null && passengerLon != null) {
+        final distance = _calculateDistanceInKm(driverLat, driverLon, passengerLat, passengerLon);
+        
+        // Assume average speed of 30 km/h
+        const averageSpeedKmH = 30;
+        final timeHours = distance / averageSpeedKmH;
+        final timeMinutes = (timeHours * 60).ceil();
+
+        if (mounted) {
+          setState(() {
+            _etaMessage = 'Chega em $timeMinutes min';
+          });
+        }
+      }
+    } catch (e) {
+      print('Error updating ETA: $e');
+      if (mounted) {
+        setState(() {
+          _etaMessage = 'Erro no ETA';
+        });
+      }
+    }
   }
 
   @override
@@ -212,7 +284,6 @@ class _EsperandoMotoristaWidgetState extends State<EsperandoMotoristaWidget> {
     );
   }
 
-  // Widget para mostrar enquanto procura por um motorista.
   Widget _buildSearchingUI() {
     return Center(
       child: Column(
@@ -230,7 +301,6 @@ class _EsperandoMotoristaWidgetState extends State<EsperandoMotoristaWidget> {
     );
   }
 
-  // Widget para mostrar quando um motorista foi encontrado.
   Widget _buildDriverFoundUI(TripsRow trip, DriversRow driver, AppUsersRow appUser) {
     final originLat = toDoubleOrNull(trip.originLatitude);
     final originLng = toDoubleOrNull(trip.originLongitude);
@@ -284,11 +354,10 @@ class _EsperandoMotoristaWidgetState extends State<EsperandoMotoristaWidget> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                    Text('Chega em 3 min', style: FlutterFlowTheme.of(context).headlineMedium),
+                    Text(_etaMessage, style: FlutterFlowTheme.of(context).headlineMedium),
                     Column(
                       crossAxisAlignment: CrossAxisAlignment.end,
                       children: [
-                        // Usa fullName do appUser.
                         Text(appUser.fullName ?? 'Nome não disponível', style: FlutterFlowTheme.of(context).titleMedium),
                         Row(
                           children: [
@@ -303,7 +372,6 @@ class _EsperandoMotoristaWidgetState extends State<EsperandoMotoristaWidget> {
                       decoration: BoxDecoration(shape: BoxShape.circle),
                       child: ClipRRect(
                         borderRadius: BorderRadius.circular(30),
-                        // Usa photoUrl do appUser.
                         child: Image.network(appUser.photoUrl ?? '', fit: BoxFit.cover, errorBuilder: (c, o, s) => Icon(Icons.person, size: 30)),
                       ),
                     ),
@@ -322,7 +390,6 @@ class _EsperandoMotoristaWidgetState extends State<EsperandoMotoristaWidget> {
                     ),
                     Container(
                       width: 60, height: 40,
-                      // Remove a foto do veículo que não existe e usa um ícone.
                       child: Icon(Icons.directions_car, size: 30),
                     ),
                   ],

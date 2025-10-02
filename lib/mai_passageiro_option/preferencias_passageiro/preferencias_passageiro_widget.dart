@@ -1,12 +1,10 @@
-// import '/auth/firebase_auth/auth_util.dart';
-// Keep if needed in future; currently not used in this file.
+import '/auth/firebase_auth/auth_util.dart';
+import '/flutter_flow/user_id_converter.dart';
 import '/backend/supabase/supabase.dart';
 import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
-// import '/flutter_flow/user_id_converter.dart';
-// Keep if needed in future; currently not used in this file.
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -50,7 +48,6 @@ class _PreferenciasPassageiroWidgetState
     super.initState();
     _model = createModel(context, () => PreferenciasPassageiroModel());
 
-    // Load passenger preferences on initialization
     SchedulerBinding.instance.addPostFrameCallback((_) async {
       await _loadPassengerPreferences();
     });
@@ -65,61 +62,131 @@ class _PreferenciasPassageiroWidgetState
   Future<void> _loadPassengerPreferences() async {
     setState(() => _model.isLoading = true);
     try {
-      // TODO: Implementar carregamento das preferências do Supabase
-      // Por enquanto, usar valores padrão
+      final firebaseUid = currentUserUid;
+      if (firebaseUid.isEmpty) return;
+
+      final appUserId =
+          await UserIdConverter.getAppUserIdFromFirebaseUid(firebaseUid);
+      if (appUserId == null) return;
+
+      final passengerList = await PassengersTable().queryRows(
+        queryFn: (q) => q.eq('user_id', appUserId).limit(1),
+      );
+
+      if (passengerList.isNotEmpty) {
+        final passenger = passengerList.first;
+        // Acessando os dados diretamente do mapa de dados brutos
+        setState(() {
+          _model.needsPet = passenger.data['pref_needs_pet'] as bool? ?? false;
+          _model.needsGrocerySpace =
+              passenger.data['pref_needs_grocery_space'] as bool? ?? false;
+          _model.needsAc = passenger.data['pref_needs_ac'] as bool? ?? false;
+          _model.needsCondoAccess =
+              passenger.data['pref_needs_condo_access'] as bool? ?? false;
+          _model.preferQuietRide =
+              passenger.data['pref_prefer_quiet_ride'] as bool? ?? false;
+        });
+      }
     } catch (e) {
       print('Erro ao carregar preferências: $e');
     } finally {
-      setState(() => _model.isLoading = false);
+      if (mounted) {
+        setState(() => _model.isLoading = false);
+      }
     }
   }
 
   Future<void> _savePreferencesAndContinue() async {
     if (_model.isSaving) return;
-    
+
     setState(() => _model.isSaving = true);
+
     try {
-      // TODO: Salvar preferências no Supabase
-      
-      // Mostrar feedback de sucesso
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Preferências salvas com sucesso!'),
-          backgroundColor: Colors.green,
-          duration: Duration(seconds: 2),
-        ),
+      final firebaseUid = currentUserUid;
+      final estimatedFare = widget.preco;
+
+      if (firebaseUid.isEmpty) {
+        throw Exception('Usuário não autenticado.');
+      }
+      if (estimatedFare == null || estimatedFare <= 0) {
+        throw Exception('Preço estimado da viagem é inválido.');
+      }
+
+      final appUserId =
+          await UserIdConverter.getAppUserIdFromFirebaseUid(firebaseUid);
+      if (appUserId == null) {
+        throw Exception('Não foi possível encontrar o perfil do usuário.');
+      }
+
+      final wallets = await PassengerWalletsTable().queryRows(
+        queryFn: (q) => q.eq('user_id', appUserId).limit(1),
       );
-      
-      // Navegar para escolha de motorista com as preferências
+
+      if (wallets.isEmpty) {
+        throw Exception('Carteira do passageiro não encontrada.');
+      }
+
+      final wallet = wallets.first;
+      final availableBalance = wallet.availableBalance ?? 0.0;
+
+      if (availableBalance < estimatedFare) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                  'Saldo insuficiente. Adicione créditos à sua carteira para continuar.'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+        return;
+      }
+
+      // Save preferences to the database
+      await PassengersTable().update(
+        data: {
+          'pref_needs_pet': _model.needsPet,
+          'pref_needs_grocery_space': _model.needsGrocerySpace,
+          'pref_needs_ac': _model.needsAc,
+          'pref_needs_condo_access': _model.needsCondoAccess,
+          'pref_prefer_quiet_ride': _model.preferQuietRide,
+        },
+        matchingRows: (q) => q.eq('user_id', appUserId),
+      );
+
       if (mounted) {
         context.pushReplacementNamed(
           'escolhaMotorista',
           queryParameters: {
             'origem': serializeParam(widget.origem, ParamType.FFPlace),
             'destino': serializeParam(widget.destino, ParamType.FFPlace),
-            'paradas': serializeParam(widget.paradas, ParamType.FFPlace, isList: true),
+            'paradas':
+                serializeParam(widget.paradas, ParamType.FFPlace, isList: true),
             'distancia': serializeParam(widget.distancia, ParamType.double),
             'duracao': serializeParam(widget.duracao, ParamType.int),
             'preco': serializeParam(widget.preco, ParamType.double),
-            // Adicionar preferências como parâmetros
-            'vehicleCategory': serializeParam(_model.vehicleCategory, ParamType.String),
-            'paymentMethod': serializeParam(_model.paymentMethod, ParamType.String),
+            'vehicleCategory':
+                serializeParam(_model.vehicleCategory, ParamType.String),
             'needsPet': serializeParam(_model.needsPet, ParamType.bool),
-            'needsGrocerySpace': serializeParam(_model.needsGrocerySpace, ParamType.bool),
+            'needsGrocerySpace':
+                serializeParam(_model.needsGrocerySpace, ParamType.bool),
             'needsAc': serializeParam(_model.needsAc, ParamType.bool),
-            'needsCondoAccess': serializeParam(_model.needsCondoAccess, ParamType.bool),
+            'needsCondoAccess':
+                serializeParam(_model.needsCondoAccess, ParamType.bool),
           }.withoutNulls,
         );
       }
     } catch (e) {
-      print('Erro ao salvar preferências: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Erro ao salvar preferências. Tente novamente.'),
-          backgroundColor: Colors.red,
-          duration: Duration(seconds: 3),
-        ),
-      );
+      print('Erro ao salvar preferências e continuar: $e');
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Erro ao salvar preferências: ${e.toString()}'),
+            backgroundColor: Colors.red,
+            duration: const Duration(seconds: 3),
+          ),
+        );
+      }
     } finally {
       if (mounted) {
         setState(() => _model.isSaving = false);
@@ -206,12 +273,6 @@ class _PreferenciasPassageiroWidgetState
                               _buildVehicleCategorySelector(),
                               SizedBox(height: 24.0),
 
-                              // Forma de Pagamento
-                              _buildSectionTitle('Forma de Pagamento'),
-                              SizedBox(height: 12.0),
-                              _buildPaymentMethodSelector(),
-                              SizedBox(height: 24.0),
-
                               // Necessidades Especiais
                               _buildSectionTitle('Necessidades Especiais'),
                               SizedBox(height: 12.0),
@@ -249,7 +310,9 @@ class _PreferenciasPassageiroWidgetState
                           ],
                         ),
                         child: FFButtonWidget(
-                          onPressed: _model.isSaving ? null : _savePreferencesAndContinue,
+                          onPressed: _model.isSaving
+                              ? null
+                              : _savePreferencesAndContinue,
                           text: _model.isSaving ? 'Salvando...' : 'Continuar',
                           options: FFButtonOptions(
                             width: double.infinity,
@@ -447,119 +510,6 @@ class _PreferenciasPassageiroWidgetState
     );
   }
 
-  Widget _buildPaymentMethodSelector() {
-    return Container(
-      width: double.infinity,
-      decoration: BoxDecoration(
-        color: FlutterFlowTheme.of(context).secondaryBackground,
-        borderRadius: BorderRadius.circular(12.0),
-        border: Border.all(
-          color: FlutterFlowTheme.of(context).alternate,
-          width: 1.0,
-        ),
-      ),
-      child: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            _buildPaymentOption(
-              'dinheiro',
-              'Dinheiro',
-              'Pagamento em espécie',
-              Icons.money,
-            ),
-            SizedBox(height: 12.0),
-            _buildPaymentOption(
-              'cartao',
-              'Cartão',
-              'Pagamento com cartão de crédito/débito',
-              Icons.credit_card,
-            ),
-            SizedBox(height: 12.0),
-            _buildPaymentOption(
-              'pix',
-              'PIX',
-              'Pagamento via PIX',
-              Icons.qr_code,
-            ),
-          ],
-        ),
-      ),
-    );
-  }
-
-  Widget _buildPaymentOption(
-      String value, String title, String description, IconData icon) {
-    final isSelected = _model.paymentMethod == value;
-    return InkWell(
-      onTap: () {
-        setState(() {
-          _model.paymentMethod = value;
-        });
-      },
-      child: Container(
-        width: double.infinity,
-        padding: EdgeInsets.all(12.0),
-        decoration: BoxDecoration(
-          color: isSelected
-              ? FlutterFlowTheme.of(context).primary.withValues(alpha: 0.1)
-              : Colors.transparent,
-          borderRadius: BorderRadius.circular(8.0),
-          border: Border.all(
-            color: isSelected
-                ? FlutterFlowTheme.of(context).primary
-                : FlutterFlowTheme.of(context).alternate,
-            width: isSelected ? 2.0 : 1.0,
-          ),
-        ),
-        child: Row(
-          children: [
-            Icon(
-              icon,
-              color: isSelected
-                  ? FlutterFlowTheme.of(context).primary
-                  : FlutterFlowTheme.of(context).secondaryText,
-              size: 24.0,
-            ),
-            SizedBox(width: 12.0),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    title,
-                    style: FlutterFlowTheme.of(context).bodyLarge.override(
-                          font: GoogleFonts.inter(),
-                          color: isSelected
-                              ? FlutterFlowTheme.of(context).primary
-                              : FlutterFlowTheme.of(context).primaryText,
-                          letterSpacing: 0.0,
-                          fontWeight: FontWeight.w600,
-                        ),
-                  ),
-                  Text(
-                    description,
-                    style: FlutterFlowTheme.of(context).bodySmall.override(
-                          font: GoogleFonts.inter(),
-                          color: FlutterFlowTheme.of(context).secondaryText,
-                          letterSpacing: 0.0,
-                        ),
-                  ),
-                ],
-              ),
-            ),
-            if (isSelected)
-              Icon(
-                Icons.check_circle,
-                color: FlutterFlowTheme.of(context).primary,
-                size: 20.0,
-              ),
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _buildSpecialNeedsSection() {
     return Container(
       width: double.infinity,
@@ -687,7 +637,10 @@ class _PreferenciasPassageiroWidgetState
                 {'value': 'sem_preferencia', 'label': 'Sem preferência'},
                 {'value': 'musica_baixa', 'label': 'Música baixa'},
                 {'value': 'sem_musica', 'label': 'Sem música'},
-                {'value': 'minha_playlist', 'label': 'Posso conectar minha playlist'},
+                {
+                  'value': 'minha_playlist',
+                  'label': 'Posso conectar minha playlist'
+                },
               ],
               (value) => setState(() => _model.musicPreference = value!),
             ),
