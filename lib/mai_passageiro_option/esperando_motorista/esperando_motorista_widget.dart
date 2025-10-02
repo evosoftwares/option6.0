@@ -1,8 +1,11 @@
+import 'package:just_audio/just_audio.dart';
 import '/backend/supabase/supabase.dart';
 import '/flutter_flow/flutter_flow_google_map.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/flutter_flow/flutter_flow_widgets.dart';
+import '/flutter_flow/flutter_flow_icon_button.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/material.dart';
 import '/utils/num_utils.dart';
 import 'esperando_motorista_model.dart';
@@ -26,6 +29,8 @@ class EsperandoMotoristaWidget extends StatefulWidget {
 
 class _EsperandoMotoristaWidgetState extends State<EsperandoMotoristaWidget> {
   late EsperandoMotoristaModel _model;
+  final AudioPlayer _audioPlayer = AudioPlayer();
+  bool _soundPlayed = false;
 
   final scaffoldKey = GlobalKey<ScaffoldState>();
 
@@ -38,6 +43,7 @@ class _EsperandoMotoristaWidgetState extends State<EsperandoMotoristaWidget> {
   @override
   void dispose() {
     _model.dispose();
+    _audioPlayer.dispose();
     super.dispose();
   }
 
@@ -119,36 +125,89 @@ class _EsperandoMotoristaWidgetState extends State<EsperandoMotoristaWidget> {
 
             final trip = snapshot.data!.first;
 
-            if (trip.driverId == null) {
-              return _buildSearchingUI();
+            if (trip.status == 'waiting_passenger' && !_soundPlayed) {
+              WidgetsBinding.instance.addPostFrameCallback((_) async {
+                await _audioPlayer.setAsset('assets/audios/ride_arrived.mp3');
+                _audioPlayer.play();
+                if (mounted) {
+                  setState(() {
+                    _soundPlayed = true;
+                  });
+                }
+              });
             }
 
-            return FutureBuilder<List<DriversRow>>(
-              future: DriversTable().querySingleRow(
-                queryFn: (q) => q.eq('id', trip.driverId!),
-              ),
-              builder: (context, driverSnapshot) {
-                if (!driverSnapshot.hasData || driverSnapshot.data!.isEmpty) {
+            switch (trip.status) {
+              case 'waiting_passenger':
+                return _buildDriverArrivedUI(trip);
+              case 'in_progress':
+                return _buildTripInProgressUI(trip);
+              case 'driver_arriving':
+              default:
+                if (trip.driverId == null) {
                   return _buildSearchingUI();
                 }
-                final driver = driverSnapshot.data!.first;
-
-                return FutureBuilder<List<AppUsersRow>>(
-                  future: AppUsersTable().querySingleRow(
-                    queryFn: (q) => q.eq('id', driver.userId),
+                return FutureBuilder<List<DriversRow>>(
+                  future: DriversTable().querySingleRow(
+                    queryFn: (q) => q.eq('id', trip.driverId!),
                   ),
-                  builder: (context, appUserSnapshot) {
-                    if (!appUserSnapshot.hasData || appUserSnapshot.data!.isEmpty) {
+                  builder: (context, driverSnapshot) {
+                    if (!driverSnapshot.hasData || driverSnapshot.data!.isEmpty) {
                       return _buildSearchingUI();
                     }
-                    final appUser = appUserSnapshot.data!.first;
-                    return _buildDriverFoundUI(trip, driver, appUser);
+                    final driver = driverSnapshot.data!.first;
+
+                    return FutureBuilder<List<AppUsersRow>>(
+                      future: AppUsersTable().querySingleRow(
+                        queryFn: (q) => q.eq('id', driver.userId),
+                      ),
+                      builder: (context, appUserSnapshot) {
+                        if (!appUserSnapshot.hasData || appUserSnapshot.data!.isEmpty) {
+                          return _buildSearchingUI();
+                        }
+                        final appUser = appUserSnapshot.data!.first;
+                        return _buildDriverFoundUI(trip, driver, appUser);
+                      },
+                    );
                   },
                 );
-              },
-            );
+            }
           },
         ),
+      ),
+    );
+  }
+
+  Widget _buildDriverArrivedUI(TripsRow trip) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          Icon(Icons.check_circle_outline, color: Colors.green, size: 80),
+          SizedBox(height: 20),
+          Text(
+            'Seu motorista chegou!',
+            textAlign: TextAlign.center,
+            style: FlutterFlowTheme.of(context).headlineMedium,
+          ),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildTripInProgressUI(TripsRow trip) {
+    return Center(
+      child: Column(
+        mainAxisAlignment: MainAxisAlignment.center,
+        children: [
+          CircularProgressIndicator(),
+          SizedBox(height: 20),
+          Text(
+            'Viagem em andamento...',
+            textAlign: TextAlign.center,
+            style: FlutterFlowTheme.of(context).headlineMedium,
+          ),
+        ],
       ),
     );
   }

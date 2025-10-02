@@ -790,7 +790,7 @@ class _PreferenciasPassageiroWidgetState
         ),
       ),
       child: DropdownButtonFormField<String>(
-        initialValue: currentValue,
+        value: currentValue,
         decoration: InputDecoration(
           contentPadding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
           border: InputBorder.none,
