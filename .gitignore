@@ -56,3 +56,5 @@
 
 # Outros
 *.local
+# Arquivo para teste visual de widgets isolados
+/lib/main_sandbox.dart

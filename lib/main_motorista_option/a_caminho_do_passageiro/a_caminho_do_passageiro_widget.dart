@@ -36,45 +36,41 @@ class _ACaminhoDoPassageiroWidgetState
     super.initState();
     _model = createModel(context, () => ACaminhoDoPassageiroModel());
 
-    // Start the timer to update ETA every 30 seconds
     if (widget.tripId != null) {
       _etaTimer = Timer.periodic(const Duration(seconds: 30), (timer) {
         _updateETA();
       });
-      // Initial call
       _updateETA();
     }
   }
 
   @override
   void dispose() {
-    _etaTimer?.cancel(); // Cancel the timer to prevent memory leaks
+    _etaTimer?.cancel();
     _model.dispose();
     super.dispose();
   }
 
-  // Function to calculate distance using Haversine formula
   double _calculateDistanceInKm(
       double lat1, double lon1, double lat2, double lon2) {
-    const p = 0.017453292519943295; // Pi / 180
+    const p = 0.017453292519943295;
     final a = 0.5 -
         cos((lat2 - lat1) * p) / 2 +
         cos(lat1 * p) * cos(lat2 * p) * (1 - cos((lon2 - lon1) * p)) / 2;
-    return 12742 * asin(sqrt(a)); // 2 * R; R = 6371 km
+    return 12742 * asin(sqrt(a));
   }
 
   Future<void> _updateETA() async {
     if (widget.tripId == null) return;
-
     try {
-      // Fetch the latest trip details
       final tripList = await TripsTable().queryRows(
         queryFn: (q) => q.eq('id', widget.tripId!).limit(1),
       );
       if (tripList.isEmpty) return;
       final trip = tripList.first;
 
-      // Fetch the driver's current location
+      if (trip.driverId == null) return;
+
       final driverList = await DriversTable().queryRows(
         queryFn: (q) => q.eq('id', trip.driverId!).limit(1),
       );
@@ -84,22 +80,20 @@ class _ACaminhoDoPassageiroWidgetState
       final driverLat = driver.currentLatitude;
       final driverLon = driver.currentLongitude;
 
-      // Determine passenger location based on trip status
-      final passengerLat = trip.status == 'in_progress'
+      final targetLat = trip.status == 'in_progress'
           ? trip.destinationLatitude
           : trip.originLatitude;
-      final passengerLon = trip.status == 'in_progress'
+      final targetLon = trip.status == 'in_progress'
           ? trip.destinationLongitude
           : trip.originLongitude;
 
       if (driverLat != null &&
           driverLon != null &&
-          passengerLat != null &&
-          passengerLon != null) {
-        final distance = _calculateDistanceInKm(
-            driverLat, driverLon, passengerLat, passengerLon);
+          targetLat != null &&
+          targetLon != null) {
+        final distance =
+            _calculateDistanceInKm(driverLat, driverLon, targetLat, targetLon);
 
-        // Assume average speed of 30 km/h
         const averageSpeedKmH = 30;
         final timeHours = distance / averageSpeedKmH;
         final timeMinutes = (timeHours * 60).ceil();
@@ -261,7 +255,13 @@ class _ACaminhoDoPassageiroWidgetState
       }
 
       if (mounted) {
-        context.goNamed('mainMotorista');
+        context.pushReplacementNamed(
+          'AvaliacaoViagemWidget',
+          queryParameters: {
+            'tripId': trip.id,
+            'userType': 'motorista',
+          },
+        );
       }
     } catch (e) {
       print('Error finishing trip: $e');
@@ -276,9 +276,7 @@ class _ACaminhoDoPassageiroWidgetState
     }
   }
 
-  /// Nova função para solicitar o motivo do cancelamento e verificar o no-show.
   Future<void> _promptCancellationReason(TripsRow trip) async {
-    //  Lógica de "No-Show"
     if (trip.status == 'waiting_passenger') {
       if (trip.driverArrivedAt == null) {
         if (mounted) {
@@ -318,7 +316,6 @@ class _ACaminhoDoPassageiroWidgetState
       }
     }
 
-    //  Coletar o Motivo do Cancelamento pelo Motorista
     String? selectedReason;
     final reasons = [
       'Passageiro não apareceu',
@@ -383,7 +380,6 @@ class _ACaminhoDoPassageiroWidgetState
     }
   }
 
-  /// Função de cancelamento modificada para aceitar um motivo.
   Future<void> _handleCancellation(TripsRow trip, String reason) async {
     try {
       final settingsList = await PlatformSettingsTable().queryRows(
@@ -428,7 +424,7 @@ class _ACaminhoDoPassageiroWidgetState
           'cancellation_fee': cancellationFee,
           'cancelled_by': 'driver',
           'cancelled_at': DateTime.now().toIso8601String(),
-          'cancellation_reason': reason, // Motivo do cancelamento salvo aqui
+          'cancellation_reason': reason,
         },
         matchingRows: (q) => q.eq('id', trip.id),
       );
@@ -449,6 +445,7 @@ class _ACaminhoDoPassageiroWidgetState
     }
   }
 
+  // O MÉTODO BUILD DEVE ESTAR AQUI, DENTRO DA CLASSE
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -600,8 +597,7 @@ class _ACaminhoDoPassageiroWidgetState
             SizedBox(height: 16),
             if (trip.status != 'in_progress')
               FFButtonWidget(
-                onPressed: () => _promptCancellationReason(
-                    trip), // Modificado para chamar a nova função
+                onPressed: () => _promptCancellationReason(trip),
                 text: 'Cancelar Viagem',
                 options: FFButtonOptions(
                     width: double.infinity,
