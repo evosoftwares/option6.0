@@ -1,4 +1,4 @@
-// Substitua o arquivo inteiro por este código corrigido:
+
 import '/backend/supabase/supabase.dart';
 import 'package:flutter/material.dart';
 import '../../utils/num_utils.dart';
