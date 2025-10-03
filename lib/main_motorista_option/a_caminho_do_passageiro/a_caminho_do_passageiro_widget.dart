@@ -1,4 +1,3 @@
-// Substitua o arquivo inteiro por este código corrigido:
 import 'dart:async';
 import 'dart:math';
 import '/backend/supabase/supabase.dart';
