@@ -1,8 +1,9 @@
-// import '/auth/firebase_auth/auth_util.dart';
+import '/auth/firebase_auth/auth_util.dart';
 import '/flutter_flow/flutter_flow_icon_button.dart';
 import '/flutter_flow/flutter_flow_theme.dart';
 import '/flutter_flow/flutter_flow_util.dart';
 import '/index.dart';
+import '/backend/supabase/supabase.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'menu_passageiro_model.dart';
@@ -56,7 +57,8 @@ class _MenuPassageiroWidgetState extends State<MenuPassageiroWidget> {
               size: 24.0,
             ),
             onPressed: () async {
-              print('🔍 [MENU_PASSAGEIRO] Fechando menu e voltando para tela principal');
+              print(
+                  '🔍 [MENU_PASSAGEIRO] Fechando menu e voltando para tela principal');
               context.goNamed('mainPassageiro');
             },
           ),
@@ -86,7 +88,8 @@ class _MenuPassageiroWidgetState extends State<MenuPassageiroWidget> {
               // Menu principal
               Expanded(
                 child: SingleChildScrollView(
-                  padding: EdgeInsetsDirectional.fromSTEB(16.0, 16.0, 16.0, 0.0),
+                  padding:
+                      EdgeInsetsDirectional.fromSTEB(16.0, 16.0, 16.0, 0.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -97,14 +100,16 @@ class _MenuPassageiroWidgetState extends State<MenuPassageiroWidget> {
                         hoverColor: Colors.transparent,
                         highlightColor: Colors.transparent,
                         onTap: () async {
-                          print('🔍 [MENU_PASSAGEIRO] Navegando para Minhas Viagens');
+                          print(
+                              '🔍 [MENU_PASSAGEIRO] Navegando para Minhas Viagens');
                           context.pushNamed(MinhasViagensPaxWidget.routeName);
                         },
                         child: Container(
                           width: double.infinity,
                           height: 60.0,
                           decoration: BoxDecoration(
-                            color: FlutterFlowTheme.of(context).secondaryBackground,
+                            color: FlutterFlowTheme.of(context)
+                                .secondaryBackground,
                             borderRadius: BorderRadius.circular(8.0),
                             border: Border.all(
                               color: FlutterFlowTheme.of(context).alternate,
@@ -112,7 +117,8 @@ class _MenuPassageiroWidgetState extends State<MenuPassageiroWidget> {
                             ),
                           ),
                           child: Padding(
-                            padding: EdgeInsetsDirectional.fromSTEB(16.0, 16.0, 16.0, 16.0),
+                            padding: EdgeInsetsDirectional.fromSTEB(
+                                16.0, 16.0, 16.0, 16.0),
                             child: Row(
                               mainAxisSize: MainAxisSize.max,
                               children: [
@@ -152,7 +158,8 @@ class _MenuPassageiroWidgetState extends State<MenuPassageiroWidget> {
                           width: double.infinity,
                           height: 60.0,
                           decoration: BoxDecoration(
-                            color: FlutterFlowTheme.of(context).secondaryBackground,
+                            color: FlutterFlowTheme.of(context)
+                                .secondaryBackground,
                             borderRadius: BorderRadius.circular(8.0),
                             border: Border.all(
                               color: FlutterFlowTheme.of(context).alternate,
@@ -160,7 +167,8 @@ class _MenuPassageiroWidgetState extends State<MenuPassageiroWidget> {
                             ),
                           ),
                           child: Padding(
-                            padding: EdgeInsetsDirectional.fromSTEB(16.0, 16.0, 16.0, 16.0),
+                            padding: EdgeInsetsDirectional.fromSTEB(
+                                16.0, 16.0, 16.0, 16.0),
                             child: Row(
                               mainAxisSize: MainAxisSize.max,
                               children: [
@@ -186,21 +194,51 @@ class _MenuPassageiroWidgetState extends State<MenuPassageiroWidget> {
                       ),
                       SizedBox(height: 16.0),
 
-                      // Editar Perfil
+                      SizedBox(height: 16.0),
+
+                      // Minhas Avaliações
                       InkWell(
                         splashColor: Colors.transparent,
                         focusColor: Colors.transparent,
                         hoverColor: Colors.transparent,
                         highlightColor: Colors.transparent,
                         onTap: () async {
-                          print('🔍 [MENU_PASSAGEIRO] Navegando para Editar Perfil');
-                          context.pushNamed(EditarPerfilWidget.routeName);
+                          // Busca o ID do usuário do Firebase e converte para o UUID do Supabase
+                          final firebaseUid = currentUserUid;
+                          if (firebaseUid.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                  content:
+                                      Text('Erro: Usuário não autenticado.')),
+                            );
+                            return;
+                          }
+                          final appUserId =
+                              await UserIdConverter.getAppUserIdFromFirebaseUid(
+                                  firebaseUid);
+
+                          if (appUserId != null) {
+                            context.pushNamed(
+                              'minhasAvaliacoes',
+                              queryParameters: {
+                                'userType': 'passageiro',
+                                'userId': appUserId,
+                              },
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                  content: Text(
+                                      'Erro: Não foi possível encontrar o perfil do usuário.')),
+                            );
+                          }
                         },
                         child: Container(
                           width: double.infinity,
                           height: 60.0,
                           decoration: BoxDecoration(
-                            color: FlutterFlowTheme.of(context).secondaryBackground,
+                            color: FlutterFlowTheme.of(context)
+                                .secondaryBackground,
                             borderRadius: BorderRadius.circular(8.0),
                             border: Border.all(
                               color: FlutterFlowTheme.of(context).alternate,
@@ -208,7 +246,57 @@ class _MenuPassageiroWidgetState extends State<MenuPassageiroWidget> {
                             ),
                           ),
                           child: Padding(
-                            padding: EdgeInsetsDirectional.fromSTEB(16.0, 16.0, 16.0, 16.0),
+                            padding: EdgeInsetsDirectional.fromSTEB(
+                                16.0, 16.0, 16.0, 16.0),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.max,
+                              children: [
+                                Icon(
+                                  Icons.star_outline,
+                                  color: FlutterFlowTheme.of(context).primary,
+                                  size: 26.0,
+                                ),
+                                Text(
+                                  'Minhas Avaliações',
+                                  style: FlutterFlowTheme.of(context)
+                                      .bodyMedium
+                                      .override(
+                                        font: GoogleFonts.inter(),
+                                        letterSpacing: 0.0,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                ),
+                              ].divide(SizedBox(width: 12.0)),
+                            ),
+                          ),
+                        ),
+                      ),
+                      // Editar Perfil
+                      InkWell(
+                        splashColor: Colors.transparent,
+                        focusColor: Colors.transparent,
+                        hoverColor: Colors.transparent,
+                        highlightColor: Colors.transparent,
+                        onTap: () async {
+                          print(
+                              '🔍 [MENU_PASSAGEIRO] Navegando para Editar Perfil');
+                          context.pushNamed(EditarPerfilWidget.routeName);
+                        },
+                        child: Container(
+                          width: double.infinity,
+                          height: 60.0,
+                          decoration: BoxDecoration(
+                            color: FlutterFlowTheme.of(context)
+                                .secondaryBackground,
+                            borderRadius: BorderRadius.circular(8.0),
+                            border: Border.all(
+                              color: FlutterFlowTheme.of(context).alternate,
+                              width: 1.0,
+                            ),
+                          ),
+                          child: Padding(
+                            padding: EdgeInsetsDirectional.fromSTEB(
+                                16.0, 16.0, 16.0, 16.0),
                             child: Row(
                               mainAxisSize: MainAxisSize.max,
                               children: [
@@ -248,7 +336,8 @@ class _MenuPassageiroWidgetState extends State<MenuPassageiroWidget> {
                           width: double.infinity,
                           height: 60.0,
                           decoration: BoxDecoration(
-                            color: FlutterFlowTheme.of(context).secondaryBackground,
+                            color: FlutterFlowTheme.of(context)
+                                .secondaryBackground,
                             borderRadius: BorderRadius.circular(8.0),
                             border: Border.all(
                               color: FlutterFlowTheme.of(context).alternate,
@@ -256,7 +345,8 @@ class _MenuPassageiroWidgetState extends State<MenuPassageiroWidget> {
                             ),
                           ),
                           child: Padding(
-                            padding: EdgeInsetsDirectional.fromSTEB(16.0, 16.0, 16.0, 16.0),
+                            padding: EdgeInsetsDirectional.fromSTEB(
+                                16.0, 16.0, 16.0, 16.0),
                             child: Row(
                               mainAxisSize: MainAxisSize.max,
                               children: [
@@ -280,7 +370,6 @@ class _MenuPassageiroWidgetState extends State<MenuPassageiroWidget> {
                           ),
                         ),
                       ),
-
                     ],
                   ),
                 ),

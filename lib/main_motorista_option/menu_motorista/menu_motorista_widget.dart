@@ -67,7 +67,8 @@ class _MenuMotoristaWidgetState extends State<MenuMotoristaWidget> {
               size: 24.0,
             ),
             onPressed: () async {
-              print('🔍 [MENU_MOTORISTA] Fechando menu e voltando para tela principal');
+              print(
+                  '🔍 [MENU_MOTORISTA] Fechando menu e voltando para tela principal');
               context.goNamed('mainMotorista');
             },
           ),
@@ -97,7 +98,8 @@ class _MenuMotoristaWidgetState extends State<MenuMotoristaWidget> {
               // Menu principal
               Expanded(
                 child: SingleChildScrollView(
-                  padding: EdgeInsetsDirectional.fromSTEB(16.0, 16.0, 16.0, 0.0),
+                  padding:
+                      EdgeInsetsDirectional.fromSTEB(16.0, 16.0, 16.0, 0.0),
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
@@ -108,14 +110,16 @@ class _MenuMotoristaWidgetState extends State<MenuMotoristaWidget> {
                         hoverColor: Colors.transparent,
                         highlightColor: Colors.transparent,
                         onTap: () async {
-                          print('🔍 [MENU_MOTORISTA] Navegando para Minhas Viagens');
+                          print(
+                              '🔍 [MENU_MOTORISTA] Navegando para Minhas Viagens');
                           context.pushNamed('minhasViagens');
                         },
                         child: Container(
                           width: double.infinity,
                           height: 60.0,
                           decoration: BoxDecoration(
-                            color: FlutterFlowTheme.of(context).secondaryBackground,
+                            color: FlutterFlowTheme.of(context)
+                                .secondaryBackground,
                             borderRadius: BorderRadius.circular(8.0),
                             border: Border.all(
                               color: FlutterFlowTheme.of(context).alternate,
@@ -123,7 +127,8 @@ class _MenuMotoristaWidgetState extends State<MenuMotoristaWidget> {
                             ),
                           ),
                           child: Padding(
-                            padding: EdgeInsetsDirectional.fromSTEB(16.0, 16.0, 16.0, 16.0),
+                            padding: EdgeInsetsDirectional.fromSTEB(
+                                16.0, 16.0, 16.0, 16.0),
                             child: Row(
                               mainAxisSize: MainAxisSize.max,
                               children: [
@@ -149,6 +154,84 @@ class _MenuMotoristaWidgetState extends State<MenuMotoristaWidget> {
                       ),
                       SizedBox(height: 16.0),
 
+                      // Minhas Avaliações
+                      InkWell(
+                        splashColor: Colors.transparent,
+                        focusColor: Colors.transparent,
+                        hoverColor: Colors.transparent,
+                        highlightColor: Colors.transparent,
+                        onTap: () async {
+                          // Busca o ID do usuário do Firebase e converte para o UUID do Supabase
+                          final firebaseUid = currentUserUid;
+                          if (firebaseUid.isEmpty) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                  content:
+                                      Text('Erro: Usuário não autenticado.')),
+                            );
+                            return;
+                          }
+                          final appUserId =
+                              await UserIdConverter.getAppUserIdFromFirebaseUid(
+                                  firebaseUid);
+
+                          if (appUserId != null) {
+                            context.pushNamed(
+                              'minhasAvaliacoes',
+                              queryParameters: {
+                                'userType': 'motorista',
+                                'userId': appUserId,
+                              },
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                  content: Text(
+                                      'Erro: Não foi possível encontrar o perfil do usuário.')),
+                            );
+                          }
+                        },
+                        child: Container(
+                          width: double.infinity,
+                          height: 60.0,
+                          decoration: BoxDecoration(
+                            color: FlutterFlowTheme.of(context)
+                                .secondaryBackground,
+                            borderRadius: BorderRadius.circular(8.0),
+                            border: Border.all(
+                              color: FlutterFlowTheme.of(context).alternate,
+                              width: 1.0,
+                            ),
+                          ),
+                          child: Padding(
+                            padding: EdgeInsetsDirectional.fromSTEB(
+                                16.0, 16.0, 16.0, 16.0),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.max,
+                              children: [
+                                Icon(
+                                  Icons.star_outline,
+                                  color: FlutterFlowTheme.of(context).primary,
+                                  size: 26.0,
+                                ),
+                                Text(
+                                  'Minhas Avaliações',
+                                  style: FlutterFlowTheme.of(context)
+                                      .bodyMedium
+                                      .override(
+                                        font: GoogleFonts.inter(),
+                                        letterSpacing: 0.0,
+                                        fontWeight: FontWeight.w500,
+                                      ),
+                                ),
+                              ].divide(SizedBox(width: 12.0)),
+                            ),
+                          ),
+                        ),
+                      ),
+
+                      SizedBox(height: 16.0),
+
                       // Meu Veículo - JÁ CLICÁVEL
                       InkWell(
                         splashColor: Colors.transparent,
@@ -156,14 +239,16 @@ class _MenuMotoristaWidgetState extends State<MenuMotoristaWidget> {
                         hoverColor: Colors.transparent,
                         highlightColor: Colors.transparent,
                         onTap: () async {
-                          print('🔍 [MENU_MOTORISTA] Navegando para Meu Veículo - consultando dados do driver');
+                          print(
+                              '🔍 [MENU_MOTORISTA] Navegando para Meu Veículo - consultando dados do driver');
                           _model.rowDriver = await DriversTable().queryRows(
                             queryFn: (q) => q.eqOrNull(
                               'user_id',
                               currentUserUid,
                             ),
                           );
-                          print('🔍 [MENU_MOTORISTA] Driver encontrado: ${_model.rowDriver?.firstOrNull?.id}');
+                          print(
+                              '🔍 [MENU_MOTORISTA] Driver encontrado: ${_model.rowDriver?.firstOrNull?.id}');
 
                           if (_model.rowDriver?.isNotEmpty == true) {
                             context.pushNamed(
@@ -176,14 +261,16 @@ class _MenuMotoristaWidgetState extends State<MenuMotoristaWidget> {
                               }.withoutNulls,
                             );
                           } else {
-                            print('❌ [MENU_MOTORISTA] Nenhum driver encontrado, criando registro...');
+                            print(
+                                '❌ [MENU_MOTORISTA] Nenhum driver encontrado, criando registro...');
                             ScaffoldMessenger.of(context).showSnackBar(
                               SnackBar(
                                 content: Text(
                                   'Configurando seus dados de motorista...',
                                   style: TextStyle(color: Colors.white),
                                 ),
-                                backgroundColor: FlutterFlowTheme.of(context).primary,
+                                backgroundColor:
+                                    FlutterFlowTheme.of(context).primary,
                                 duration: Duration(seconds: 2),
                               ),
                             );
@@ -195,7 +282,8 @@ class _MenuMotoristaWidgetState extends State<MenuMotoristaWidget> {
                           width: double.infinity,
                           height: 60.0,
                           decoration: BoxDecoration(
-                            color: FlutterFlowTheme.of(context).secondaryBackground,
+                            color: FlutterFlowTheme.of(context)
+                                .secondaryBackground,
                             borderRadius: BorderRadius.circular(8.0),
                             border: Border.all(
                               color: FlutterFlowTheme.of(context).alternate,
@@ -203,7 +291,8 @@ class _MenuMotoristaWidgetState extends State<MenuMotoristaWidget> {
                             ),
                           ),
                           child: Padding(
-                            padding: EdgeInsetsDirectional.fromSTEB(16.0, 16.0, 16.0, 16.0),
+                            padding: EdgeInsetsDirectional.fromSTEB(
+                                16.0, 16.0, 16.0, 16.0),
                             child: Row(
                               mainAxisSize: MainAxisSize.max,
                               children: [
@@ -236,13 +325,16 @@ class _MenuMotoristaWidgetState extends State<MenuMotoristaWidget> {
                         hoverColor: Colors.transparent,
                         highlightColor: Colors.transparent,
                         onTap: () async {
-                          print('🔍 [MENU_MOTORISTA] Navegando para Carteira do Motorista');
+                          print(
+                              '🔍 [MENU_MOTORISTA] Navegando para Carteira do Motorista');
                           // Verificar se existe uma tela específica de carteira para motorista
                           // Por enquanto, redirecionar para uma tela dedicada ou mostrar mensagem
                           ScaffoldMessenger.of(context).showSnackBar(
                             SnackBar(
-                              content: Text('Carteira do motorista - funcionalidade em desenvolvimento'),
-                              backgroundColor: FlutterFlowTheme.of(context).primary,
+                              content: Text(
+                                  'Carteira do motorista - funcionalidade em desenvolvimento'),
+                              backgroundColor:
+                                  FlutterFlowTheme.of(context).primary,
                               duration: Duration(seconds: 2),
                             ),
                           );
@@ -253,7 +345,8 @@ class _MenuMotoristaWidgetState extends State<MenuMotoristaWidget> {
                           width: double.infinity,
                           height: 60.0,
                           decoration: BoxDecoration(
-                            color: FlutterFlowTheme.of(context).secondaryBackground,
+                            color: FlutterFlowTheme.of(context)
+                                .secondaryBackground,
                             borderRadius: BorderRadius.circular(8.0),
                             border: Border.all(
                               color: FlutterFlowTheme.of(context).alternate,
@@ -261,7 +354,8 @@ class _MenuMotoristaWidgetState extends State<MenuMotoristaWidget> {
                             ),
                           ),
                           child: Padding(
-                            padding: EdgeInsetsDirectional.fromSTEB(16.0, 16.0, 16.0, 16.0),
+                            padding: EdgeInsetsDirectional.fromSTEB(
+                                16.0, 16.0, 16.0, 16.0),
                             child: Row(
                               mainAxisSize: MainAxisSize.max,
                               children: [
@@ -294,14 +388,16 @@ class _MenuMotoristaWidgetState extends State<MenuMotoristaWidget> {
                         hoverColor: Colors.transparent,
                         highlightColor: Colors.transparent,
                         onTap: () async {
-                          print('🔍 [MENU_MOTORISTA] Navegando para Preferências');
+                          print(
+                              '🔍 [MENU_MOTORISTA] Navegando para Preferências');
                           context.pushNamed('preferenciasMotorista');
                         },
                         child: Container(
                           width: double.infinity,
                           height: 60.0,
                           decoration: BoxDecoration(
-                            color: FlutterFlowTheme.of(context).secondaryBackground,
+                            color: FlutterFlowTheme.of(context)
+                                .secondaryBackground,
                             borderRadius: BorderRadius.circular(8.0),
                             border: Border.all(
                               color: FlutterFlowTheme.of(context).alternate,
@@ -309,7 +405,8 @@ class _MenuMotoristaWidgetState extends State<MenuMotoristaWidget> {
                             ),
                           ),
                           child: Padding(
-                            padding: EdgeInsetsDirectional.fromSTEB(16.0, 16.0, 16.0, 16.0),
+                            padding: EdgeInsetsDirectional.fromSTEB(
+                                16.0, 16.0, 16.0, 16.0),
                             child: Row(
                               mainAxisSize: MainAxisSize.max,
                               children: [
@@ -342,14 +439,16 @@ class _MenuMotoristaWidgetState extends State<MenuMotoristaWidget> {
                         hoverColor: Colors.transparent,
                         highlightColor: Colors.transparent,
                         onTap: () async {
-                          print('🔍 [MENU_MOTORISTA] Navegando para Editar Perfil');
+                          print(
+                              '🔍 [MENU_MOTORISTA] Navegando para Editar Perfil');
                           context.pushNamed(EditarPerfilWidget.routeName);
                         },
                         child: Container(
                           width: double.infinity,
                           height: 60.0,
                           decoration: BoxDecoration(
-                            color: FlutterFlowTheme.of(context).secondaryBackground,
+                            color: FlutterFlowTheme.of(context)
+                                .secondaryBackground,
                             borderRadius: BorderRadius.circular(8.0),
                             border: Border.all(
                               color: FlutterFlowTheme.of(context).alternate,
@@ -357,7 +456,8 @@ class _MenuMotoristaWidgetState extends State<MenuMotoristaWidget> {
                             ),
                           ),
                           child: Padding(
-                            padding: EdgeInsetsDirectional.fromSTEB(16.0, 16.0, 16.0, 16.0),
+                            padding: EdgeInsetsDirectional.fromSTEB(
+                                16.0, 16.0, 16.0, 16.0),
                             child: Row(
                               mainAxisSize: MainAxisSize.max,
                               children: [
@@ -397,7 +497,8 @@ class _MenuMotoristaWidgetState extends State<MenuMotoristaWidget> {
                           width: double.infinity,
                           height: 60.0,
                           decoration: BoxDecoration(
-                            color: FlutterFlowTheme.of(context).secondaryBackground,
+                            color: FlutterFlowTheme.of(context)
+                                .secondaryBackground,
                             borderRadius: BorderRadius.circular(8.0),
                             border: Border.all(
                               color: FlutterFlowTheme.of(context).alternate,
@@ -405,7 +506,8 @@ class _MenuMotoristaWidgetState extends State<MenuMotoristaWidget> {
                             ),
                           ),
                           child: Padding(
-                            padding: EdgeInsetsDirectional.fromSTEB(16.0, 16.0, 16.0, 16.0),
+                            padding: EdgeInsetsDirectional.fromSTEB(
+                                16.0, 16.0, 16.0, 16.0),
                             child: Row(
                               mainAxisSize: MainAxisSize.max,
                               children: [
@@ -431,7 +533,6 @@ class _MenuMotoristaWidgetState extends State<MenuMotoristaWidget> {
                       ),
                       SizedBox(height: 16.0),
 
-
                       SizedBox(height: 16.0),
 
                       // Privacidade e Localização - Revogar consentimento
@@ -442,14 +543,20 @@ class _MenuMotoristaWidgetState extends State<MenuMotoristaWidget> {
                         highlightColor: Colors.transparent,
                         onTap: () async {
                           final prefs = await SharedPreferences.getInstance();
-                          final hasConsent = prefs.getBool('driver_bg_location_consent') ?? false;
+                          final hasConsent =
+                              prefs.getBool('driver_bg_location_consent') ??
+                                  false;
 
                           // Verificar status das permissões
-                          final basicLocationStatus = await Permission.location.status;
-                          final backgroundLocationStatus = await Permission.locationAlways.status;
+                          final basicLocationStatus =
+                              await Permission.location.status;
+                          final backgroundLocationStatus =
+                              await Permission.locationAlways.status;
 
-                          final bool hasBasicPermission = basicLocationStatus.isGranted;
-                          final bool hasBackgroundPermission = backgroundLocationStatus.isGranted;
+                          final bool hasBasicPermission =
+                              basicLocationStatus.isGranted;
+                          final bool hasBackgroundPermission =
+                              backgroundLocationStatus.isGranted;
 
                           await showDialog(
                             context: context,
@@ -458,31 +565,41 @@ class _MenuMotoristaWidgetState extends State<MenuMotoristaWidget> {
                                 title: const Text('Privacidade e Localização'),
                                 content: SingleChildScrollView(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
                                       const Text(
                                         'O aplicativo coleta sua localização em segundo plano quando você está ONLINE como motorista.',
-                                        style: TextStyle(fontWeight: FontWeight.w500),
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w500),
                                       ),
                                       const SizedBox(height: 16),
 
                                       // Status das permissões
                                       const Text(
                                         'Status das Permissões:',
-                                        style: TextStyle(fontWeight: FontWeight.w600, fontSize: 16),
+                                        style: TextStyle(
+                                            fontWeight: FontWeight.w600,
+                                            fontSize: 16),
                                       ),
                                       const SizedBox(height: 8),
 
                                       Row(
                                         children: [
                                           Icon(
-                                            hasBasicPermission ? Icons.check_circle : Icons.cancel,
-                                            color: hasBasicPermission ? Colors.green : Colors.red,
+                                            hasBasicPermission
+                                                ? Icons.check_circle
+                                                : Icons.cancel,
+                                            color: hasBasicPermission
+                                                ? Colors.green
+                                                : Colors.red,
                                             size: 20,
                                           ),
                                           const SizedBox(width: 8),
-                                          const Expanded(child: Text('Localização básica')),
+                                          const Expanded(
+                                              child:
+                                                  Text('Localização básica')),
                                         ],
                                       ),
                                       const SizedBox(height: 4),
@@ -490,12 +607,18 @@ class _MenuMotoristaWidgetState extends State<MenuMotoristaWidget> {
                                       Row(
                                         children: [
                                           Icon(
-                                            hasBackgroundPermission ? Icons.check_circle : Icons.cancel,
-                                            color: hasBackgroundPermission ? Colors.green : Colors.red,
+                                            hasBackgroundPermission
+                                                ? Icons.check_circle
+                                                : Icons.cancel,
+                                            color: hasBackgroundPermission
+                                                ? Colors.green
+                                                : Colors.red,
                                             size: 20,
                                           ),
                                           const SizedBox(width: 8),
-                                          const Expanded(child: Text('Localização em segundo plano')),
+                                          const Expanded(
+                                              child: Text(
+                                                  'Localização em segundo plano')),
                                         ],
                                       ),
                                       const SizedBox(height: 4),
@@ -503,12 +626,18 @@ class _MenuMotoristaWidgetState extends State<MenuMotoristaWidget> {
                                       Row(
                                         children: [
                                           Icon(
-                                            hasConsent ? Icons.check_circle : Icons.cancel,
-                                            color: hasConsent ? Colors.green : Colors.red,
+                                            hasConsent
+                                                ? Icons.check_circle
+                                                : Icons.cancel,
+                                            color: hasConsent
+                                                ? Colors.green
+                                                : Colors.red,
                                             size: 20,
                                           ),
                                           const SizedBox(width: 8),
-                                          const Expanded(child: Text('Consentimento do usuário')),
+                                          const Expanded(
+                                              child: Text(
+                                                  'Consentimento do usuário')),
                                         ],
                                       ),
                                       const SizedBox(height: 16),
@@ -517,24 +646,35 @@ class _MenuMotoristaWidgetState extends State<MenuMotoristaWidget> {
                                       Container(
                                         padding: const EdgeInsets.all(12),
                                         decoration: BoxDecoration(
-                                          color: (hasBasicPermission && hasBackgroundPermission && hasConsent)
-                                              ? Colors.green.withValues(alpha: 0.1)
-                                              : Colors.orange.withValues(alpha: 0.1),
-                                          borderRadius: BorderRadius.circular(8),
+                                          color: (hasBasicPermission &&
+                                                  hasBackgroundPermission &&
+                                                  hasConsent)
+                                              ? Colors.green
+                                                  .withValues(alpha: 0.1)
+                                              : Colors.orange
+                                                  .withValues(alpha: 0.1),
+                                          borderRadius:
+                                              BorderRadius.circular(8),
                                           border: Border.all(
-                                            color: (hasBasicPermission && hasBackgroundPermission && hasConsent)
+                                            color: (hasBasicPermission &&
+                                                    hasBackgroundPermission &&
+                                                    hasConsent)
                                                 ? Colors.green
                                                 : Colors.orange,
                                             width: 1,
                                           ),
                                         ),
                                         child: Text(
-                                          (hasBasicPermission && hasBackgroundPermission && hasConsent)
+                                          (hasBasicPermission &&
+                                                  hasBackgroundPermission &&
+                                                  hasConsent)
                                               ? '✓ Todas as permissões estão configuradas corretamente'
                                               : '⚠ Algumas permissões precisam ser configuradas',
                                           style: TextStyle(
                                             fontWeight: FontWeight.w500,
-                                            color: (hasBasicPermission && hasBackgroundPermission && hasConsent)
+                                            color: (hasBasicPermission &&
+                                                    hasBackgroundPermission &&
+                                                    hasConsent)
                                                 ? Colors.green.shade700
                                                 : Colors.orange.shade700,
                                           ),
@@ -550,47 +690,61 @@ class _MenuMotoristaWidgetState extends State<MenuMotoristaWidget> {
                                   ),
 
                                   // Botão para solicitar permissões (se necessário)
-                                  if (!hasBasicPermission || !hasBackgroundPermission || !hasConsent)
+                                  if (!hasBasicPermission ||
+                                      !hasBackgroundPermission ||
+                                      !hasConsent)
                                     ElevatedButton(
                                       onPressed: () async {
                                         Navigator.of(ctx).pop();
 
                                         // Solicitar permissões através do sistema otimizado
-                                        final success = await actions.iniciarRastreamentoViagemOtimizado(context, '');
+                                        final success = await actions
+                                            .iniciarRastreamentoViagemOtimizado(
+                                                context, '');
 
                                         if (success) {
-                                          ScaffoldMessenger.of(context).showSnackBar(
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
                                             const SnackBar(
-                                              content: Text('✓ Permissões configuradas com sucesso!'),
+                                              content: Text(
+                                                  '✓ Permissões configuradas com sucesso!'),
                                               backgroundColor: Colors.green,
                                               duration: Duration(seconds: 3),
                                             ),
                                           );
                                         } else {
-                                          ScaffoldMessenger.of(context).showSnackBar(
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
                                             const SnackBar(
-                                              content: Text('Não foi possível configurar todas as permissões. Verifique as configurações do dispositivo.'),
+                                              content: Text(
+                                                  'Não foi possível configurar todas as permissões. Verifique as configurações do dispositivo.'),
                                               backgroundColor: Colors.orange,
                                               duration: Duration(seconds: 4),
                                             ),
                                           );
                                         }
                                       },
-                                      child: const Text('Configurar Permissões'),
+                                      child:
+                                          const Text('Configurar Permissões'),
                                     ),
 
                                   // Botão para revogar consentimento (se ativo)
                                   if (hasConsent)
                                     TextButton(
                                       onPressed: () async {
-                                        await prefs.setBool('driver_bg_location_consent', false);
+                                        await prefs.setBool(
+                                            'driver_bg_location_consent',
+                                            false);
                                         try {
-                                          await actions.pararRastreamentoOtimizado();
+                                          await actions
+                                              .pararRastreamentoOtimizado();
                                         } catch (_) {}
                                         if (context.mounted) {
-                                          ScaffoldMessenger.of(context).showSnackBar(
+                                          ScaffoldMessenger.of(context)
+                                              .showSnackBar(
                                             const SnackBar(
-                                              content: Text('Consentimento revogado. Rastreamento em segundo plano interrompido.'),
+                                              content: Text(
+                                                  'Consentimento revogado. Rastreamento em segundo plano interrompido.'),
                                               backgroundColor: Colors.red,
                                               duration: Duration(seconds: 4),
                                             ),
@@ -598,7 +752,8 @@ class _MenuMotoristaWidgetState extends State<MenuMotoristaWidget> {
                                           Navigator.of(ctx).pop();
                                         }
                                       },
-                                      child: const Text('Revogar Consentimento'),
+                                      child:
+                                          const Text('Revogar Consentimento'),
                                     ),
                                 ],
                               );
@@ -609,7 +764,8 @@ class _MenuMotoristaWidgetState extends State<MenuMotoristaWidget> {
                           width: double.infinity,
                           constraints: BoxConstraints(minHeight: 60.0),
                           decoration: BoxDecoration(
-                            color: FlutterFlowTheme.of(context).secondaryBackground,
+                            color: FlutterFlowTheme.of(context)
+                                .secondaryBackground,
                             borderRadius: BorderRadius.circular(8.0),
                             border: Border.all(
                               color: FlutterFlowTheme.of(context).alternate,
@@ -617,7 +773,8 @@ class _MenuMotoristaWidgetState extends State<MenuMotoristaWidget> {
                             ),
                           ),
                           child: Padding(
-                            padding: EdgeInsetsDirectional.fromSTEB(16.0, 16.0, 16.0, 16.0),
+                            padding: EdgeInsetsDirectional.fromSTEB(
+                                16.0, 16.0, 16.0, 16.0),
                             child: Row(
                               mainAxisSize: MainAxisSize.max,
                               crossAxisAlignment: CrossAxisAlignment.center,
@@ -630,7 +787,8 @@ class _MenuMotoristaWidgetState extends State<MenuMotoristaWidget> {
                                 SizedBox(width: 12.0),
                                 Expanded(
                                   child: Column(
-                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     mainAxisAlignment: MainAxisAlignment.center,
                                     mainAxisSize: MainAxisSize.min,
                                     children: [
@@ -653,7 +811,9 @@ class _MenuMotoristaWidgetState extends State<MenuMotoristaWidget> {
                                             .labelSmall
                                             .override(
                                               font: GoogleFonts.inter(),
-                                              color: FlutterFlowTheme.of(context).secondaryText,
+                                              color:
+                                                  FlutterFlowTheme.of(context)
+                                                      .secondaryText,
                                               letterSpacing: 0.0,
                                             ),
                                         maxLines: 2,
@@ -671,14 +831,16 @@ class _MenuMotoristaWidgetState extends State<MenuMotoristaWidget> {
 
                       // Seção Funcionalidades Exclusivas
                       Padding(
-                        padding: EdgeInsetsDirectional.fromSTEB(4.0, 0.0, 0.0, 12.0),
+                        padding:
+                            EdgeInsetsDirectional.fromSTEB(4.0, 0.0, 0.0, 12.0),
                         child: Text(
                           'Funcionalidades exclusivas',
                           style: FlutterFlowTheme.of(context)
                               .labelMedium
                               .override(
                                 font: GoogleFonts.inter(),
-                                color: FlutterFlowTheme.of(context).secondaryText,
+                                color:
+                                    FlutterFlowTheme.of(context).secondaryText,
                                 letterSpacing: 0.0,
                                 fontWeight: FontWeight.w600,
                               ),
@@ -692,14 +854,17 @@ class _MenuMotoristaWidgetState extends State<MenuMotoristaWidget> {
                         hoverColor: Colors.transparent,
                         highlightColor: Colors.transparent,
                         onTap: () async {
-                          print('🔍 [MENU_MOTORISTA] Navegando para Zonas de Exclusão');
-                          context.pushNamed(ZonasdeExclusaoMotoristaWidget.routeName);
+                          print(
+                              '🔍 [MENU_MOTORISTA] Navegando para Zonas de Exclusão');
+                          context.pushNamed(
+                              ZonasdeExclusaoMotoristaWidget.routeName);
                         },
                         child: Container(
                           width: double.infinity,
                           height: 60.0,
                           decoration: BoxDecoration(
-                            color: FlutterFlowTheme.of(context).secondaryBackground,
+                            color: FlutterFlowTheme.of(context)
+                                .secondaryBackground,
                             borderRadius: BorderRadius.circular(8.0),
                             border: Border.all(
                               color: FlutterFlowTheme.of(context).alternate,
@@ -707,7 +872,8 @@ class _MenuMotoristaWidgetState extends State<MenuMotoristaWidget> {
                             ),
                           ),
                           child: Padding(
-                            padding: EdgeInsetsDirectional.fromSTEB(16.0, 16.0, 16.0, 16.0),
+                            padding: EdgeInsetsDirectional.fromSTEB(
+                                16.0, 16.0, 16.0, 16.0),
                             child: Row(
                               mainAxisSize: MainAxisSize.max,
                               children: [
@@ -740,14 +906,16 @@ class _MenuMotoristaWidgetState extends State<MenuMotoristaWidget> {
                         hoverColor: Colors.transparent,
                         highlightColor: Colors.transparent,
                         onTap: () async {
-                          print('🔍 [MENU_MOTORISTA] Navegando para Upload de Documentos');
+                          print(
+                              '🔍 [MENU_MOTORISTA] Navegando para Upload de Documentos');
                           context.goNamed(DocumentosMotoristaWidget.routeName);
                         },
                         child: Container(
                           width: double.infinity,
                           height: 60.0,
                           decoration: BoxDecoration(
-                            color: FlutterFlowTheme.of(context).secondaryBackground,
+                            color: FlutterFlowTheme.of(context)
+                                .secondaryBackground,
                             borderRadius: BorderRadius.circular(8.0),
                             border: Border.all(
                               color: FlutterFlowTheme.of(context).alternate,
@@ -755,7 +923,8 @@ class _MenuMotoristaWidgetState extends State<MenuMotoristaWidget> {
                             ),
                           ),
                           child: Padding(
-                            padding: EdgeInsetsDirectional.fromSTEB(16.0, 16.0, 16.0, 16.0),
+                            padding: EdgeInsetsDirectional.fromSTEB(
+                                16.0, 16.0, 16.0, 16.0),
                             child: Row(
                               mainAxisSize: MainAxisSize.max,
                               children: [

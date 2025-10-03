@@ -197,8 +197,22 @@ class _EsperandoMotoristaWidgetState extends State<EsperandoMotoristaWidget> {
 
             final trip = snapshot.data!.first;
 
-            if (trip.status == 'waiting_passenger' && !_soundPlayed) {
-              WidgetsBinding.instance.addPostFrameCallback((_) async {
+            // INÍCIO DA MODIFICAÇÃO: Redirecionar se a viagem for concluída
+            if (trip.status == 'completed') {
+              WidgetsBinding.instance.addPostFrameCallback((_) {
+                context.pushReplacementNamed(
+                  'avaliacaoViagem',
+                  queryParameters: {
+                    'tripId': trip.id,
+                    'userType': 'passageiro',
+                  },
+                );
+              });
+              return const Center(child: CircularProgressIndicator());
+            }
+            // FIM DA MODIFICAÇÃO
+
+            if (trip.status == 'waiting_passenger' && !_soundPlayed) {              WidgetsBinding.instance.addPostFrameCallback((_) async {
                 await _audioPlayer.setAsset('assets/audios/ride_arrived.mp3');
                 _audioPlayer.play();
                 if (mounted) {
