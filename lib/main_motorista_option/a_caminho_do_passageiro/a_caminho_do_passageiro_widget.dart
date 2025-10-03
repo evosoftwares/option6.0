@@ -276,7 +276,115 @@ class _ACaminhoDoPassageiroWidgetState
     }
   }
 
-  Future<void> _handleCancellation(TripsRow trip) async {
+  /// Nova função para solicitar o motivo do cancelamento e verificar o no-show.
+  Future<void> _promptCancellationReason(TripsRow trip) async {
+    //  Lógica de "No-Show"
+    if (trip.status == 'waiting_passenger') {
+      if (trip.driverArrivedAt == null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content:
+                  Text('Erro: Não foi possível verificar o tempo de espera.'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+        return;
+      }
+
+      final waitingDuration = DateTime.now().difference(trip.driverArrivedAt!);
+
+      final settingsList = await PlatformSettingsTable().queryRows(
+        queryFn: (q) => q.eq('category', trip.vehicleCategory!).limit(1),
+      );
+
+      if (settingsList.isNotEmpty) {
+        final platformSettings = settingsList.first;
+        final noShowWaitMinutes = platformSettings.noShowWaitMinutes ?? 3;
+
+        if (waitingDuration.inMinutes < noShowWaitMinutes) {
+          if (mounted) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              SnackBar(
+                content: Text(
+                    'Aguarde o tempo mínimo de $noShowWaitMinutes minutos no local antes de cancelar.'),
+                backgroundColor: Colors.orange,
+              ),
+            );
+          }
+          return;
+        }
+      }
+    }
+
+    //  Coletar o Motivo do Cancelamento pelo Motorista
+    String? selectedReason;
+    final reasons = [
+      'Passageiro não apareceu',
+      'Endereço incorreto',
+      'Problema no veículo',
+      'Outro',
+    ];
+
+    final reason = await showDialog<String>(
+      context: context,
+      builder: (BuildContext context) {
+        return StatefulBuilder(
+          builder: (context, setState) {
+            return AlertDialog(
+              title: const Text('Motivo do Cancelamento'),
+              content: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: reasons.map((reason) {
+                  return RadioListTile<String>(
+                    title: Text(reason),
+                    value: reason,
+                    groupValue: selectedReason,
+                    onChanged: (value) {
+                      setState(() {
+                        selectedReason = value;
+                      });
+                    },
+                  );
+                }).toList(),
+              ),
+              actions: <Widget>[
+                TextButton(
+                  child: const Text('Voltar'),
+                  onPressed: () => Navigator.of(context).pop(),
+                ),
+                TextButton(
+                  child: const Text('Confirmar'),
+                  onPressed: () {
+                    if (selectedReason != null) {
+                      Navigator.of(context).pop(selectedReason);
+                    } else {
+                      if (mounted) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Por favor, selecione um motivo.'),
+                            backgroundColor: Colors.orange,
+                          ),
+                        );
+                      }
+                    }
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      },
+    );
+
+    if (reason != null && reason.isNotEmpty) {
+      await _handleCancellation(trip, reason);
+    }
+  }
+
+  /// Função de cancelamento modificada para aceitar um motivo.
+  Future<void> _handleCancellation(TripsRow trip, String reason) async {
     try {
       final settingsList = await PlatformSettingsTable().queryRows(
         queryFn: (q) => q.eq('category', trip.vehicleCategory!).limit(1),
@@ -286,7 +394,6 @@ class _ACaminhoDoPassageiroWidgetState
       }
       final platformSettings = settingsList.first;
 
-      // snake_case para camelCase
       final estimatedFare = trip.estimatedDistanceKm ?? 0.0;
       final percentageValue =
           estimatedFare * (platformSettings.cancellationFeePercent ?? 0.0);
@@ -321,6 +428,7 @@ class _ACaminhoDoPassageiroWidgetState
           'cancellation_fee': cancellationFee,
           'cancelled_by': 'driver',
           'cancelled_at': DateTime.now().toIso8601String(),
+          'cancellation_reason': reason, // Motivo do cancelamento salvo aqui
         },
         matchingRows: (q) => q.eq('id', trip.id),
       );
@@ -492,7 +600,8 @@ class _ACaminhoDoPassageiroWidgetState
             SizedBox(height: 16),
             if (trip.status != 'in_progress')
               FFButtonWidget(
-                onPressed: () => _handleCancellation(trip),
+                onPressed: () => _promptCancellationReason(
+                    trip), // Modificado para chamar a nova função
                 text: 'Cancelar Viagem',
                 options: FFButtonOptions(
                     width: double.infinity,

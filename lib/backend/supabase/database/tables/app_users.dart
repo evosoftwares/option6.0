@@ -36,6 +36,10 @@ class AppUsersRow extends SupabaseDataRow {
   String? get status => getField<String>('status');
   set status(String? value) => setField<String>('status', value);
 
+  DateTime? get suspensionEndsAt => getField<DateTime>('suspension_ends_at');
+  set suspensionEndsAt(DateTime? value) =>
+      setField<DateTime>('suspension_ends_at', value);
+
   DateTime? get createdAt => getField<DateTime>('created_at');
   set createdAt(DateTime? value) => setField<DateTime>('created_at', value);
 
@@ -49,18 +53,22 @@ class AppUsersRow extends SupabaseDataRow {
   set deviceId(String? value) => setField<String>('device_id', value);
 
   String? get devicePlatform => getField<String>('device_platform');
-  set devicePlatform(String? value) => setField<String>('device_platform', value);
+  set devicePlatform(String? value) =>
+      setField<String>('device_platform', value);
 
   DateTime? get lastActiveAt => getField<DateTime>('last_active_at');
-  set lastActiveAt(DateTime? value) => setField<DateTime>('last_active_at', value);
+  set lastActiveAt(DateTime? value) =>
+      setField<DateTime>('last_active_at', value);
 
   bool? get profileComplete => getField<bool>('profile_complete');
   set profileComplete(bool? value) => setField<bool>('profile_complete', value);
 
   String? get onesignalPlayerId => getField<String>('onesignal_player_id');
-  set onesignalPlayerId(String? value) => setField<String>('onesignal_player_id', value);
+  set onesignalPlayerId(String? value) =>
+      setField<String>('onesignal_player_id', value);
 
-  String? get currentUserUidFirebase => getField<String>('currentUser_UID_Firebase');
-  set currentUserUidFirebase(String? value) => setField<String>('currentUser_UID_Firebase', value);
-
+  String? get currentUserUidFirebase =>
+      getField<String>('currentUser_UID_Firebase');
+  set currentUserUidFirebase(String? value) =>
+      setField<String>('currentUser_UID_Firebase', value);
 }

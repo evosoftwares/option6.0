@@ -98,24 +98,101 @@ class _PreferenciasPassageiroWidgetState
 
   Future<void> _savePreferencesAndContinue() async {
     if (_model.isSaving) return;
-
     setState(() => _model.isSaving = true);
 
     try {
       final firebaseUid = currentUserUid;
-      final estimatedFare = widget.preco;
-
       if (firebaseUid.isEmpty) {
         throw Exception('Usuário não autenticado.');
-      }
-      if (estimatedFare == null || estimatedFare <= 0) {
-        throw Exception('Preço estimado da viagem é inválido.');
       }
 
       final appUserId =
           await UserIdConverter.getAppUserIdFromFirebaseUid(firebaseUid);
       if (appUserId == null) {
         throw Exception('Não foi possível encontrar o perfil do usuário.');
+      }
+
+      // --- INÍCIO DA LÓGICA DE PUNIÇÃO E VALIDAÇÃO
+
+      // Buscar os registros do usuário em 'passengers' e 'app_users'
+      final appUserList = await AppUsersTable().queryRows(
+        queryFn: (q) => q.eq('id', appUserId).limit(1),
+      );
+      final passengerList = await PassengersTable().queryRows(
+        queryFn: (q) => q.eq('user_id', appUserId).limit(1),
+      );
+
+      if (appUserList.isEmpty || passengerList.isEmpty) {
+        throw Exception('Dados do usuário ou passageiro não encontrados.');
+      }
+      final appUser = appUserList.first;
+      final passenger = passengerList.first;
+
+      //  Lógica de Reativação
+      final dynamic suspensionEndsAtRaw = appUser.data['suspension_ends_at'];
+      if (appUser.status == 'suspended' && suspensionEndsAtRaw is String) {
+        final suspensionEnds = DateTime.tryParse(suspensionEndsAtRaw);
+
+        if (suspensionEnds != null) {
+          if (DateTime.now().isAfter(suspensionEnds)) {
+            // Se a suspensão já passou, reativa a conta
+            await AppUsersTable().update(
+              data: {'status': 'active', 'suspension_ends_at': null},
+              matchingRows: (q) => q.eq('id', appUserId),
+            );
+          } else {
+            // Se ainda está suspenso, informa o usuário e interrompe
+            if (mounted) {
+              ScaffoldMessenger.of(context).showSnackBar(
+                SnackBar(
+                  content: Text(
+                      'Sua conta está suspensa. Você poderá solicitar viagens novamente em ${DateFormat('dd/MM/yyyy HH:mm').format(suspensionEnds)}.'),
+                  backgroundColor: Colors.orange,
+                ),
+              );
+            }
+            setState(() => _model.isSaving = false); // Reseta o estado do botão
+            return; // Interrompe a função
+          }
+        }
+      }
+
+      // Lógica de Punição
+      if ((passenger.consecutiveCancellations ?? 0) >= 3) {
+        final newSuspensionEndsAt = DateTime.now().add(const Duration(days: 1));
+
+        // Aplica a punição de 24 horas
+        await AppUsersTable().update(
+          data: {
+            'status': 'suspended',
+            'suspension_ends_at': newSuspensionEndsAt.toIso8601String(),
+          },
+          matchingRows: (q) => q.eq('id', appUserId),
+        );
+
+        // Zera o contador de cancelamentos
+        await PassengersTable().update(
+          data: {'consecutive_cancellations': 0},
+          matchingRows: (q) => q.eq('user_id', appUserId),
+        );
+
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                  'Você atingiu o limite de cancelamentos e sua conta foi suspensa por 24 horas.'),
+              backgroundColor: Colors.red,
+            ),
+          );
+        }
+        setState(() => _model.isSaving = false); // Reseta o estado do botão
+        return; // Interrompe a função
+      }
+
+      // Se passou pelas validações, o código continua para a verificação de saldo
+      final estimatedFare = widget.preco;
+      if (estimatedFare == null || estimatedFare <= 0) {
+        throw Exception('Preço estimado da viagem é inválido.');
       }
 
       final wallets = await PassengerWalletsTable().queryRows(
@@ -181,7 +258,7 @@ class _PreferenciasPassageiroWidgetState
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Erro ao salvar preferências: ${e.toString()}'),
+            content: Text('Erro ao processar sua solicitação: ${e.toString()}'),
             backgroundColor: Colors.red,
             duration: const Duration(seconds: 3),
           ),
